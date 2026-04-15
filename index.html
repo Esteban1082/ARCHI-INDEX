@@ -1,0 +1,683 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark" data-font="md">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ARCHI//INDEX — Ressources Architecture</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<style>
+:root {
+  --bg:#080809;--bg2:#0e0e10;--bg3:#141417;
+  --border:rgba(200,180,140,0.12);--border-h:rgba(200,180,140,0.35);
+  --gold:#c9a96e;--gold-dim:rgba(201,169,110,0.6);--gold-faint:rgba(201,169,110,0.08);
+  --text:#e8e0d0;--text-dim:rgba(232,224,208,0.5);--text-muted:rgba(232,224,208,0.28);
+  --mono:'IBM Plex Mono',monospace;--serif:'Cormorant Garamond',Georgia,serif;
+}
+[data-theme="light"] {
+  --bg:#f4f1eb;--bg2:#ede9e0;--bg3:#e5e0d4;
+  --border:rgba(100,80,40,0.14);--border-h:rgba(100,80,40,0.38);
+  --gold:#8a6530;--gold-dim:rgba(138,101,48,0.7);--gold-faint:rgba(138,101,48,0.09);
+  --text:#1a1510;--text-dim:rgba(26,21,16,0.55);--text-muted:rgba(26,21,16,0.35);
+}
+[data-font="sm"] { font-size:13px; }
+[data-font="md"] { font-size:15px; }
+[data-font="lg"] { font-size:17px; }
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden;transition:background .25s,color .25s;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
+  background-image:linear-gradient(rgba(201,169,110,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,110,.035) 1px,transparent 1px),linear-gradient(rgba(201,169,110,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,110,.015) 1px,transparent 1px);
+  background-size:80px 80px,80px 80px,20px 20px,20px 20px;}
+[data-theme="light"] body::before{opacity:.4;}
+body::after{content:'';position:fixed;top:0;left:0;width:160px;height:160px;pointer-events:none;z-index:1;
+  background:linear-gradient(var(--gold),var(--gold)) top left/40px 1px no-repeat,linear-gradient(var(--gold),var(--gold)) top left/1px 40px no-repeat;opacity:.2;}
+.corner-br{position:fixed;bottom:0;right:0;width:160px;height:160px;pointer-events:none;z-index:1;
+  background:linear-gradient(var(--gold),var(--gold)) bottom right/40px 1px no-repeat,linear-gradient(var(--gold),var(--gold)) bottom right/1px 40px no-repeat;opacity:.2;}
+.wrapper{position:relative;z-index:2;max-width:1300px;margin:0 auto;padding:48px 32px 100px;}
+
+/* HEADER */
+header{margin-bottom:40px;display:flex;flex-direction:column;gap:14px;}
+.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
+.logo-label{font-size:.6em;font-weight:500;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
+h1{font-family:var(--serif);font-size:clamp(38px,5.5vw,72px);font-weight:300;line-height:.9;letter-spacing:-.02em;}
+h1 em{font-style:italic;color:var(--gold);}
+.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;padding-top:6px;}
+.stat{font-size:.6em;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;}
+.stat span{color:var(--gold-dim);font-weight:500;}
+.header-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
+.icon-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.12em;padding:5px 9px;cursor:pointer;transition:all .18s;text-transform:uppercase;}
+.icon-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--gold-faint);}
+.icon-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
+.font-group{display:flex;gap:3px;}
+.divider{width:100%;height:1px;background:linear-gradient(90deg,var(--gold) 0%,rgba(201,169,110,.1) 60%,transparent 100%);opacity:.3;margin:4px 0;}
+.header-desc{font-size:.7em;color:var(--text-dim);letter-spacing:.04em;line-height:1.8;max-width:640px;}
+
+/* TABS */
+.tabs{display:flex;gap:0;margin-bottom:40px;border-bottom:1px solid var(--border);}
+.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-family:var(--mono);font-size:.62em;letter-spacing:.22em;text-transform:uppercase;padding:11px 20px;cursor:pointer;transition:all .2s;margin-bottom:-1px;}
+.tab-btn:hover{color:var(--text-dim);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* NOUVEAUTES */
+.section-label{font-size:.58em;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
+.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
+.new-strip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:36px;}
+.new-chip{background:var(--gold-faint);border:1px solid rgba(201,169,110,.2);padding:7px 13px;font-size:.62em;letter-spacing:.08em;color:var(--gold-dim);cursor:pointer;transition:all .18s;text-decoration:none;display:flex;align-items:center;gap:7px;}
+.new-chip:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,169,110,.12);}
+.chip-badge{font-size:.85em;opacity:.7;}
+
+/* CONTROLS */
+.controls{display:flex;flex-direction:column;gap:14px;margin-bottom:32px;}
+.controls-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
+.search-wrap{position:relative;flex:1;min-width:200px;}
+.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--gold-dim);font-size:.75em;pointer-events:none;}
+.search-input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.72em;padding:12px 14px 12px 40px;outline:none;transition:border-color .2s;letter-spacing:.04em;}
+.search-input::placeholder{color:var(--text-muted);}
+.search-input:focus{border-color:var(--border-h);}
+.filters{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
+.filter-label{font-size:.56em;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase;margin-right:2px;}
+.filter-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.58em;letter-spacing:.1em;padding:5px 11px;cursor:pointer;transition:all .18s;text-transform:uppercase;display:flex;align-items:center;gap:4px;}
+.filter-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--gold-faint);}
+.filter-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
+.filter-btn .dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55;}
+.filter-btn.belgique{border-color:rgba(232,200,74,.2);color:rgba(232,200,74,.5);}
+.filter-btn.belgique:hover{border-color:rgba(232,200,74,.5);color:rgba(232,200,74,.85);background:rgba(232,200,74,.05);}
+.filter-btn.belgique.active{border-color:#e8c84a;color:#e8c84a;background:rgba(232,200,74,.06);}
+.sort-select{background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.58em;letter-spacing:.08em;padding:5px 10px;outline:none;cursor:pointer;}
+.view-toggle{display:flex;gap:3px;}
+.results-meta{font-size:.58em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;margin-bottom:16px;}
+.results-meta span{color:var(--gold-dim);}
+
+/* GRID/LIST */
+.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px;}
+.resource-grid.list-mode{grid-template-columns:1fr;}
+
+/* CARD */
+.card{background:var(--bg2);border:1px solid var(--border);padding:20px;transition:border-color .2s,background .2s;display:flex;flex-direction:column;gap:11px;animation:fadeIn .3s ease both;}
+.card:hover{border-color:var(--border-h);background:var(--bg3);}
+.card.belgique-card{border-left:2px solid rgba(232,200,74,.2);}
+.card.belgique-card:hover{border-left-color:rgba(232,200,74,.45);}
+@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
+.list-mode .card{flex-direction:row;align-items:flex-start;gap:16px;padding:14px 20px;}
+.list-mode .card-body{flex:1;display:flex;flex-direction:column;gap:7px;}
+.list-mode .card-tip{display:none;}
+.list-mode .card-desc{font-size:.65em;}
+.list-mode .card-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
+.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.card-cat{font-size:.55em;letter-spacing:.25em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:3px;}
+.card-name{font-family:var(--serif);font-size:1.1em;font-weight:400;line-height:1.15;}
+.badge{font-size:.5em;letter-spacing:.15em;text-transform:uppercase;padding:2px 6px;border:1px solid;white-space:nowrap;}
+.badge-free{border-color:rgba(100,180,100,.4);color:rgba(120,200,120,.8);}
+.badge-partial{border-color:rgba(200,160,80,.4);color:rgba(200,160,80,.8);}
+.badge-paywall{border-color:rgba(200,80,80,.3);color:rgba(200,100,100,.7);}
+.badge-bypass{border-color:rgba(100,150,220,.4);color:rgba(100,170,240,.8);}
+.card-desc{font-size:.67em;line-height:1.75;color:var(--text-dim);letter-spacing:.02em;}
+.card-tip{background:rgba(201,169,110,.04);border-left:2px solid rgba(201,169,110,.25);padding:8px 12px;font-size:.6em;line-height:1.7;color:rgba(201,169,110,.6);}
+.card-tip strong{color:var(--gold-dim);font-weight:500;}
+.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:3px;gap:6px;}
+.card-url{font-size:.55em;color:var(--text-muted);letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
+.card-actions{display:flex;gap:4px;flex-shrink:0;align-items:center;}
+.card-link{display:inline-flex;align-items:center;font-size:.56em;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,169,110,.25);padding:4px 10px;transition:all .18s;}
+.card-link:hover{background:var(--gold);color:var(--bg);}
+.card-link::after{content:' →';}
+.btn-ico{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:4px 7px;font-size:.75em;cursor:pointer;transition:all .18s;line-height:1;}
+.btn-ico:hover{border-color:var(--border-h);color:var(--text);}
+.btn-ico.fav-on{border-color:var(--gold);color:var(--gold);}
+.btn-ico.ok{border-color:rgba(100,200,100,.5);color:rgba(120,210,120,.8);}
+.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);}
+.empty-t{font-family:var(--serif);font-size:2em;font-weight:300;font-style:italic;margin-bottom:8px;}
+.empty-s{font-size:.65em;letter-spacing:.1em;}
+
+/* RECHERCHE */
+.rtab-head{margin-bottom:24px;}
+.rtab-head h2{font-family:var(--serif);font-size:clamp(22px,3vw,38px);font-weight:300;margin-bottom:5px;}
+.rtab-head p{font-size:.67em;color:var(--text-dim);line-height:1.75;letter-spacing:.03em;}
+.search-bar-big{display:flex;gap:7px;margin-bottom:14px;}
+.search-bar-big input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--serif);font-size:1.15em;font-style:italic;padding:14px 18px;outline:none;transition:border-color .2s;letter-spacing:.02em;}
+.search-bar-big input::placeholder{color:var(--text-muted);}
+.search-bar-big input:focus{border-color:var(--border-h);}
+.btn-search{background:var(--gold);color:var(--bg);border:none;font-family:var(--mono);font-size:.6em;letter-spacing:.18em;text-transform:uppercase;padding:0 24px;cursor:pointer;transition:opacity .18s;white-space:nowrap;}
+.btn-search:hover{opacity:.85;}
+.btn-search:disabled{opacity:.4;cursor:default;}
+.type-filters{display:flex;gap:5px;margin-bottom:24px;}
+.type-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.58em;letter-spacing:.12em;padding:5px 13px;cursor:pointer;transition:all .18s;text-transform:uppercase;}
+.type-btn:hover{border-color:var(--border-h);color:var(--text);}
+.type-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
+.hist-block{margin-bottom:22px;}
+.hist-label{font-size:.56em;letter-spacing:.22em;color:var(--text-muted);text-transform:uppercase;margin-bottom:7px;}
+.hist-chips{display:flex;gap:5px;flex-wrap:wrap;}
+.hist-chip{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--mono);font-size:.58em;letter-spacing:.07em;padding:3px 9px;cursor:pointer;transition:all .18s;}
+.hist-chip:hover{border-color:var(--border-h);color:var(--text);}
+.res-sec{margin-bottom:32px;}
+.res-sec-title{font-size:.6em;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
+.res-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
+.api-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:7px;}
+.res-card{background:var(--bg2);border:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:9px;transition:border-color .2s;}
+.res-card:hover{border-color:var(--border-h);}
+.res-card-top{display:flex;gap:11px;align-items:flex-start;}
+.res-cover{width:44px;height:60px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;background:var(--bg3);}
+.res-title{font-family:var(--serif);font-size:.95em;font-weight:400;line-height:1.2;margin-bottom:3px;}
+.res-author{font-size:.6em;color:var(--text-dim);letter-spacing:.04em;margin-bottom:3px;}
+.res-year{font-size:.55em;color:var(--text-muted);letter-spacing:.08em;}
+.res-source{font-size:.52em;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-top:3px;}
+.res-link{font-size:.58em;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,169,110,.2);padding:4px 9px;transition:all .18s;align-self:flex-start;}
+.res-link:hover{background:var(--gold);color:var(--bg);}
+.res-link::after{content:' →';}
+.direct-links{display:flex;flex-wrap:wrap;gap:7px;}
+.direct-link{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border);padding:10px 14px;text-decoration:none;color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.08em;transition:all .2s;}
+.direct-link:hover{border-color:var(--border-h);color:var(--text);background:var(--bg3);}
+.direct-link::after{content:'↗';font-size:.8em;color:var(--gold-dim);}
+.loading{display:flex;align-items:center;gap:11px;padding:22px 0;color:var(--text-muted);font-size:.62em;letter-spacing:.08em;}
+.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.no-res{padding:36px 0;text-align:center;color:var(--text-muted);font-size:.67em;letter-spacing:.08em;}
+
+/* CARTE */
+.carte-layout{display:grid;grid-template-columns:270px 1fr;gap:0;border:1px solid var(--border);}
+@media(max-width:700px){.carte-layout{grid-template-columns:1fr;}}
+.carte-sidebar{border-right:1px solid var(--border);padding:18px 14px;background:var(--bg2);max-height:580px;overflow-y:auto;}
+.carte-sidebar h3{font-family:var(--serif);font-size:1.05em;font-weight:300;margin-bottom:10px;}
+.carte-sidebar p{font-size:.6em;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
+.carte-type-filters{display:flex;flex-direction:column;gap:3px;margin-bottom:14px;}
+.cfilter{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.56em;letter-spacing:.1em;padding:5px 9px;cursor:pointer;transition:all .18s;text-transform:uppercase;text-align:left;}
+.cfilter:hover{border-color:var(--border-h);color:var(--text);}
+.cfilter.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
+.inst-list{display:flex;flex-direction:column;gap:3px;}
+.inst-item{padding:9px 11px;border:1px solid var(--border);cursor:pointer;transition:all .18s;font-size:.6em;letter-spacing:.04em;}
+.inst-item:hover{border-color:var(--border-h);background:var(--bg3);}
+.inst-item.active{border-color:var(--gold);background:var(--gold-faint);}
+.inst-name{font-family:var(--serif);font-size:1.1em;margin-bottom:2px;}
+.inst-type{font-size:.85em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;}
+#map{height:580px;background:var(--bg3);}
+.leaflet-popup-content-wrapper{background:var(--bg2);border:1px solid var(--border);border-radius:0;box-shadow:0 4px 20px rgba(0,0,0,.4);color:var(--text);font-family:var(--mono);}
+.leaflet-popup-tip{background:var(--bg2);}
+.leaflet-popup-content{margin:13px 15px;font-size:.63em;line-height:1.7;}
+.popup-name{font-family:var(--serif);font-size:1.4em;font-weight:400;margin-bottom:5px;}
+.popup-type{font-size:.85em;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:7px;}
+.popup-info{color:var(--text-dim);font-size:.95em;margin-bottom:3px;}
+.popup-link{color:var(--gold);text-decoration:none;font-size:.9em;letter-spacing:.08em;}
+.popup-link:hover{text-decoration:underline;}
+.leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important;}
+
+/* FOOTER */
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+.footer-text{font-size:.56em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;}
+.footer-note{font-family:var(--serif);font-size:.72em;color:var(--text-muted);font-style:italic;}
+@media(max-width:580px){.wrapper{padding:28px 14px 70px;}.tabs{overflow-x:auto;}.tab-btn{padding:9px 12px;}}
+</style>
+</head>
+<body>
+<div class="corner-br"></div>
+<div class="wrapper">
+
+<header>
+  <div class="header-top">
+    <div>
+      <div class="logo-label">Index de ressources · Architecture</div>
+      <h1>ARCHI<em>//</em><br>INDEX</h1>
+    </div>
+    <div class="header-right">
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
+        <div class="stat">Ressources <span id="totalCount">—</span></div>
+        <div class="stat">Catégories <span>06</span></div>
+        <div class="stat">Accès <span>Maj. gratuit</span></div>
+      </div>
+      <div class="header-controls">
+        <div class="font-group">
+          <button class="icon-btn" id="fSm" onclick="setFont('sm')">A−</button>
+          <button class="icon-btn active" id="fMd" onclick="setFont('md')">A</button>
+          <button class="icon-btn" id="fLg" onclick="setFont('lg')">A+</button>
+        </div>
+        <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">☾ Dark</button>
+      </div>
+    </div>
+  </div>
+  <div class="divider"></div>
+  <p class="header-desc">Répertoire de sources pour l'architecture — livres, archives, revues, ressources visuelles, outils et institutions belges. Recherche intégrée sur Open Library, Gutenberg & Archive.org avec liens directs vers toutes les plateformes.</p>
+</header>
+
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('index')">// Index</button>
+  <button class="tab-btn" onclick="switchTab('recherche')">// Recherche</button>
+  <button class="tab-btn" onclick="switchTab('carte')">// Carte Belgique</button>
+  <button class="tab-btn" onclick="switchTab('favoris')">// Favoris <span id="fav-count"></span></button>
+</div>
+
+<!-- TAB INDEX -->
+<div class="tab-panel active" id="tab-index">
+  <div class="section-label">Ressources mises en avant</div>
+  <div class="new-strip" id="nouvStrip"></div>
+  <div class="controls">
+    <div class="controls-row">
+      <div class="search-wrap">
+        <span class="search-icon">⌕</span>
+        <input type="text" class="search-input" id="idxSearch" placeholder="Filtrer par nom, description, tip…" autocomplete="off">
+      </div>
+      <select class="sort-select" id="sortSel" onchange="renderIdx()">
+        <option value="def">Tri : défaut</option>
+        <option value="name">Tri : nom A→Z</option>
+        <option value="access">Tri : accès</option>
+        <option value="cat">Tri : catégorie</option>
+      </select>
+      <div class="view-toggle">
+        <button class="icon-btn active" id="btnGrid" onclick="setView('grid')">⊞ Grille</button>
+        <button class="icon-btn" id="btnList" onclick="setView('list')">☰ Liste</button>
+      </div>
+    </div>
+    <div class="filters" id="catFilters"></div>
+  </div>
+  <div class="results-meta">Affichage <span id="visCnt">—</span> ressource(s)</div>
+  <div class="resource-grid" id="resGrid"></div>
+</div>
+
+<!-- TAB RECHERCHE -->
+<div class="tab-panel" id="tab-recherche">
+  <div class="rtab-head">
+    <h2>Rechercher un <em>titre</em> ou un <em>auteur</em></h2>
+    <p>Résultats en direct depuis Open Library, Gutenberg et Archive.org — plus des liens de recherche rapide vers Z-Library, LibGen, Sci-Hub, Google Scholar et les archives belges.</p>
+  </div>
+  <div class="search-bar-big">
+    <input type="text" id="bookSearch" placeholder="Ex: Viollet-le-Duc, Rem Koolhaas, Vers une architecture…" autocomplete="off">
+    <button class="btn-search" id="searchBtn" onclick="doSearch()">Chercher</button>
+  </div>
+  <div class="type-filters">
+    <button class="type-btn active" onclick="setType(this,'all')">Tout</button>
+    <button class="type-btn" onclick="setType(this,'books')">Livres</button>
+    <button class="type-btn" onclick="setType(this,'texts')">Articles & textes</button>
+    <button class="type-btn" onclick="setType(this,'archive')">Archives</button>
+  </div>
+  <div class="hist-block" id="histBlock" style="display:none">
+    <div class="hist-label">Recherches récentes —</div>
+    <div class="hist-chips" id="histChips"></div>
+  </div>
+  <div id="searchResults"></div>
+</div>
+
+<!-- TAB CARTE -->
+<div class="tab-panel" id="tab-carte">
+  <div class="carte-layout">
+    <div class="carte-sidebar">
+      <h3>Institutions <em>belges</em></h3>
+      <p>Archives, bibliothèques et centres de recherche accessibles physiquement en Belgique.</p>
+      <div class="carte-type-filters" id="carteFilters"></div>
+      <div class="inst-list" id="instList"></div>
+    </div>
+    <div id="map"></div>
+  </div>
+</div>
+
+<!-- TAB FAVORIS -->
+<div class="tab-panel" id="tab-favoris">
+  <div class="section-label" style="margin-bottom:8px;">Mes favoris</div>
+  <p style="font-size:.67em;color:var(--text-dim);letter-spacing:.03em;line-height:1.7;margin-bottom:24px;">Vos ressources marquées d'une étoile — sauvegardées localement dans ce navigateur.</p>
+  <div class="resource-grid" id="favGrid"></div>
+</div>
+
+<footer>
+  <div class="footer-text">ARCHI//INDEX · Usage personnel & académique</div>
+  <div class="footer-note">Pour les étudiants en architecture, par un ami bienveillant.</div>
+</footer>
+</div>
+
+<script>
+/* ── DATA ── */
+const resources=[
+  {cat:"livres",name:"Project Gutenberg",url:"https://gutenberg.org",access:"free",desc:"Plus de 70 000 livres libres de droits en texte intégral. Idéal pour les textes théoriques anciens : Vitruve, Ruskin, Viollet-le-Duc, et les grands traités d'architecture pré-XXe siècle.",tip:"Utiliser la recherche avancée avec les termes « architecture », « building », « construction » — beaucoup de titres sont en anglais même pour des auteurs français."},
+  {cat:"livres",name:"Z-Library",url:"https://z-library.sk",access:"bypass",desc:"La plus grande bibliothèque numérique du monde — des millions de livres et articles en PDF ou EPUB. Couvre pratiquement tout le corpus académique en architecture, design et urbanisme.",tip:"Créer un compte gratuit pour lever la limite quotidienne. Rechercher directement par ISBN ou titre exact. Si le site est inaccessible, essayer singlelogin.re comme miroir."},
+  {cat:"livres",name:"Internet Archive — Books",url:"https://archive.org/details/texts",access:"free",desc:"Bibliothèque numérique massive avec emprunts de livres scannés. Accès à des ouvrages épuisés impossibles à trouver ailleurs, notamment des atlas architecturaux et monographies.",tip:"La fonctionnalité « Borrow » permet d'emprunter les livres sous droits pour 1h ou 14 jours. Créer un compte gratuit pour en profiter."},
+  {cat:"livres",name:"Open Library",url:"https://openlibrary.org",access:"partial",desc:"Projet de l'Internet Archive visant à cataloguer chaque livre jamais publié. Interface plus ergonomique qu'Archive.org pour la recherche, avec emprunts numériques intégrés.",tip:"Certains livres sont disponibles en lecture complète, d'autres uniquement en aperçu. Chercher par sujet avec les tags « Architecture », « Urban planning », « Vernacular architecture »."},
+  {cat:"livres",name:"Gallica — BnF",url:"https://gallica.bnf.fr",access:"free",desc:"La bibliothèque numérique de la Bibliothèque nationale de France. Ressource exceptionnelle pour l'architecture française, les plans de villes historiques, gravures et traités anciens.",tip:"Utiliser les filtres « Type » → « Image » pour trouver les planches et relevés architecturaux. Les collections Viollet-le-Duc et Piranèse y sont remarquablement bien indexées."},
+  {cat:"livres",name:"HathiTrust Digital Library",url:"https://hathitrust.org",access:"partial",desc:"Consortium de bibliothèques universitaires américaines — plus de 17 millions de volumes scannés. Forte en publications académiques d'architecture du XXe siècle.",tip:"Les livres hors droits sont en accès complet. Pour les autres, la full-text search reste disponible — utile pour localiser des passages précis."},
+  {cat:"livres",name:"Library Genesis",url:"https://libgen.rs",access:"bypass",desc:"Base de données de livres académiques et scientifiques, complémentaire à Z-Library. Particulièrement fort sur les manuels techniques, structures, physique du bâtiment.",tip:"Si libgen.rs est lent, essayer libgen.is ou libgen.st comme miroirs. La recherche par auteur ou ISBN est la plus fiable pour les ouvrages techniques."},
+  {cat:"livres",name:"Europeana",url:"https://europeana.eu",access:"free",desc:"Agrégateur culturel européen fédérant les collections numérisées de milliers d'institutions. Excellente source pour l'architecture vernaculaire et le patrimoine bâti européen.",tip:"Filtrer par « Type » → « Image » et par pays pour explorer les collections architecturales régionales. Beaucoup de métadonnées en plusieurs langues."},
+  {cat:"archives",name:"archive.is / archive.ph",url:"https://archive.is",access:"free",desc:"Snapshots instantanés de pages web — utile pour accéder à des articles de revues derrière paywall ou des pages supprimées. Archive n'importe quelle URL en quelques secondes.",tip:"Saisir l'URL d'un article payant directement dans la barre de recherche — souvent la version archivée est accessible intégralement. Fonctionne sur beaucoup de sites d'architecture."},
+  {cat:"archives",name:"Getty Research Portal",url:"https://portal.getty.edu",access:"free",desc:"Portail de recherche unifié des collections numériques du Getty Institute. Archives photographiques, dessins d'architecture, maquettes, correspondances d'architectes.",tip:"Les collections « Architecture and Design » sont particulièrement riches. Tous les documents sont téléchargeables en haute résolution pour usage académique."},
+  {cat:"archives",name:"Library of Congress — Maps",url:"https://loc.gov/maps/collections",access:"free",desc:"Collections cartographiques et architecturales de la Bibliothèque du Congrès américain. Inclut les relevés HABS/HAER — des milliers de plans et photos de bâtiments historiques.",tip:"Les collections HABS (Historic American Buildings Survey) sont exceptionnelles : plans cotés, façades, coupes et photos de bâtiments souvent démolis."},
+  {cat:"archives",name:"Wikimedia Commons — Architecture",url:"https://commons.wikimedia.org/wiki/Category:Architecture",access:"free",desc:"Millions d'images, plans et médias libres de droits. Catégories très fines par style architectural, époque, pays et type de bâtiment.",tip:"Chercher « Floor plans », « Architectural drawings », « Building sections » pour trouver des documents techniques précis."},
+  {cat:"archives",name:"ETH Zürich — e-collection",url:"https://www.research-collection.ethz.ch",access:"free",desc:"Archives ouvertes de l'École Polytechnique Fédérale de Zurich. Thèses, mémoires, publications de recherche de l'une des meilleures écoles d'architecture au monde.",tip:"Chercher directement par thème ou par nom d'enseignant. La qualité des travaux graphiques est un excellent modèle de référence."},
+  {cat:"archives",name:"RIBA Architecture Library",url:"https://www.architecture.com/knowledge-and-resources/riba-library",access:"partial",desc:"Archives du Royal Institute of British Architects — l'une des plus importantes collections d'archives d'architecture au monde. Dessins originaux, photographies, collections privées.",tip:"L'accès complet est réservé aux membres RIBA, mais les catalogues sont consultables gratuitement. Utile pour identifier des sources à demander via le prêt inter-bibliothèques."},
+  {cat:"archives",name:"Avery Index",url:"https://avery.columbia.edu",access:"partial",desc:"Index de référence mondial des périodiques et livres d'architecture depuis 1934. Géré par Columbia University. Recense des milliers de revues internationales.",tip:"Accès gratuit via beaucoup d'universités. Une fois un article repéré, utiliser Unpaywall ou Sci-Hub pour accéder au PDF."},
+  {cat:"archives",name:"OpenStreetMap",url:"https://openstreetmap.org",access:"free",desc:"Carte mondiale collaborative et open source. Export de données vectorielles pour tout contexte urbain, analyse urbaine ou fond de plan — directement utilisable sous QGIS ou AutoCAD.",tip:"Utiliser l'outil « Export » ou passer par overpass-turbo.eu pour des requêtes sur mesure (bâtiments, voiries, espaces verts d'un périmètre précis)."},
+  {cat:"revues",name:"JSTOR",url:"https://jstor.org",access:"partial",desc:"Archive numérique de milliers de revues académiques. Contient les grandes revues d'architecture : Journal of the Society of Architectural Historians, Architectural History, etc.",tip:"Créer un compte gratuit MyJSTOR pour accéder à 100 articles gratuits par mois. Pour le reste, archive.is fonctionne souvent, ou utiliser Unpaywall."},
+  {cat:"revues",name:"Sci-Hub",url:"https://sci-hub.se",access:"bypass",desc:"Accès libre à des dizaines de millions d'articles scientifiques. Couvre une grande partie des revues d'architecture, urbanisme et sciences du bâtiment derrière paywall.",tip:"Saisir directement le DOI de l'article (format 10.xxxx/xxxxx) pour un accès instantané. Le DOI se trouve sur la page de l'éditeur ou sur Google Scholar."},
+  {cat:"revues",name:"Unpaywall",url:"https://unpaywall.org",access:"free",desc:"Extension navigateur qui détecte automatiquement les versions open access légales de n'importe quel article académique. Trouve souvent les preprints déposés par les auteurs.",tip:"Installer l'extension Chrome/Firefox — un cadenas vert = version gratuite disponible. Toujours essayer avant Sci-Hub."},
+  {cat:"revues",name:"Google Scholar",url:"https://scholar.google.com",access:"free",desc:"Moteur de recherche académique incontournable. Permet de trouver des articles, de suivre les citations, de configurer des alertes par mots-clés et d'identifier les auteurs de référence.",tip:"Cliquer sur « Toutes les N versions » sous un résultat — souvent une version PDF gratuite est listée parmi les miroirs. Combiner avec Unpaywall."},
+  {cat:"revues",name:"ResearchGate",url:"https://researchgate.net",access:"partial",desc:"Réseau social académique où les chercheurs déposent leurs publications. Beaucoup d'auteurs y postent leurs articles en PDF même si l'éditeur est sous paywall.",tip:"Si le PDF n'est pas disponible, utiliser le bouton « Request full-text » — les auteurs répondent généralement en 24-48h."},
+  {cat:"revues",name:"Academia.edu",url:"https://academia.edu",access:"partial",desc:"Plateforme de partage académique avec des milliers de travaux en architecture, théorie et histoire de l'architecture. Dépôts de thèses, chapitres de livres et articles de conférences.",tip:"Créer un compte gratuit pour accéder à la plupart des documents. L'abonnement payant n'est pas nécessaire pour la majorité des ressources."},
+  {cat:"revues",name:"DOAJ — Open Access Journals",url:"https://doaj.org",access:"free",desc:"Répertoire de toutes les revues en open access vérifiées et de qualité. Permet de trouver des revues entièrement gratuites et légales en architecture, urbanisme et patrimoine.",tip:"Chercher « architecture », « urban design », « heritage » dans le DOAJ pour identifier des revues entières accessibles sans restriction."},
+  {cat:"revues",name:"ArchDaily — Research",url:"https://archdaily.com/search/articles",access:"free",desc:"Au-delà des projets, ArchDaily publie des articles de fond, analyses et entretiens approfondis. Utile pour suivre les débats contemporains et les pratiques émergentes.",tip:"Utiliser la section « Articles » et filtrer par thème. Le moteur de recherche est puissant pour retrouver des analyses sur des typologies ou architectes précis."},
+  {cat:"revues",name:"Divisare — Archive",url:"https://divisare.com",access:"partial",desc:"Archive éditoriale de référence sur l'architecture contemporaine. Projets photographiés, plans, coupes et mémoires explicatifs de très haute qualité graphique.",tip:"Les premiers accès sont gratuits, certaines sections nécessitent un abonnement. Excellent pour étudier comment les agences présentent leurs projets."},
+  {cat:"visuels",name:"Artstor Digital Library",url:"https://library.artstor.org",access:"partial",desc:"Bibliothèque d'images d'art et d'architecture de très haute qualité — dessins originaux, photographies d'archives, maquettes. Souvent accessible via les abonnements universitaires.",tip:"Vérifier si votre université y est abonnée. Certaines collections publiques sont accessibles sans compte."},
+  {cat:"visuels",name:"Flickr Commons",url:"https://flickr.com/commons",access:"free",desc:"Collections photographiques de 150+ institutions culturelles mondiales. Photos d'architecture historique en haute résolution, souvent sans restriction d'usage.",tip:"Chercher directement par institution (ex: « Library of Congress ») pour accéder aux fonds patrimoniaux. Filtrer par date et licence d'utilisation."},
+  {cat:"visuels",name:"Getty Open Content",url:"https://search.getty.edu/gateway/search?q=&cat=type&rows=10&mediatype=images",access:"free",desc:"Des milliers d'images de haute résolution des collections Getty en open access total — peintures, dessins d'architecture, photographies historiques, librement téléchargeables.",tip:"Filtrer par « Works of Art » puis par département « Architecture ». Toutes les images open content sont téléchargeables en très haute résolution."},
+  {cat:"visuels",name:"Piranesi — Vedute di Roma",url:"https://archive.org/search?query=piranesi+vedute",access:"free",desc:"Collections numérisées des gravures de Piranèse — Vedute di Roma, Carceri, Antichità Romane — en très haute résolution. Référence incontournable en dessin architectural.",tip:"Chercher « Piranesi » sur Archive.org ou Gallica pour trouver plusieurs éditions scannées en haute qualité. Les fichiers TIFF originaux sont souvent disponibles."},
+  {cat:"visuels",name:"MoMA Online Collection",url:"https://moma.org/collection",access:"free",desc:"Collection en ligne du Museum of Modern Art incluant maquettes, dessins et projets d'architecture du XXe siècle. Fortement représenté en architecture moderne et contemporaine.",tip:"Filtrer par département « Architecture & Design ». Beaucoup d'images sont téléchargeables pour usage éducatif."},
+  {cat:"visuels",name:"V&A Museum — Architecture",url:"https://collections.vam.ac.uk/search/?q=architecture",access:"free",desc:"Collections numériques du Victoria & Albert Museum — aquarelles d'architecture, relevés, dessins de détails et photographies historiques. Très fort sur l'architecture victorienne.",tip:"Les collections sont entièrement téléchargeables pour usage non commercial. Interface de recherche par matériau, technique et date très précise."},
+  {cat:"visuels",name:"ArchEyes",url:"https://archeyes.com",access:"free",desc:"Photographies d'architecture contemporaine de haute qualité éditoriale — projets récents, bâtiments iconiques, intérieurs. Focus sur la composition et la qualité de mise en lumière.",tip:"Utile pour constituer des références visuelles sur une typologie ou un style contemporain. Les articles incluent les données techniques des projets."},
+  {cat:"visuels",name:"Unsplash — Architecture",url:"https://unsplash.com/s/photos/architecture",access:"free",desc:"Photos libres de droits en haute résolution. Utile pour les planches ambiance, références matière et photographies atmosphériques pour les rendus conceptuels.",tip:"Utiliser des recherches précises : « concrete texture », « brutalist building », « wood facade », « courtyard architecture » — bien plus utile que la recherche générique."},
+  {cat:"outils",name:"Autodesk Education",url:"https://autodesk.com/education/edu-software",access:"free",desc:"Accès gratuit à toute la suite Autodesk pour les étudiants — AutoCAD, Revit, 3ds Max, Maya, Fusion 360. Licences étudiantes valables 1 an, renouvelables.",tip:"S'inscrire avec l'adresse mail universitaire. Les licences sont complètes et identiques à la version professionnelle. Télécharger Revit et AutoCAD en priorité."},
+  {cat:"outils",name:"SketchUp Free",url:"https://app.sketchup.com",access:"free",desc:"Version web gratuite de SketchUp — modélisation 3D intuitive, parfaite pour les études de volumes et maquettes numériques rapides. Pas de téléchargement requis.",tip:"Coupler avec le 3D Warehouse pour importer des éléments (meubles, structures, végétation). SketchUp for Web est suffisant pour la plupart des exercices de master."},
+  {cat:"outils",name:"Blender",url:"https://blender.org",access:"free",desc:"Logiciel 3D open source de référence — modélisation, rendu photoréaliste (Cycles), animation et export. Courbe d'apprentissage plus raide que SketchUp mais sans limite de fonctionnalités.",tip:"Utiliser les add-ons Archipack ou BlenderBIM pour le travail architectural. La chaîne YouTube Blender Guru est un excellent point de départ."},
+  {cat:"outils",name:"QGIS",url:"https://qgis.org",access:"free",desc:"Logiciel SIG open source — analyse urbaine, cartographie, extraction de données cadastrales et PLU. Alternative libre à ArcGIS.",tip:"Coupler avec les données OpenStreetMap et les flux WMS des IGN/géoportails nationaux. Le plugin QuickOSM permet d'importer directement des données OSM."},
+  {cat:"outils",name:"Rhino 3D — Évaluation",url:"https://rhino3d.com/download",access:"partial",desc:"La référence en modélisation NURBS pour l'architecture paramétrique et les formes complexes. Version d'évaluation fonctionnelle 90 jours, tarif étudiant très réduit ensuite.",tip:"Beaucoup d'écoles d'architecture ont des licences réseau accessibles sur leurs postes. Vérifier avec le service informatique avant d'acheter. Grasshopper (inclus) est incontournable."},
+  {cat:"outils",name:"FreeCAD",url:"https://freecad.org",access:"free",desc:"Logiciel CAO 3D open source — modélisation paramétrique, plans techniques, nomenclatures. Alternative gratuite à AutoCAD pour les projets de détail et les plans d'exécution.",tip:"Le module Arch/BIM de FreeCAD est en constante amélioration. Bon complément pour exporter vers des formats IFC compatibles avec d'autres logiciels BIM."},
+  {cat:"outils",name:"Canva",url:"https://canva.com",access:"partial",desc:"Outil en ligne de mise en page graphique — planches ambiance, book de portfolio, présentations clients. Interface intuitive, templates adaptables pour les rendus d'agence.",tip:"Utiliser le compte Education gratuit si disponible. Pour les books de portfolio, exporter en PDF print (300dpi) pour la remise."},
+  {cat:"outils",name:"Adobe CC — Tarif Étudiant",url:"https://adobe.com/fr/creativecloud/buy/students.html",access:"partial",desc:"Suite complète Photoshop, InDesign, Illustrator, Lightroom au tarif étudiant (~20€/mois). InDesign pour les books de rendu, Photoshop pour les rendus et photomontages.",tip:"Certaines écoles incluent Adobe CC dans leurs frais de scolarité — vérifier d'abord. Sinon, le tarif étudiant la 1ère année est souvent très réduit (parfois 60% de réduction)."},
+  {cat:"belgique",name:"Kanal Architecture (ex-CIVA)",url:"https://catalogue.kanal.brussels",access:"partial",desc:"LA référence pour l'architecture belge — 500+ fonds d'archives, 65.000 ouvrages et 2.300 titres de revues. Regroupe les AAM, Sint-Lukasarchief, la Bibliothèque René Pechère. Catalogue consultable en ligne.",tip:"Chercher par architecte dans le catalogue pour localiser les fonds (plans, perspectives, photos d'époque). Pour des reproductions, contacter reproductions@civa.brussels."},
+  {cat:"belgique",name:"Inventaire Patrimoine — Bruxelles",url:"https://monument.heritage.brussels/fr/inventaire/",access:"free",desc:"Base de données de plus de 40.000 bâtiments bruxellois avec fiches historiques, plans, photos anciennes et récentes. Recherche par rue, architecte, style, époque et commune.",tip:"Les fiches PDF sont téléchargeables et incluent souvent des reproductions de plans originaux et de permis de bâtir historiques. Idéal pour tout travail sur le bâti bruxellois."},
+  {cat:"belgique",name:"Inventaire Patrimoine — Wallonie (AWaP)",url:"https://inventairepatrimoine.wallonie.be/fr",access:"free",desc:"Inventaire régional du patrimoine culturel immobilier de Wallonie — recensement sélectif du bâti, mis à jour en continu. Héritier de l'Inventaire du Patrimoine Monumental depuis 1973, plus de 30.000 biens.",tip:"Recherche possible par commune, type de bien et critères patrimoniaux. Utile pour étudier l'architecture vernaculaire, industrielle et les cités-jardins en Wallonie."},
+  {cat:"belgique",name:"Archives de l'État — AGATHA",url:"https://arch.be/index.php?l=fr&m=ressources-en-ligne",access:"partial",desc:"Portail en ligne des Archives de l'État belge — millions de documents numérisés (cadastre, permis de bâtir, plans de communes). Présentes dans toutes les grandes villes du pays.",tip:"Créer un compte gratuit pour accéder aux documents numérisés. Les séries cadastrales et les plans de bâtisses anciens sont accessibles via le moteur AGATHA."},
+  {cat:"belgique",name:"Archives de la Ville de Bruxelles",url:"https://archives.bruxelles.be/archives-en-ligne",access:"partial",desc:"Archives numérisées de la Ville de Bruxelles — documents historiques sur l'évolution urbaine, plans, permis de bâtir et archives administratives communales.",tip:"Une partie des documents n'est accessible qu'en salle de lecture pour des raisons légales. Consulter le catalogue en ligne avant de se déplacer."},
+  {cat:"belgique",name:"Digithèque ULB",url:"https://digistore.bib.ulb.ac.be",access:"free",desc:"Programme de numérisation de l'ULB — ouvrages anciens libres de droits et thèses défendues à l'ULB depuis sa fondation, consultables gratuitement en ligne.",tip:"Rechercher « architecture », « urbanisme », « Bruxelles » dans le catalogue Cible+ de l'ULB pour trouver les thèses numérisées pertinentes. Accès libre sans connexion."},
+  {cat:"belgique",name:"Archives d'Architecture — ULB",url:"https://bib.ulb.be/fr/bibliotheques/architecture/archives-d-architecture",access:"partial",desc:"Fonds d'archives d'architectes belges conservés à la bibliothèque d'architecture de l'ULB — plans, dessins, correspondances, photos de chantier.",tip:"Contacter archivesarchitecture@ulb.be pour identifier les fonds disponibles. En tant qu'étudiante ULB, l'accès est prioritaire et gratuit."},
+  {cat:"belgique",name:"BAIU UCLouvain — Archives d'architectes",url:"https://uclouvain.be/fr/bibliotheques/baiu/archives-architectes.html",access:"partial",desc:"Bibliothèque d'Architecture de l'UCLouvain — fonds d'archives d'architectes belges (plans, maquettes, photos, correspondances). Hérite des collections des Instituts Saint-Luc.",tip:"Les ressources en ligne sont orientées open access. Pour les archives physiques, contacter directement la BAIU. Le catalogue en ligne permet d'identifier les fonds disponibles."},
+  {cat:"belgique",name:"KBR — Bibliothèque royale",url:"https://kbr.be/fr/collections-en-ligne/",access:"partial",desc:"Collections numérisées de la Bibliothèque royale — manuscrits, cartes, gravures et imprimés anciens. Riche en cartographie historique belge, plans de villes et documents iconographiques.",tip:"Chercher dans la section « Cartes & plans » et « Estampes & dessins ». Plans de villes des XVIIe-XIXe siècles d'une précision remarquable."},
+  {cat:"belgique",name:"Cartes de Ferraris — IGN Belgique",url:"https://www.ngi.be/website/fr/cartes/atlas-de-ferraris/",access:"free",desc:"La carte de cabinet des Pays-Bas autrichiens (1771-1778) numérisée en haute résolution — première cartographie systématique et précise du territoire belge.",tip:"Disponible également sur Cartes en Ligne (cartogis.be) avec superposition des cartes actuelles. Utile pour comprendre l'évolution du tissu urbain et rural sur des siècles."},
+  {cat:"belgique",name:"Géoportail Bruxelles — urban.brussels",url:"https://geoportal.brussels",access:"free",desc:"Portail cartographique officiel de la Région bruxelloise — données SIG, plans d'affectation, périmètres de protection, orthophotos historiques et données urbanistiques en open data.",tip:"Les orthophotos historiques (depuis les années 1970) permettent de suivre l'évolution urbaine d'un quartier. Les données vectorielles sont téléchargeables pour QGIS ou AutoCAD."},
+  {cat:"belgique",name:"WalOnMap — Géoportail Wallonie",url:"https://geoportail.wallonie.be",access:"free",desc:"Géoportail de la Wallonie — données cartographiques, plans de secteur, périmètres de protection, relevés LiDAR. Données ouvertes téléchargeables pour analyse et projets d'urbanisme.",tip:"Les données LiDAR (nuage de points 3D du territoire) sont téléchargeables gratuitement — très utiles pour les analyses topographiques et les projets d'insertion paysagère."},
+  {cat:"belgique",name:"Inventaris Erfgoed Vlaanderen",url:"https://inventaris.onroerenderfgoed.be",access:"free",desc:"Inventaire du patrimoine architectural immobilier flamand — fiches descriptives avec photos, plans et données historiques de milliers de bâtiments en Flandre. Interface néerlandaise.",tip:"Utiliser le moteur de recherche avec des mots-clés français ou anglais — beaucoup de fiches incluent des termes architecturaux multilingues. Riche en Art Nouveau gantois et anversois."}
+];
+
+const catLabels={livres:"Livres & Manuels",archives:"Archives & Plans",revues:"Revues Académiques",visuels:"Ressources Visuelles",outils:"Outils & Logiciels",belgique:"🇧🇪 Belgique"};
+const accLabels={free:{l:"Gratuit",c:"badge-free"},partial:{l:"Partiel",c:"badge-partial"},paywall:{l:"Paywall",c:"badge-paywall"},bypass:{l:"Open",c:"badge-bypass"}};
+const accOrd={free:0,bypass:1,partial:2,paywall:3};
+
+const nouveautes=[
+  {name:"Kanal Architecture",url:"https://catalogue.kanal.brussels",badge:"Nouveau"},
+  {name:"Digithèque ULB",url:"https://digistore.bib.ulb.ac.be",badge:"ULB"},
+  {name:"WalOnMap LiDAR",url:"https://geoportail.wallonie.be",badge:"Géo"},
+  {name:"ETH Zürich e-collection",url:"https://www.research-collection.ethz.ch",badge:"Thèses"},
+  {name:"Getty Open Content",url:"https://search.getty.edu/gateway/search?q=&cat=type&rows=10&mediatype=images",badge:"Gratuit"}
+];
+
+const institutions=[
+  {name:"Kanal Architecture (ex-CIVA)",type:"culture",lat:50.8641,lng:4.3512,adresse:"Quai de Willebroek 6, 1000 Bruxelles",horaires:"Ouverture prévue novembre 2026",url:"https://kanal.brussels"},
+  {name:"KBR — Bibliothèque Royale",type:"bibliotheque",lat:50.8429,lng:4.3618,adresse:"Bd de l'Empereur 4, 1000 Bruxelles",horaires:"Lun–Ven 9h–20h, Sam 9h–17h",url:"https://kbr.be"},
+  {name:"Archives de la Ville de Bruxelles",type:"archive",lat:50.8461,lng:4.3548,adresse:"Rue des Tanneurs 65, 1000 Bruxelles",horaires:"Lun–Ven 9h–12h & 13h–16h",url:"https://archives.bruxelles.be"},
+  {name:"Archives de l'État — Bruxelles",type:"archive",lat:50.8560,lng:4.3625,adresse:"Rue de Ruysbroeck 2-6, 1000 Bruxelles",horaires:"Lun–Ven 9h–12h30 & 13h–17h",url:"https://arch.be"},
+  {name:"ULB — Bibliothèque d'Architecture",type:"universite",lat:50.8125,lng:4.3820,adresse:"Avenue Antoine Depage 1, 1050 Ixelles",horaires:"Lun–Ven 9h–18h (archives sur RDV)",url:"https://bib.ulb.be/fr/bibliotheques/architecture"},
+  {name:"UCLouvain — BAIU (Saint-Luc BXL)",type:"universite",lat:50.8340,lng:4.3490,adresse:"Rue d'Irlande 57, 1060 Saint-Gilles",horaires:"Lun–Ven 9h–17h",url:"https://uclouvain.be/fr/bibliotheques/baiu"},
+  {name:"Archives de l'État — Liège",type:"archive",lat:50.6448,lng:5.5735,adresse:"Rue du Chéra 79, 4000 Liège",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
+  {name:"Archives de l'État — Gand",type:"archive",lat:51.0498,lng:3.7254,adresse:"Academiestraat 14, 9000 Gand",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
+  {name:"Archives de l'État — Bruges",type:"archive",lat:51.2097,lng:3.2239,adresse:"Academiestraat 14, 8000 Bruges",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
+  {name:"Archives de l'État — Namur",type:"archive",lat:50.4669,lng:4.8680,adresse:"Rue d'Arquet 45, 5000 Namur",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
+  {name:"Archives de l'État — Mons",type:"archive",lat:50.4543,lng:3.9538,adresse:"Place du Parc 23, 7000 Mons",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
+  {name:"Universiteitsbibliotheek Gent",type:"universite",lat:51.0534,lng:3.7218,adresse:"Rozier 9, 9000 Gand",horaires:"Lun–Ven 8h30–22h, Sam 10h–18h",url:"https://lib.ugent.be"},
+  {name:"KU Leuven — BSCS Architecture",type:"universite",lat:50.8764,lng:4.7040,adresse:"Kasteelpark Arenberg 1, 3001 Louvain",horaires:"Lun–Ven 9h–17h",url:"https://bib.kuleuven.be"}
+];
+
+const typeLabels={all:"Tous",archive:"Archives d'État",universite:"Universités",bibliotheque:"Bibliothèques",culture:"Culture & Patrimoine"};
+const typeColors={archive:"#c9a96e",universite:"#7aabcf",bibliotheque:"#87c98a",culture:"#cf87bf"};
+
+/* ── STATE ── */
+let activeCat="all",viewMode="grid",idxQ="",searchType="all",carteFilter="all";
+let favorites=JSON.parse(localStorage.getItem("archiFav")||"[]");
+let history=JSON.parse(localStorage.getItem("archiHist")||"[]");
+let mapInst=null,mapMarkers=[];
+
+/* ── BOOT ── */
+document.getElementById("totalCount").textContent=resources.length;
+// Nouveautés
+const ns=document.getElementById("nouvStrip");
+nouveautes.forEach(n=>{
+  const a=document.createElement("a");
+  a.className="new-chip";a.href=n.url;a.target="_blank";a.rel="noopener";
+  a.innerHTML=`<span class="chip-badge">[${n.badge}]</span>${n.name}`;
+  ns.appendChild(a);
+});
+// Cat filters
+const cf=document.getElementById("catFilters");
+cf.innerHTML=`<span class="filter-label">Filtres —</span><button class="filter-btn active" data-cat="all"><span class="dot"></span>Tout</button>${Object.entries(catLabels).map(([k,v])=>`<button class="filter-btn${k==="belgique"?" belgique":""}" data-cat="${k}"><span class="dot"></span>${v}</button>`).join("")}`;
+cf.querySelectorAll(".filter-btn").forEach(b=>b.addEventListener("click",()=>{
+  cf.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");activeCat=b.dataset.cat;renderIdx();
+}));
+document.getElementById("idxSearch").addEventListener("input",e=>{idxQ=e.target.value;renderIdx();});
+document.getElementById("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
+updateFavCount();renderIdx();renderFavs();renderHist();
+
+/* ── INDEX RENDER ── */
+function renderIdx(){
+  const grid=document.getElementById("resGrid");
+  const q=idxQ.toLowerCase().trim();
+  let fl=resources.filter(r=>{
+    const cm=activeCat==="all"||r.cat===activeCat;
+    const sm=!q||[r.name,r.desc,r.tip,catLabels[r.cat]||""].some(s=>s.toLowerCase().includes(q));
+    return cm&&sm;
+  });
+  const sort=document.getElementById("sortSel").value;
+  if(sort==="name")fl.sort((a,b)=>a.name.localeCompare(b.name));
+  else if(sort==="access")fl.sort((a,b)=>(accOrd[a.access]||3)-(accOrd[b.access]||3));
+  else if(sort==="cat")fl.sort((a,b)=>a.cat.localeCompare(b.cat));
+  document.getElementById("visCnt").textContent=fl.length;
+  grid.innerHTML=fl.length?"":`<div class="empty"><div class="empty-t">Aucun résultat</div><div class="empty-s">Essayez des mots-clés différents ou réinitialisez les filtres</div></div>`;
+  fl.forEach((r,i)=>grid.appendChild(buildCard(r,i)));
+}
+
+function buildCard(r,i=0){
+  const acc=accLabels[r.access]||{l:"?",c:""};
+  const fav=favorites.includes(r.url);
+  const card=document.createElement("div");
+  card.className="card"+(r.cat==="belgique"?" belgique-card":"");
+  card.style.animationDelay=Math.min(i*22,380)+"ms";
+  const dispUrl=r.url.replace(/^https?:\/\//,"").replace(/\/$/,"");
+  const isListMode=document.getElementById("resGrid").classList.contains("list-mode")||document.getElementById("favGrid").classList.contains("list-mode");
+  card.innerHTML=`
+    <div class="card-header">
+      <div><div class="card-cat">${catLabels[r.cat]||r.cat}</div><div class="card-name">${r.name}</div></div>
+      <span class="badge ${acc.c}">${acc.l}</span>
+    </div>
+    <div class="card-desc">${r.desc}</div>
+    <div class="card-tip"><strong>// Tip —</strong> ${r.tip}</div>
+    <div class="card-footer">
+      <span class="card-url">${dispUrl}</span>
+      <div class="card-actions">
+        <button class="btn-ico fav-btn${fav?" fav-on":""}" title="${fav?"Retirer":"Ajouter aux favoris"}">★</button>
+        <button class="btn-ico copy-btn" title="Copier le lien">⧉</button>
+        <a class="card-link" href="${r.url}" target="_blank" rel="noopener">Accéder</a>
+      </div>
+    </div>`;
+  card.querySelector(".fav-btn").addEventListener("click",()=>toggleFav(r.url,card.querySelector(".fav-btn")));
+  card.querySelector(".copy-btn").addEventListener("click",()=>copyLink(r.url,card.querySelector(".copy-btn")));
+  return card;
+}
+
+/* ── FAVORITES ── */
+function toggleFav(url,btn){
+  const i=favorites.indexOf(url);
+  if(i===-1){favorites.push(url);btn.classList.add("fav-on");btn.title="Retirer des favoris";}
+  else{favorites.splice(i,1);btn.classList.remove("fav-on");btn.title="Ajouter aux favoris";}
+  localStorage.setItem("archiFav",JSON.stringify(favorites));
+  updateFavCount();renderFavs();
+}
+function renderFavs(){
+  const grid=document.getElementById("favGrid");
+  const fl=resources.filter(r=>favorites.includes(r.url));
+  if(!fl.length){grid.innerHTML=`<div class="empty"><div class="empty-t">Aucun favori</div><div class="empty-s">Cliquez sur ★ sur une ressource pour l'ajouter ici</div></div>`;return;}
+  grid.innerHTML="";fl.forEach((r,i)=>grid.appendChild(buildCard(r,i)));
+}
+function updateFavCount(){const e=document.getElementById("fav-count");e.textContent=favorites.length?`(${favorites.length})`:""}
+
+/* ── COPY ── */
+function copyLink(url,btn){
+  navigator.clipboard.writeText(url).then(()=>{
+    btn.textContent="✓";btn.classList.add("ok");
+    setTimeout(()=>{btn.textContent="⧉";btn.classList.remove("ok");},1800);
+  }).catch(()=>prompt("Copier le lien :",url));
+}
+
+/* ── VIEW / SORT ── */
+function setView(v){
+  viewMode=v;
+  document.getElementById("resGrid").classList.toggle("list-mode",v==="list");
+  document.getElementById("btnGrid").classList.toggle("active",v==="grid");
+  document.getElementById("btnList").classList.toggle("active",v==="list");
+  renderIdx();
+}
+
+/* ── THEME / FONT ── */
+function toggleTheme(){
+  const d=document.documentElement;
+  const dark=d.dataset.theme==="dark";
+  d.dataset.theme=dark?"light":"dark";
+  document.getElementById("themeBtn").textContent=dark?"☀ Light":"☾ Dark";
+  if(mapInst){
+    mapInst.eachLayer(l=>{if(l._url){mapInst.removeLayer(l);}});
+    const url=dark?"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png":"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
+    L.tileLayer(url,{attribution:"© CARTO",maxZoom:18}).addTo(mapInst);
+    mapInst.invalidateSize();
+  }
+}
+function setFont(s){
+  document.documentElement.dataset.font=s;
+  [{id:"fSm",v:"sm"},{id:"fMd",v:"md"},{id:"fLg",v:"lg"}].forEach(f=>{
+    document.getElementById(f.id).classList.toggle("active",f.v===s);
+  });
+}
+
+/* ── TABS ── */
+function switchTab(tab){
+  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
+  document.getElementById("tab-"+tab).classList.add("active");
+  document.querySelectorAll(".tab-btn").forEach(b=>{if(b.getAttribute("onclick").includes("'"+tab+"'"))b.classList.add("active");});
+  if(tab==="carte"&&!mapInst)initMap();
+  if(tab==="favoris")renderFavs();
+}
+
+/* ── SEARCH TAB ── */
+function setType(btn,t){
+  searchType=t;
+  document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+function renderHist(){
+  const b=document.getElementById("histBlock"),c=document.getElementById("histChips");
+  if(!history.length){b.style.display="none";return;}
+  b.style.display="block";
+  c.innerHTML=history.map(q=>`<button class="hist-chip" onclick="useHist('${q.replace(/'/g,"\\'")}')">${q}</button>`).join("");
+}
+function useHist(q){document.getElementById("bookSearch").value=q;doSearch();}
+
+async function doSearch(){
+  const q=document.getElementById("bookSearch").value.trim();
+  if(!q)return;
+  history=[q,...history.filter(h=>h!==q)].slice(0,10);
+  localStorage.setItem("archiHist",JSON.stringify(history));renderHist();
+  const cont=document.getElementById("searchResults");
+  cont.innerHTML=`<div class="loading"><div class="spinner"></div>Recherche en cours pour « ${q} »…</div>`;
+  document.getElementById("searchBtn").disabled=true;
+  try{
+    const [ol,gut,arc]=await Promise.allSettled([fetchOL(q),fetchGut(q),fetchArc(q)]);
+    const all=[...(ol.value||[]),...(gut.value||[]),...(arc.value||[])];
+    cont.innerHTML="";
+    if(all.length){
+      const sec=document.createElement("div");sec.className="res-sec";
+      sec.innerHTML=`<div class="res-sec-title">Résultats directs (${all.length} trouvés)</div><div class="api-grid" id="apiGrid"></div>`;
+      cont.appendChild(sec);
+      const g=sec.querySelector("#apiGrid");
+      all.forEach(r=>g.appendChild(buildResCard(r)));
+    }else{
+      cont.innerHTML=`<div class="no-res">Aucun résultat direct trouvé — utilisez les liens de recherche ci-dessous.</div>`;
+    }
+    const ls=document.createElement("div");ls.className="res-sec";
+    ls.innerHTML=`<div class="res-sec-title">Chercher aussi sur…</div><div class="direct-links">${buildDLinks(q)}</div>`;
+    cont.appendChild(ls);
+  }catch(e){
+    cont.innerHTML=`<div class="no-res">Erreur lors de la recherche. Vérifiez votre connexion.</div>`;
+  }
+  document.getElementById("searchBtn").disabled=false;
+}
+
+function buildResCard(r){
+  const d=document.createElement("div");d.className="res-card";
+  d.innerHTML=`<div class="res-card-top">${r.cover?`<img class="res-cover" src="${r.cover}" alt="" loading="lazy">`:""}
+    <div><div class="res-title">${r.title}</div>${r.author?`<div class="res-author">${r.author}</div>`:""}${r.year?`<div class="res-year">${r.year}</div>`:""}
+    <div class="res-source">${r.source}</div></div></div>
+    <a class="res-link" href="${r.url}" target="_blank" rel="noopener">Accéder</a>`;
+  return d;
+}
+
+async function fetchOL(q){
+  if(searchType==="archive")return[];
+  const r=await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&fields=key,title,author_name,first_publish_year,cover_i&limit=9`);
+  const d=await r.json();
+  return(d.docs||[]).slice(0,9).map(x=>({title:x.title,author:x.author_name?.join(", ")||"",year:x.first_publish_year||"",cover:x.cover_i?`https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg`:null,url:`https://openlibrary.org${x.key}`,source:"Open Library"}));
+}
+async function fetchGut(q){
+  if(searchType==="archive")return[];
+  const r=await fetch(`https://gutendex.com/books/?search=${encodeURIComponent(q)}&languages=fr,en`);
+  const d=await r.json();
+  return(d.results||[]).slice(0,5).map(x=>({title:x.title,author:x.authors?.map(a=>a.name).join(", ")||"",year:"",cover:x.formats?.["image/jpeg"]||null,url:x.formats?.["text/html"]||`https://www.gutenberg.org/ebooks/${x.id}`,source:"Project Gutenberg"}));
+}
+async function fetchArc(q){
+  if(searchType==="books")return[];
+  const mt=searchType==="texts"?"texts":searchType==="archive"?"image":"texts";
+  const r=await fetch(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl=identifier,title,creator,year&rows=6&mediatype=${mt}&output=json`);
+  const d=await r.json();
+  return(d.response?.docs||[]).slice(0,6).map(x=>({title:x.title||x.identifier,author:x.creator||"",year:x.year||"",cover:null,url:`https://archive.org/details/${x.identifier}`,source:"Internet Archive"}));
+}
+
+function buildDLinks(q){
+  const e=encodeURIComponent(q);
+  return[
+    {n:"Z-Library",u:`https://z-library.sk/s/${e}`},
+    {n:"LibGen",u:`https://libgen.rs/search.php?req=${e}&column=def`},
+    {n:"Gallica BnF",u:`https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&query=dc.title+adj+%22${e}%22`},
+    {n:"Google Scholar",u:`https://scholar.google.com/scholar?q=${e}`},
+    {n:"JSTOR",u:`https://www.jstor.org/action/doBasicSearch?Query=${e}`},
+    {n:"Sci-Hub",u:`https://sci-hub.se/${e}`},
+    {n:"ResearchGate",u:`https://www.researchgate.net/search?q=${e}`},
+    {n:"Kanal Architecture",u:`https://catalogue.kanal.brussels/cgi-bin/koha/opac-search.pl?q=${e}`},
+    {n:"Digithèque ULB",u:`https://bib.ulb.be/fr/rechercher?q=${e}`},
+    {n:"ETH Zürich",u:`https://www.research-collection.ethz.ch/discover?query=${e}`},
+  ].map(l=>`<a class="direct-link" href="${l.u}" target="_blank" rel="noopener">${l.n}</a>`).join("");
+}
+
+/* ── CARTE ── */
+function initMap(){
+  const dark=document.documentElement.dataset.theme==="dark";
+  mapInst=L.map("map",{zoomControl:true}).setView([50.5,4.5],8);
+  L.tileLayer(dark?"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png":"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:"© CARTO",maxZoom:18}).addTo(mapInst);
+  // carte filters
+  const cf=document.getElementById("carteFilters");
+  cf.innerHTML=Object.entries(typeLabels).map(([k,v])=>`<button class="cfilter${k==="all"?" active":""}" onclick="filterCarte(this,'${k}')">${v}</button>`).join("");
+  renderMarkers();renderInstList();
+}
+
+function mkIcon(c){
+  return L.divIcon({html:`<div style="width:11px;height:11px;background:${c};border:2px solid rgba(255,255,255,.25);border-radius:0;box-shadow:0 0 8px ${c}66;"></div>`,className:"",iconSize:[11,11],iconAnchor:[5,5]});
+}
+function renderMarkers(){
+  mapMarkers.forEach(m=>m.remove());mapMarkers=[];
+  institutions.filter(inst=>carteFilter==="all"||inst.type===carteFilter).forEach((inst,i)=>{
+    const c=typeColors[inst.type]||"#c9a96e";
+    const m=L.marker([inst.lat,inst.lng],{icon:mkIcon(c)}).addTo(mapInst);
+    m.bindPopup(`<div class="popup-name">${inst.name}</div><div class="popup-type">${typeLabels[inst.type]||inst.type}</div><div class="popup-info">📍 ${inst.adresse}</div><div class="popup-info">🕐 ${inst.horaires}</div><a class="popup-link" href="${inst.url}" target="_blank" rel="noopener">→ Site web</a>`);
+    mapMarkers.push(m);
+  });
+}
+function renderInstList(){
+  const list=document.getElementById("instList");
+  const fl=institutions.filter(inst=>carteFilter==="all"||inst.type===carteFilter);
+  list.innerHTML=fl.map((inst,i)=>`<div class="inst-item" onclick="focusInst(${i})"><div class="inst-name">${inst.name}</div><div class="inst-type">${typeLabels[inst.type]||inst.type}</div></div>`).join("");
+}
+function filterCarte(btn,type){
+  carteFilter=type;
+  document.querySelectorAll(".cfilter").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");renderMarkers();renderInstList();
+}
+function focusInst(i){
+  const fl=institutions.filter(inst=>carteFilter==="all"||inst.type===carteFilter);
+  const inst=fl[i];if(!inst||!mapInst)return;
+  mapInst.setView([inst.lat,inst.lng],14);
+  if(mapMarkers[i])mapMarkers[i].openPopup();
+  document.querySelectorAll(".inst-item").forEach((el,j)=>el.classList.toggle("active",j===i));
+}
+</script>
+</body>
+</html>
