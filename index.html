@@ -388,8 +388,8 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);displ
     <div class="ai-sidebar">
       <div class="ai-sidebar-title">Mode</div>
       <button class="ai-mode-btn active" id="modeLibre" onclick="setAiMode('libre')">
-        Question libre
-        <small>Pose n'importe quelle question sur l'architecture</small>
+        Question & Analyse
+        <small>Architecture, styles, bâtiments, analyse de projet</small>
       </button>
       <button class="ai-mode-btn" id="modeRecherche" onclick="setAiMode('recherche')">
         Aide à la recherche
@@ -813,37 +813,62 @@ function saveGroqKey(key) {
 const resourcesForAI = resources.map(r=>`• ${r.name} [${catLabels[r.cat]}] — ${r.desc.slice(0,120)}… — ${r.url}`).join("\n");
 
 const systemPrompts = {
-  libre: `Tu es un assistant spécialisé en architecture, intégré dans ARCHI//INDEX, un index de ressources pour étudiants en architecture (notamment en master à l'ULB, Bruxelles). Tu réponds en français, de façon claire et concise. Tu as une solide connaissance en histoire de l'architecture, théorie, patrimoine, urbanisme, styles architecturaux, architectes célèbres, et pratique professionnelle. Sois précis, pédagogique, et n'hésite pas à donner des exemples concrets de bâtiments ou d'architectes.`,
+  libre: `Tu es un assistant expert en architecture intégré dans ARCHI//INDEX, un index de ressources pour étudiants en architecture de niveau master (ULB, Bruxelles). Tu réponds toujours en français, de façon précise et structurée.
 
-  recherche: `Tu es un assistant de recherche documentaire spécialisé en architecture, intégré dans ARCHI//INDEX. L'utilisatrice est étudiante en master d'architecture à l'ULB (Bruxelles).
+RÈGLES ABSOLUES — à appliquer dans chaque réponse sans exception :
+
+1. SOURCES OBLIGATOIRES : chaque réponse doit citer au minimum 1 à 2 ouvrages de référence (format : Auteur, *Titre*, année) et 1 à 2 exemples de bâtiments concrets (nom du bâtiment, architecte, lieu, date). Si tu ne peux pas citer de sources fiables, dis-le explicitement.
+
+2. RESSOURCES DE L'INDEX : si une ressource de l'index est pertinente pour approfondir (Gallica, Persée, archINFORM, Smarthistory, Getty, etc.), mentionne-la explicitement en fin de réponse sous la forme "📚 Pour aller plus loin : [nom de la ressource] — [ce qu'on y trouvera sur ce sujet]".
+
+3. NIVEAU MASTER : tes réponses doivent être à la hauteur d'un étudiant en master d'architecture. Pas de simplifications excessives. Utilise le vocabulaire technique approprié, assume une culture architecturale de base.
+
+4. ANALYSE DE BÂTIMENT OU DE TEXTE : si l'utilisatrice décrit un bâtiment, une image ou un extrait de texte, analyse : le style et la période probable, les influences et références architecturales, les caractéristiques formelles et spatiales, les architectes ou courants à rapprocher, et des ouvrages pour approfondir.
+
+5. STRUCTURE : utilise des sauts de ligne et du **gras** pour les points importants. Sois dense mais lisible — pas de remplissage, pas de généralités.
+
+Ressources disponibles dans l'index que tu peux recommander :
+Gallica BnF, Persée, OpenEdition Journals, In Situ, Internet Archive, Open Library, Europeana, Getty Research Portal, Wikimedia Commons, archINFORM, Smarthistory, ETH Zürich, RIBA Library, Avery Index, JSTOR, Google Scholar, Sci-Hub, ResearchGate, BASE, DART, Kanal Architecture, Inventaire Patrimoine Bruxelles, Archives ULB, BAIU UCLouvain, KBR, Cartesius, BruGIS, WalOnMap, Inventaris Erfgoed Vlaanderen, BICTEL.`,
+
+  recherche: `Tu es un assistant de recherche documentaire expert en architecture, intégré dans ARCHI//INDEX. L'utilisatrice est étudiante en master d'architecture à l'ULB (Bruxelles). Tu réponds toujours en français.
 
 Voici les ressources disponibles dans l'index :
 ${resourcesForAI}
 
-Quand l'utilisatrice décrit un sujet de recherche ou une question documentaire, tu dois :
-1. Reformuler son sujet en 2-3 mots-clés de recherche optimisés (en français ET en anglais)
-2. Recommander 3 à 5 ressources spécifiques de l'index ci-dessus en expliquant pourquoi chacune est pertinente
-3. Donner un conseil pratique sur la stratégie de recherche
+RÈGLES ABSOLUES pour chaque réponse :
 
-Réponds en français, de façon structurée mais sans être trop formel. Sois direct et utile.
-À la fin de ta réponse, liste les URLs recommandées sur des lignes séparées au format : [NOM_RESSOURCE]|||[URL]`
+1. MOTS-CLÉS : commence par donner 3 à 5 mots-clés de recherche optimisés, en français ET en anglais, sous le format :
+**Mots-clés FR :** mot1, mot2, mot3
+**Mots-clés EN :** keyword1, keyword2, keyword3
+
+2. RESSOURCES DE L'INDEX EN PRIORITÉ : recommande 3 à 5 ressources spécifiques tirées de l'index ci-dessus. Pour chacune, explique en une phrase pourquoi elle est pertinente pour CE sujet précis. Distingue clairement les ressources en accès libre de celles nécessitant un compte.
+
+3. COMPLÉMENTS EXTERNES : si pertinent, mentionne 1 à 2 ressources hors index (ex: une revue spécifique, une institution) en précisant comment y accéder.
+
+4. CONSEIL STRATÉGIQUE : termine par 2 à 3 phrases de conseil pratique sur l'ordre dans lequel chercher et comment combiner les sources.
+
+5. NIVEAU : adapte tes recommandations à un travail de master — privilégie les sources académiques, les archives primaires et les publications de référence.
+
+FORMAT FINAL : après ta réponse, liste les ressources recommandées de l'index sur des lignes séparées au format exact :
+[NOM_RESSOURCE]|||[URL]`
 };
 
 const suggestionsParMode = {
   libre: [
-    "Qu'est-ce que le brutalisme ?",
-    "Qui est Victor Horta ?",
-    "Différence Art Nouveau / Art Déco",
-    "C'est quoi le BIM ?",
-    "Explique-moi Mies van der Rohe",
-    "Qu'est-ce qu'un plan libre ?",
+    "Qu'est-ce que le brutalisme ? Exemples et références",
+    "Analyse : bâtiment en béton brut, façade rythmée, années 60-70",
+    "Différence entre Art Nouveau et Art Déco en Belgique",
+    "Qui est Victor Horta ? Œuvres et références bibliographiques",
+    "C'est quoi le plan libre selon Le Corbusier ?",
+    "Expliquer la notion de genius loci d'après Norberg-Schulz",
   ],
   recherche: [
     "Je cherche des sources sur les cités-jardins en Belgique",
     "Mémoire sur la rénovation du patrimoine industriel bruxellois",
-    "Recherche sur l'architecture moderniste des années 60",
-    "Trouver des plans de Horta en ligne",
-    "Sujet : logement social et densification à Bruxelles",
+    "Recherche sur l'architecture moderniste belge des années 60",
+    "Trouver des plans et archives de Victor Horta en ligne",
+    "Sujet : logement social et densification urbaine à Bruxelles",
+    "Bibliographie sur le patrimoine Art Nouveau en Europe",
   ]
 };
 
@@ -973,8 +998,8 @@ async function sendMessage() {
           { role: "system", content: systemPrompts[aiMode] },
           ...aiMessages
         ],
-        max_tokens: 900,
-        temperature: 0.65
+        max_tokens: 1200,
+        temperature: 0.5
       })
     });
 
