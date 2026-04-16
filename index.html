@@ -248,7 +248,17 @@ h1 em{font-style:italic;color:var(--gold);}
 .ai-res-chip:hover{border-color:var(--gold);color:var(--gold);}
 .ai-res-chip::after{content:'↗';font-size:.9em;color:var(--gold-dim);}
 
-.ai-typing{display:flex;gap:4px;align-items:center;padding:8px 0;}
+.ai-key-prompt{padding:28px 24px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--border);background:rgba(201,169,110,.03);}
+.ai-key-prompt p{font-size:.67em;color:var(--text-dim);line-height:1.75;letter-spacing:.03em;}
+.ai-key-prompt strong{color:var(--gold-dim);}
+.ai-key-row{display:flex;gap:7px;}
+.ai-key-input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.68em;padding:10px 13px;outline:none;transition:border-color .2s;letter-spacing:.04em;}
+.ai-key-input:focus{border-color:var(--border-h);}
+.ai-key-input::placeholder{color:var(--text-muted);}
+.ai-key-save{background:var(--gold);color:var(--bg);border:none;font-family:var(--mono);font-size:.6em;letter-spacing:.15em;text-transform:uppercase;padding:0 16px;cursor:pointer;transition:opacity .18s;white-space:nowrap;}
+.ai-key-save:hover{opacity:.85;}
+.ai-key-note{font-size:.58em;color:var(--text-muted);letter-spacing:.04em;line-height:1.6;}
+display:flex;gap:4px;align-items:center;padding:8px 0;}
 .ai-typing span{width:5px;height:5px;background:var(--gold-dim);border-radius:50%;animation:blink 1.2s infinite;}
 .ai-typing span:nth-child(2){animation-delay:.2s;}
 .ai-typing span:nth-child(3){animation-delay:.4s;}
@@ -388,6 +398,11 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);displ
       <div class="ai-sidebar-sep"></div>
       <div class="ai-sidebar-info">Modèle : Llama 3.3 70B via Groq</div>
       <div class="ai-sidebar-info">Répond en français · Spécialisé architecture</div>
+      <div class="ai-sidebar-sep"></div>
+      <button class="ai-mode-btn" onclick="showKeyPrompt()" style="font-size:.56em;padding:7px 10px;">
+        🔑 Clé API Groq
+        <small id="keyStatus">Non configurée</small>
+      </button>
     </div>
     <div class="ai-main">
       <div class="ai-messages" id="aiMessages">
@@ -781,10 +796,18 @@ function focusInst(i){
   document.querySelectorAll(".inst-item").forEach((el,j)=>el.classList.toggle("active",j===i));
 }
 /* ── AI ASSISTANT ── */
-const GROQ_KEY = "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";
 const GROQ_MODEL = "llama-3.3-70b-versatile";
 let aiMode = "libre";
-let aiMessages = []; // conversation history
+let aiMessages = [];
+
+function getGroqKey() {
+  return localStorage.getItem("archiGroqKey") || "";
+}
+
+function saveGroqKey(key) {
+  localStorage.setItem("archiGroqKey", key.trim());
+}
+
 
 // Resource index summary for the AI (name + url + desc, compact)
 const resourcesForAI = resources.map(r=>`• ${r.name} [${catLabels[r.cat]}] — ${r.desc.slice(0,120)}… — ${r.url}`).join("\n");
@@ -921,6 +944,9 @@ function cleanResponse(text) {
 }
 
 async function sendMessage() {
+  const key = getGroqKey();
+  if (!key) { showKeyPrompt(); return; }
+
   const input = document.getElementById("aiInput");
   const q = input.value.trim();
   if (!q) return;
@@ -939,7 +965,7 @@ async function sendMessage() {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${GROQ_KEY}`
+        "Authorization": `Bearer ${key}`
       },
       body: JSON.stringify({
         model: GROQ_MODEL,
@@ -951,6 +977,14 @@ async function sendMessage() {
         temperature: 0.65
       })
     });
+
+    if (resp.status === 401) {
+      removeTyping();
+      appendMessage("assistant", "❌ Clé API invalide ou révoquée. Clique sur **Changer la clé** pour en saisir une nouvelle.");
+      localStorage.removeItem("archiGroqKey");
+      document.getElementById("aiSend").disabled = false;
+      return;
+    }
 
     const data = await resp.json();
     const raw = data.choices?.[0]?.message?.content || "Désolée, je n'ai pas pu générer une réponse.";
@@ -979,8 +1013,63 @@ document.getElementById("aiInput").addEventListener("keydown", function(e) {
   if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 });
 
-// Init AI tab
+function showKeyPrompt() {
+  const msgs = document.getElementById("aiMessages");
+  // Remove existing prompt if any
+  const existing = document.getElementById("aiKeyPrompt");
+  if (existing) { existing.remove(); return; }
+
+  const div = document.createElement("div");
+  div.id = "aiKeyPrompt";
+  div.className = "ai-key-prompt";
+  div.innerHTML = `
+    <p>Pour utiliser l'assistant, saisis ta <strong>clé API Groq</strong> (gratuite sur <a href="https://console.groq.com" target="_blank" style="color:var(--gold)">console.groq.com</a>).<br>
+    Elle sera stockée <strong>uniquement dans ton navigateur</strong> — jamais dans le code.</p>
+    <div class="ai-key-row">
+      <input type="password" class="ai-key-input" id="aiKeyInput" placeholder="gsk_…" autocomplete="off">
+      <button class="ai-key-save" onclick="saveKey()">Sauvegarder</button>
+    </div>
+    <div class="ai-key-note">Raccourci : Entrée pour valider. La clé reste en localStorage entre sessions.</div>`;
+
+  msgs.insertBefore(div, msgs.firstChild);
+  document.getElementById("aiKeyInput").focus();
+  document.getElementById("aiKeyInput").addEventListener("keydown", e => {
+    if (e.key === "Enter") saveKey();
+  });
+}
+
+function saveKey() {
+  const val = document.getElementById("aiKeyInput")?.value?.trim();
+  if (!val || !val.startsWith("gsk_")) {
+    document.getElementById("aiKeyInput").style.borderColor = "rgba(200,80,80,.5)";
+    return;
+  }
+  saveGroqKey(val);
+  document.getElementById("aiKeyPrompt")?.remove();
+  updateKeyStatus();
+  clearChat();
+  appendMessage("assistant", "✅ Clé API configurée ! Tu peux maintenant poser tes questions. Essaie un des sujets suggérés ou écris directement ta question.");
+}
+
+function updateKeyStatus() {
+  const el = document.getElementById("keyStatus");
+  if (!el) return;
+  el.textContent = getGroqKey() ? "✓ Configurée" : "Non configurée";
+}
+
+// ── INIT AI ──
 renderSuggestions();
+setTimeout(() => {
+  updateKeyStatus();
+  if (!getGroqKey()) {
+    const welcome = document.getElementById("aiWelcome");
+    if (welcome) welcome.innerHTML = `
+      <div class="ai-welcome-title">Assistant <em>Architecture</em></div>
+      <div class="ai-welcome-sub">Configure ta clé API Groq pour démarrer — clique sur <strong>🔑 Clé API Groq</strong> dans la sidebar, ou sur le bouton ci-dessous.</div>
+      <br><button class="ai-sug-chip" style="margin:0 auto;display:inline-block;" onclick="showKeyPrompt()">🔑 Configurer ma clé Groq</button>`;
+  }
+}, 100);
+
 </script>
 </body>
 </html>
