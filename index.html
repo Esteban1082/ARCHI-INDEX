@@ -202,7 +202,62 @@ h1 em{font-style:italic;color:var(--gold);}
 .popup-link:hover{text-decoration:underline;}
 .leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important;}
 
-/* FOOTER */
+/* ── AI ASSISTANT ── */
+.ai-layout{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid var(--border);min-height:560px;}
+@media(max-width:700px){.ai-layout{grid-template-columns:1fr;}}
+.ai-sidebar{border-right:1px solid var(--border);background:var(--bg2);padding:20px 14px;display:flex;flex-direction:column;gap:6px;}
+.ai-sidebar-title{font-size:.58em;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.ai-mode-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.1em;padding:10px 12px;cursor:pointer;transition:all .18s;text-transform:uppercase;text-align:left;display:flex;flex-direction:column;gap:3px;}
+.ai-mode-btn:hover{border-color:var(--border-h);color:var(--text);}
+.ai-mode-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
+.ai-mode-btn small{font-size:.85em;opacity:.6;letter-spacing:.05em;text-transform:none;}
+.ai-sidebar-sep{height:1px;background:var(--border);margin:8px 0;}
+.ai-sidebar-info{font-size:.55em;color:var(--text-muted);line-height:1.6;letter-spacing:.03em;padding:4px 0;}
+
+.ai-main{display:flex;flex-direction:column;background:var(--bg);}
+.ai-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;min-height:380px;max-height:460px;}
+.ai-msg{display:flex;flex-direction:column;gap:4px;animation:fadeIn .2s ease;}
+.ai-msg.user{align-items:flex-end;}
+.ai-msg.assistant{align-items:flex-start;}
+.ai-bubble{max-width:80%;padding:12px 16px;font-size:.68em;line-height:1.75;letter-spacing:.02em;}
+.ai-msg.user .ai-bubble{background:var(--gold-faint);border:1px solid rgba(201,169,110,.25);color:var(--text);}
+.ai-msg.assistant .ai-bubble{background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);}
+.ai-msg.assistant .ai-bubble strong{color:var(--gold-dim);}
+.ai-bubble-src{font-size:.55em;letter-spacing:.08em;color:var(--gold-dim);opacity:.7;margin-top:2px;}
+.ai-msg.user .ai-bubble-src{text-align:right;}
+
+.ai-suggestions{display:flex;flex-direction:column;gap:4px;margin:0 20px 12px;}
+.ai-sug-label{font-size:.55em;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;}
+.ai-sug-chips{display:flex;flex-wrap:wrap;gap:5px;}
+.ai-sug-chip{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--mono);font-size:.58em;letter-spacing:.06em;padding:4px 10px;cursor:pointer;transition:all .18s;}
+.ai-sug-chip:hover{border-color:var(--border-h);color:var(--text);}
+
+.ai-input-area{border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:8px;background:var(--bg2);}
+.ai-input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.7em;padding:10px 14px;outline:none;transition:border-color .2s;letter-spacing:.03em;resize:none;height:42px;min-height:42px;}
+.ai-input:focus{border-color:var(--border-h);}
+.ai-input::placeholder{color:var(--text-muted);}
+.ai-send{background:var(--gold);color:var(--bg);border:none;font-family:var(--mono);font-size:.6em;letter-spacing:.15em;text-transform:uppercase;padding:0 18px;cursor:pointer;transition:opacity .18s;white-space:nowrap;flex-shrink:0;}
+.ai-send:hover{opacity:.85;}
+.ai-send:disabled{opacity:.35;cursor:default;}
+.ai-clear{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--mono);font-size:.58em;letter-spacing:.1em;padding:0 12px;cursor:pointer;transition:all .18s;text-transform:uppercase;}
+.ai-clear:hover{border-color:var(--border-h);color:var(--text);}
+
+/* resource suggestion cards inside AI */
+.ai-res-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
+.ai-res-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);padding:4px 10px;font-size:.58em;letter-spacing:.06em;color:var(--text-dim);text-decoration:none;transition:all .18s;}
+.ai-res-chip:hover{border-color:var(--gold);color:var(--gold);}
+.ai-res-chip::after{content:'↗';font-size:.9em;color:var(--gold-dim);}
+
+.ai-typing{display:flex;gap:4px;align-items:center;padding:8px 0;}
+.ai-typing span{width:5px;height:5px;background:var(--gold-dim);border-radius:50%;animation:blink 1.2s infinite;}
+.ai-typing span:nth-child(2){animation-delay:.2s;}
+.ai-typing span:nth-child(3){animation-delay:.4s;}
+@keyframes blink{0%,80%,100%{opacity:.15;}40%{opacity:.9;}}
+
+.ai-welcome{padding:32px 20px;text-align:center;color:var(--text-muted);}
+.ai-welcome-title{font-family:var(--serif);font-size:1.6em;font-weight:300;font-style:italic;margin-bottom:8px;color:var(--text-dim);}
+.ai-welcome-sub{font-size:.62em;line-height:1.7;letter-spacing:.04em;max-width:420px;margin:0 auto;}
+
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-text{font-size:.56em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;}
 .footer-note{font-family:var(--serif);font-size:.72em;color:var(--text-muted);font-style:italic;}
@@ -244,6 +299,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);displ
   <button class="tab-btn" onclick="switchTab('recherche')">// Recherche</button>
   <button class="tab-btn" onclick="switchTab('carte')">// Carte Belgique</button>
   <button class="tab-btn" onclick="switchTab('favoris')">// Favoris <span id="fav-count"></span></button>
+  <button class="tab-btn" onclick="switchTab('assistant')">// Assistant IA</button>
 </div>
 
 <!-- TAB INDEX -->
@@ -316,7 +372,44 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);displ
   <div class="resource-grid" id="favGrid"></div>
 </div>
 
-<footer>
+<!-- TAB ASSISTANT IA -->
+<div class="tab-panel" id="tab-assistant">
+  <div class="ai-layout">
+    <div class="ai-sidebar">
+      <div class="ai-sidebar-title">Mode</div>
+      <button class="ai-mode-btn active" id="modeLibre" onclick="setAiMode('libre')">
+        Question libre
+        <small>Pose n'importe quelle question sur l'architecture</small>
+      </button>
+      <button class="ai-mode-btn" id="modeRecherche" onclick="setAiMode('recherche')">
+        Aide à la recherche
+        <small>Décris ton sujet, l'IA suggère où chercher</small>
+      </button>
+      <div class="ai-sidebar-sep"></div>
+      <div class="ai-sidebar-info">Modèle : Llama 3.3 70B via Groq</div>
+      <div class="ai-sidebar-info">Répond en français · Spécialisé architecture</div>
+    </div>
+    <div class="ai-main">
+      <div class="ai-messages" id="aiMessages">
+        <div class="ai-welcome" id="aiWelcome">
+          <div class="ai-welcome-title">Bonjour, que puis-je faire pour toi ?</div>
+          <div class="ai-welcome-sub">Pose une question sur l'architecture, un style, un architecte, ou décris ton sujet de recherche pour que je t'oriente vers les meilleures ressources de l'index.</div>
+        </div>
+      </div>
+      <div class="ai-suggestions" id="aiSuggestions">
+        <div class="ai-sug-label">Suggestions —</div>
+        <div class="ai-sug-chips" id="aiSugChips"></div>
+      </div>
+      <div class="ai-input-area">
+        <textarea class="ai-input" id="aiInput" placeholder="Écris ta question ici…" rows="1"></textarea>
+        <button class="ai-clear" onclick="clearChat()" title="Effacer la conversation">↺</button>
+        <button class="ai-send" id="aiSend" onclick="sendMessage()">Envoyer</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
   <div class="footer-text">ARCHI//INDEX · Usage personnel & académique</div>
   <div class="footer-note">Pour les étudiants en architecture, par un ami bienveillant.</div>
 </footer>
@@ -687,6 +780,207 @@ function focusInst(i){
   if(mapMarkers[i])mapMarkers[i].openPopup();
   document.querySelectorAll(".inst-item").forEach((el,j)=>el.classList.toggle("active",j===i));
 }
+/* ── AI ASSISTANT ── */
+const GROQ_KEY = "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";
+const GROQ_MODEL = "llama-3.3-70b-versatile";
+let aiMode = "libre";
+let aiMessages = []; // conversation history
+
+// Resource index summary for the AI (name + url + desc, compact)
+const resourcesForAI = resources.map(r=>`• ${r.name} [${catLabels[r.cat]}] — ${r.desc.slice(0,120)}… — ${r.url}`).join("\n");
+
+const systemPrompts = {
+  libre: `Tu es un assistant spécialisé en architecture, intégré dans ARCHI//INDEX, un index de ressources pour étudiants en architecture (notamment en master à l'ULB, Bruxelles). Tu réponds en français, de façon claire et concise. Tu as une solide connaissance en histoire de l'architecture, théorie, patrimoine, urbanisme, styles architecturaux, architectes célèbres, et pratique professionnelle. Sois précis, pédagogique, et n'hésite pas à donner des exemples concrets de bâtiments ou d'architectes.`,
+
+  recherche: `Tu es un assistant de recherche documentaire spécialisé en architecture, intégré dans ARCHI//INDEX. L'utilisatrice est étudiante en master d'architecture à l'ULB (Bruxelles).
+
+Voici les ressources disponibles dans l'index :
+${resourcesForAI}
+
+Quand l'utilisatrice décrit un sujet de recherche ou une question documentaire, tu dois :
+1. Reformuler son sujet en 2-3 mots-clés de recherche optimisés (en français ET en anglais)
+2. Recommander 3 à 5 ressources spécifiques de l'index ci-dessus en expliquant pourquoi chacune est pertinente
+3. Donner un conseil pratique sur la stratégie de recherche
+
+Réponds en français, de façon structurée mais sans être trop formel. Sois direct et utile.
+À la fin de ta réponse, liste les URLs recommandées sur des lignes séparées au format : [NOM_RESSOURCE]|||[URL]`
+};
+
+const suggestionsParMode = {
+  libre: [
+    "Qu'est-ce que le brutalisme ?",
+    "Qui est Victor Horta ?",
+    "Différence Art Nouveau / Art Déco",
+    "C'est quoi le BIM ?",
+    "Explique-moi Mies van der Rohe",
+    "Qu'est-ce qu'un plan libre ?",
+  ],
+  recherche: [
+    "Je cherche des sources sur les cités-jardins en Belgique",
+    "Mémoire sur la rénovation du patrimoine industriel bruxellois",
+    "Recherche sur l'architecture moderniste des années 60",
+    "Trouver des plans de Horta en ligne",
+    "Sujet : logement social et densification à Bruxelles",
+  ]
+};
+
+function setAiMode(mode) {
+  aiMode = mode;
+  document.getElementById("modeLibre").classList.toggle("active", mode === "libre");
+  document.getElementById("modeRecherche").classList.toggle("active", mode === "recherche");
+  const input = document.getElementById("aiInput");
+  input.placeholder = mode === "libre"
+    ? "Écris ta question sur l'architecture…"
+    : "Décris ton sujet ou ce que tu cherches…";
+  renderSuggestions();
+  clearChat();
+}
+
+function renderSuggestions() {
+  const chips = document.getElementById("aiSugChips");
+  chips.innerHTML = suggestionsParMode[aiMode]
+    .map(s => `<button class="ai-sug-chip" onclick="useSuggestion('${s.replace(/'/g, "\\'")}')">${s}</button>`)
+    .join("");
+}
+
+function useSuggestion(text) {
+  document.getElementById("aiInput").value = text;
+  sendMessage();
+}
+
+function clearChat() {
+  aiMessages = [];
+  const msgs = document.getElementById("aiMessages");
+  msgs.innerHTML = `<div class="ai-welcome" id="aiWelcome">
+    <div class="ai-welcome-title">Bonjour, que puis-je faire pour toi ?</div>
+    <div class="ai-welcome-sub">${aiMode === "libre"
+      ? "Pose une question sur l'architecture, un style, un architecte ou un concept."
+      : "Décris ton sujet de recherche et je t'oriente vers les meilleures ressources de l'index."
+    }</div>
+  </div>`;
+}
+
+function appendMessage(role, content, resourceLinks = []) {
+  const welcome = document.getElementById("aiWelcome");
+  if (welcome) welcome.remove();
+
+  const msgs = document.getElementById("aiMessages");
+  const div = document.createElement("div");
+  div.className = `ai-msg ${role}`;
+
+  // Format markdown-lite: bold, newlines
+  const formatted = content
+    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+    .replace(/\n/g, "<br>");
+
+  let html = `<div class="ai-bubble">${formatted}</div>`;
+  if (role === "assistant") html += `<div class="ai-bubble-src">ARCHI//INDEX · Llama 3.3 70B</div>`;
+
+  // Resource chips
+  if (resourceLinks.length) {
+    html += `<div class="ai-res-chips">`;
+    resourceLinks.forEach(({name, url}) => {
+      html += `<a class="ai-res-chip" href="${url}" target="_blank" rel="noopener">${name}</a>`;
+    });
+    html += `</div>`;
+  }
+
+  div.innerHTML = html;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function showTyping() {
+  const msgs = document.getElementById("aiMessages");
+  const div = document.createElement("div");
+  div.className = "ai-msg assistant";
+  div.id = "aiTyping";
+  div.innerHTML = `<div class="ai-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function removeTyping() {
+  const t = document.getElementById("aiTyping");
+  if (t) t.remove();
+}
+
+function parseResourceLinks(text) {
+  const links = [];
+  const lines = text.split("\n");
+  lines.forEach(line => {
+    const match = line.match(/\[(.+?)\]\|\|\|(.+)/);
+    if (match) links.push({ name: match[1].trim(), url: match[2].trim() });
+  });
+  return links;
+}
+
+function cleanResponse(text) {
+  // Remove the [NOM]|||[URL] lines from displayed text
+  return text.replace(/\[.+?\]\|\|\|.+\n?/g, "").trim();
+}
+
+async function sendMessage() {
+  const input = document.getElementById("aiInput");
+  const q = input.value.trim();
+  if (!q) return;
+
+  input.value = "";
+  input.style.height = "42px";
+  document.getElementById("aiSend").disabled = true;
+
+  appendMessage("user", q);
+  aiMessages.push({ role: "user", content: q });
+
+  showTyping();
+
+  try {
+    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${GROQ_KEY}`
+      },
+      body: JSON.stringify({
+        model: GROQ_MODEL,
+        messages: [
+          { role: "system", content: systemPrompts[aiMode] },
+          ...aiMessages
+        ],
+        max_tokens: 900,
+        temperature: 0.65
+      })
+    });
+
+    const data = await resp.json();
+    const raw = data.choices?.[0]?.message?.content || "Désolée, je n'ai pas pu générer une réponse.";
+
+    const resourceLinks = aiMode === "recherche" ? parseResourceLinks(raw) : [];
+    const cleaned = aiMode === "recherche" ? cleanResponse(raw) : raw;
+
+    removeTyping();
+    appendMessage("assistant", cleaned, resourceLinks);
+    aiMessages.push({ role: "assistant", content: raw });
+
+  } catch(e) {
+    removeTyping();
+    appendMessage("assistant", "Une erreur est survenue. Vérifie ta connexion et réessaie.");
+  }
+
+  document.getElementById("aiSend").disabled = false;
+}
+
+// Auto-resize textarea
+document.getElementById("aiInput").addEventListener("input", function() {
+  this.style.height = "42px";
+  this.style.height = Math.min(this.scrollHeight, 120) + "px";
+});
+document.getElementById("aiInput").addEventListener("keydown", function(e) {
+  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+});
+
+// Init AI tab
+renderSuggestions();
 </script>
 </body>
 </html>
