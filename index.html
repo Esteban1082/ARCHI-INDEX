@@ -268,6 +268,40 @@ display:flex;gap:4px;align-items:center;padding:8px 0;}
 .ai-welcome-title{font-family:var(--serif);font-size:1.6em;font-weight:300;font-style:italic;margin-bottom:8px;color:var(--text-dim);}
 .ai-welcome-sub{font-size:.62em;line-height:1.7;letter-spacing:.04em;max-width:420px;margin:0 auto;}
 
+/* INTL TAB */
+.intl-layout{display:grid;grid-template-columns:220px 1fr;gap:0;border:1px solid var(--border);}
+@media(max-width:700px){.intl-layout{grid-template-columns:1fr;}}
+.intl-sidebar{border-right:1px solid var(--border);background:var(--bg2);padding:18px 14px;display:flex;flex-direction:column;gap:4px;max-height:640px;overflow-y:auto;}
+.intl-sidebar-title{font-size:.58em;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
+.country-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.1em;padding:9px 12px;cursor:pointer;transition:all .18s;text-transform:uppercase;text-align:left;display:flex;align-items:center;gap:8px;width:100%;}
+.country-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--gold-faint);}
+.country-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
+.country-btn .cnt{font-size:.85em;opacity:.5;margin-left:auto;}
+.intl-main{padding:24px;overflow-y:auto;max-height:640px;flex:1;}
+.intl-header{margin-bottom:18px;}
+.intl-header h3{font-family:var(--serif);font-size:1.5em;font-weight:300;margin-bottom:4px;}
+.intl-header p{font-size:.63em;color:var(--text-dim);line-height:1.7;letter-spacing:.03em;}
+.intl-search-wrap{position:relative;margin-bottom:18px;}
+.intl-search{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.68em;padding:10px 14px 10px 38px;outline:none;transition:border-color .2s;letter-spacing:.04em;}
+.intl-search::placeholder{color:var(--text-muted);}
+.intl-search:focus{border-color:var(--border-h);}
+.intl-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold-dim);font-size:.75em;pointer-events:none;}
+.intl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:2px;}
+.intl-card{background:var(--bg2);border:1px solid var(--border);padding:18px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,background .2s;animation:fadeIn .25s ease both;}
+.intl-card:hover{border-color:var(--border-h);background:var(--bg3);}
+.intl-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.intl-card-meta{flex:1;}
+.intl-card-country{font-size:.54em;letter-spacing:.22em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:3px;}
+.intl-card-name{font-family:var(--serif);font-size:1.05em;font-weight:400;line-height:1.15;}
+.intl-card-desc{font-size:.63em;line-height:1.72;color:var(--text-dim);letter-spacing:.02em;}
+.intl-card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto;}
+.intl-card-url{font-size:.54em;color:var(--text-muted);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
+.intl-link{font-size:.56em;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,169,110,.25);padding:4px 10px;transition:all .18s;flex-shrink:0;}
+.intl-link:hover{background:var(--gold);color:var(--bg);}
+.intl-link::after{content:' →';}
+.intl-empty{grid-column:1/-1;padding:48px 20px;text-align:center;color:var(--text-muted);}
+.intl-empty-t{font-family:var(--serif);font-size:1.4em;font-style:italic;font-weight:300;}
+
 footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
 .footer-text{font-size:.56em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;}
 .footer-note{font-family:var(--serif);font-size:.72em;color:var(--text-muted);font-style:italic;}
@@ -334,6 +368,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);displ
       </div>
     </div>
     <div class="filters" id="catFilters"></div>
+    <div class="filters" id="paysFilters" style="padding-top:4px;border-top:1px solid var(--border);margin-top:6px;"></div>
   </div>
   <div class="results-meta">Affichage <span id="visCnt">—</span> ressource(s)</div>
   <div class="resource-grid" id="resGrid"></div>
@@ -425,6 +460,7 @@ footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);displ
 </div>
 
 
+<footer>
   <div class="footer-text">ARCHI//INDEX · Usage personnel & académique</div>
   <div class="footer-note">Pour les étudiants en architecture, par un ami bienveillant.</div>
 </footer>
@@ -496,9 +532,11 @@ const resources=[
   {cat:"belgique",name:"Inventaris Erfgoed Vlaanderen",url:"https://inventaris.onroerenderfgoed.be",access:"free",desc:"Inventaire du patrimoine architectural immobilier flamand — fiches descriptives avec photos, plans et données historiques de milliers de bâtiments en Flandre. Interface néerlandaise.",tip:"Utiliser le moteur de recherche avec des mots-clés français ou anglais — beaucoup de fiches incluent des termes architecturaux multilingues. Riche en Art Nouveau gantois et anversois."}
 ];
 
-const catLabels={livres:"Livres & Manuels",archives:"Archives & Plans",revues:"Revues Académiques",visuels:"Ressources Visuelles",outils:"Outils & Logiciels",belgique:"🇧🇪 Belgique"};
+const catLabels={livres:"Livres & Manuels",archives:"Archives & Plans",revues:"Revues Académiques",visuels:"Ressources Visuelles",outils:"Outils & Logiciels",belgique:"🇧🇪 Belgique",intl:"🌍 International"};
 const accLabels={free:{l:"Gratuit",c:"badge-free"},partial:{l:"Partiel",c:"badge-partial"},paywall:{l:"Paywall",c:"badge-paywall"},bypass:{l:"Open",c:"badge-bypass"}};
 const accOrd={free:0,bypass:1,partial:2,paywall:3};
+const paysLabels={all:"Tout",international:"🌐 International",france:"🇫🇷 France",italie:"🇮🇹 Italie",uk:"🇬🇧 Royaume-Uni",allemagne:"🇩🇪 Allemagne & Autriche",paysbas:"🇳🇱 Pays-Bas & Flandre",espagne:"🇪🇸 Espagne & Portugal",usa:"🇺🇸 USA"};
+function getAllRes(){return[...resources.map(r=>({...r,pays:null})),...intlSources.map(s=>({...s,cat:"intl",tip:s.tip||""}))];}
 
 const nouveautes=[
   {name:"Kanal Architecture",url:"https://catalogue.kanal.brussels",badge:"Nouveau"},
@@ -527,13 +565,12 @@ const typeLabels={all:"Tous",archive:"Archives d'État",universite:"Universités
 const typeColors={archive:"#c9a96e",universite:"#7aabcf",bibliotheque:"#87c98a",culture:"#cf87bf"};
 
 /* ── STATE ── */
-let activeCat="all",viewMode="grid",idxQ="",searchType="all",carteFilter="all";
+let activeCat="all",activePays="all",viewMode="grid",idxQ="",searchType="all",carteFilter="all";
 let favorites=JSON.parse(localStorage.getItem("archiFav")||"[]");
 let history=JSON.parse(localStorage.getItem("archiHist")||"[]");
 let mapInst=null,mapMarkers=[];
 
 /* ── BOOT ── */
-document.getElementById("totalCount").textContent=resources.length;
 // Nouveautés
 const ns=document.getElementById("nouvStrip");
 nouveautes.forEach(n=>{
@@ -542,25 +579,37 @@ nouveautes.forEach(n=>{
   a.innerHTML=`<span class="chip-badge">[${n.badge}]</span>${n.name}`;
   ns.appendChild(a);
 });
-// Cat filters
+// Cat filters (type)
 const cf=document.getElementById("catFilters");
-cf.innerHTML=`<span class="filter-label">Filtres —</span><button class="filter-btn active" data-cat="all"><span class="dot"></span>Tout</button>${Object.entries(catLabels).map(([k,v])=>`<button class="filter-btn${k==="belgique"?" belgique":""}" data-cat="${k}"><span class="dot"></span>${v}</button>`).join("")}`;
+cf.innerHTML=`<span class="filter-label">Type —</span><button class="filter-btn active" data-cat="all"><span class="dot"></span>Tout</button>${Object.entries(catLabels).map(([k,v])=>`<button class="filter-btn${k==="belgique"?" belgique":""}" data-cat="${k}"><span class="dot"></span>${v}</button>`).join("")}`;
 cf.querySelectorAll(".filter-btn").forEach(b=>b.addEventListener("click",()=>{
   cf.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");activeCat=b.dataset.cat;renderIdx();
+  b.classList.add("active");
+  activeCat=b.dataset.cat;
+  activePays="all";
+  document.querySelectorAll("#paysFilters .filter-btn").forEach(x=>x.classList.toggle("active",x.dataset.pays==="all"));
+  renderIdx();
 }));
+// Pays filters — initialisés à la fin du script après intlSources
 document.getElementById("idxSearch").addEventListener("input",e=>{idxQ=e.target.value;renderIdx();});
 document.getElementById("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
-updateFavCount();renderIdx();renderFavs();renderHist();
+updateFavCount();renderHist();
 
 /* ── INDEX RENDER ── */
 function renderIdx(){
   const grid=document.getElementById("resGrid");
   const q=idxQ.toLowerCase().trim();
-  let fl=resources.filter(r=>{
+  let fl=getAllRes().filter(r=>{
     const cm=activeCat==="all"||r.cat===activeCat;
-    const sm=!q||[r.name,r.desc,r.tip,catLabels[r.cat]||""].some(s=>s.toLowerCase().includes(q));
-    return cm&&sm;
+    const pm=activePays==="all"||(r.pays===activePays);
+    // If pays filter is active: only show intl sources matching pays (ignore cat)
+    // If cat filter is active (not all): only show resources matching cat (pays must be all)
+    let show;
+    if(activePays!=="all") show=r.cat==="intl"&&r.pays===activePays;
+    else if(activeCat!=="all") show=cm;
+    else show=true;
+    const sm=!q||[r.name,r.desc||"",r.tip||"",catLabels[r.cat]||""].some(s=>s.toLowerCase().includes(q));
+    return show&&sm;
   });
   const sort=document.getElementById("sortSel").value;
   if(sort==="name")fl.sort((a,b)=>a.name.localeCompare(b.name));
@@ -575,17 +624,19 @@ function buildCard(r,i=0){
   const acc=accLabels[r.access]||{l:"?",c:""};
   const fav=favorites.includes(r.url);
   const card=document.createElement("div");
-  card.className="card"+(r.cat==="belgique"?" belgique-card":"");
+  const isIntl=r.cat==="intl";
+  card.className="card"+(r.cat==="belgique"?" belgique-card":"")+(isIntl?" intl-card-merged":"");
+  if(isIntl) card.style.borderLeft="2px solid rgba(100,150,220,.2)";
   card.style.animationDelay=Math.min(i*22,380)+"ms";
   const dispUrl=r.url.replace(/^https?:\/\//,"").replace(/\/$/,"");
-  const isListMode=document.getElementById("resGrid").classList.contains("list-mode")||document.getElementById("favGrid").classList.contains("list-mode");
+  const catDisplay=isIntl?`${r.flag||"🌍"} ${paysLabels[r.pays]||r.pays}`:catLabels[r.cat]||r.cat;
   card.innerHTML=`
     <div class="card-header">
-      <div><div class="card-cat">${catLabels[r.cat]||r.cat}</div><div class="card-name">${r.name}</div></div>
+      <div><div class="card-cat">${catDisplay}</div><div class="card-name">${r.name}</div></div>
       <span class="badge ${acc.c}">${acc.l}</span>
     </div>
-    <div class="card-desc">${r.desc}</div>
-    <div class="card-tip"><strong>// Tip —</strong> ${r.tip}</div>
+    <div class="card-desc">${r.desc||""}</div>
+    ${r.tip?`<div class="card-tip"><strong>// Tip —</strong> ${r.tip}</div>`:""}
     <div class="card-footer">
       <span class="card-url">${dispUrl}</span>
       <div class="card-actions">
@@ -609,7 +660,8 @@ function toggleFav(url,btn){
 }
 function renderFavs(){
   const grid=document.getElementById("favGrid");
-  const fl=resources.filter(r=>favorites.includes(r.url));
+  const pool=getAllRes();
+  const fl=pool.filter(r=>favorites.includes(r.url));
   if(!fl.length){grid.innerHTML=`<div class="empty"><div class="empty-t">Aucun favori</div><div class="empty-s">Cliquez sur ★ sur une ressource pour l'ajouter ici</div></div>`;return;}
   grid.innerHTML="";fl.forEach((r,i)=>grid.appendChild(buildCard(r,i)));
 }
@@ -741,18 +793,38 @@ async function fetchArc(q){
 
 function buildDLinks(q){
   const e=encodeURIComponent(q);
-  return[
-    {n:"Z-Library",u:`https://z-library.sk/s/${e}`},
-    {n:"Anna's Archive",u:`https://annas-archive.gl/search?q=${e}`},
-    {n:"Gallica BnF",u:`https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&query=dc.title+adj+%22${e}%22`},
-    {n:"Google Scholar",u:`https://scholar.google.com/scholar?q=${e}`},
-    {n:"JSTOR",u:`https://www.jstor.org/action/doBasicSearch?Query=${e}`},
-    {n:"Sci-Hub",u:`https://sci-hub.st/${e}`},
-    {n:"ResearchGate",u:`https://www.researchgate.net/search?q=${e}`},
-    {n:"Kanal Architecture",u:`https://catalogue.kanal.brussels/cgi-bin/koha/opac-search.pl?q=${e}`},
-    {n:"Digithèque ULB",u:`https://bib.ulb.be/fr/rechercher?q=${e}`},
-    {n:"ETH Zürich",u:`https://www.research-collection.ethz.ch/discover?query=${e}`},
-  ].map(l=>`<a class="direct-link" href="${l.u}" target="_blank" rel="noopener">${l.n}</a>`).join("");
+  const groups = [
+    { label:"Général", links:[
+      {n:"Z-Library",u:`https://z-library.sk/s/${e}`},
+      {n:"Anna's Archive",u:`https://annas-archive.gl/search?q=${e}`},
+      {n:"Google Scholar",u:`https://scholar.google.com/scholar?q=${e}`},
+      {n:"JSTOR",u:`https://www.jstor.org/action/doBasicSearch?Query=${e}`},
+      {n:"Sci-Hub",u:`https://sci-hub.st/${e}`},
+      {n:"ResearchGate",u:`https://www.researchgate.net/search?q=${e}`},
+    ]},
+    { label:"🇧🇪 Belgique", links:[
+      {n:"Kanal Architecture",u:`https://catalogue.kanal.brussels/cgi-bin/koha/opac-search.pl?q=${e}`},
+      {n:"DI-fusion ULB",u:`https://difusion.ulb.be/vufind/Search/Results?lookfor=${e}`},
+      {n:"ETH Zürich",u:`https://www.research-collection.ethz.ch/discover?query=${e}`},
+    ]},
+    { label:"🇫🇷 France", links:[
+      {n:"Gallica BnF",u:`https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&query=dc.title+adj+%22${e}%22`},
+      {n:"Persée",u:`https://www.persee.fr/search?q=${e}`},
+      {n:"Cité Architecture",u:`https://portaildocumentaire.citedelarchitecture.fr/ipac20/ipac.jsp?session=&menu=search&aspect=basic_search&npp=10&ipp=20&spp=20&profile=main&ri=&index=.GK&term=${e}`},
+      {n:"POP Patrimoine",u:`https://pop.culture.gouv.fr/search/mosaic?base=merimee&mainSearch=${e}`},
+    ]},
+    { label:"🌐 International", links:[
+      {n:"UNESCO WHC",u:`https://whc.unesco.org/en/list/?search=${e}`},
+      {n:"Archnet",u:`https://archnet.org/search?q=${e}`},
+      {n:"SAH Archipedia",u:`https://sah-archipedia.org/search?q=${e}`},
+      {n:"archINFORM",u:`https://www.archinform.net/arch/-a.htm?s=${e}`},
+      {n:"Het Nieuwe Instituut",u:`https://zoeken.nieuweinstituut.nl/en?q=${e}`},
+    ]},
+  ];
+  return groups.map(g=>`
+    <div style="width:100%;font-size:.55em;letter-spacing:.2em;color:var(--gold-dim);text-transform:uppercase;padding:8px 0 4px;border-top:1px solid var(--border);margin-top:4px;">${g.label}</div>
+    ${g.links.map(l=>`<a class="direct-link" href="${l.u}" target="_blank" rel="noopener">${l.n}</a>`).join("")}
+  `).join("");
 }
 
 /* ── CARTE ── */
@@ -832,8 +904,18 @@ Gallica BnF, Persée, OpenEdition Journals, In Situ, Internet Archive, Open Libr
 
   recherche: `Tu es un assistant de recherche documentaire expert en architecture, intégré dans ARCHI//INDEX. L'utilisatrice est étudiante en master d'architecture à l'ULB (Bruxelles). Tu réponds toujours en français.
 
-Voici les ressources disponibles dans l'index :
+Voici les ressources disponibles dans l'index principal :
 ${resourcesForAI}
+
+L'index comprend également un onglet "Sources Internationales" avec des ressources par pays :
+— International : UNESCO WHC, ICOMOS, DOCOMOMO, Archnet, SAH Archipedia, Colossus
+— France : Cité de l'Architecture (portail documentaire), Médiathèque du Patrimoine (MPP), Base Mérimée, Base Mémoire, FRAC Centre
+— Italie : Fondazione Zeri, MAXXI, Treccani, Casabella, Archivio Comune di Venezia
+— Royaume-Uni : Historic England Archive, Canmore (Écosse), C20 Society, Archives Hub UK, AA Archive
+— Allemagne & Autriche : Bauhaus-Archiv, DAM Frankfurt, Wien Geschichte Wiki, Deutsche Digitale Bibliothek
+— Pays-Bas & Flandre : Het Nieuwe Instituut, Rijksdienst Cultureel Erfgoed, Onroerend Erfgoed Vlaanderen
+— Espagne & Portugal : Fundación Mies van der Rohe, IPCE, SIPA Portugal
+— USA : Getty Conservation Institute, SAH, MIT OpenCourseWare Architecture, NYPL, Case Study Houses
 
 RÈGLES ABSOLUES pour chaque réponse :
 
@@ -841,15 +923,15 @@ RÈGLES ABSOLUES pour chaque réponse :
 **Mots-clés FR :** mot1, mot2, mot3
 **Mots-clés EN :** keyword1, keyword2, keyword3
 
-2. RESSOURCES DE L'INDEX EN PRIORITÉ : recommande 3 à 5 ressources spécifiques tirées de l'index ci-dessus. Pour chacune, explique en une phrase pourquoi elle est pertinente pour CE sujet précis. Distingue clairement les ressources en accès libre de celles nécessitant un compte.
+2. RESSOURCES EN PRIORITÉ : recommande 3 à 5 ressources spécifiques tirées de l'index ou des sources internationales. Pour chacune, explique en une phrase pourquoi elle est pertinente pour CE sujet précis. Distingue clairement les ressources en accès libre de celles nécessitant un compte.
 
-3. COMPLÉMENTS EXTERNES : si pertinent, mentionne 1 à 2 ressources hors index (ex: une revue spécifique, une institution) en précisant comment y accéder.
+3. COMPLÉMENTS EXTERNES : si pertinent, mentionne 1 à 2 ressources hors index avec comment y accéder.
 
 4. CONSEIL STRATÉGIQUE : termine par 2 à 3 phrases de conseil pratique sur l'ordre dans lequel chercher et comment combiner les sources.
 
 5. NIVEAU : adapte tes recommandations à un travail de master — privilégie les sources académiques, les archives primaires et les publications de référence.
 
-FORMAT FINAL : après ta réponse, liste les ressources recommandées de l'index sur des lignes séparées au format exact :
+FORMAT FINAL : après ta réponse, liste les ressources recommandées sur des lignes séparées au format exact :
 [NOM_RESSOURCE]|||[URL]`
 };
 
@@ -1095,6 +1177,84 @@ setTimeout(() => {
   }
 }, 100);
 
+/* ── SOURCES INTERNATIONALES (fusionnées dans l'Index) ── */
+const intlSources = [
+  // INTERNATIONAL
+  {pays:"international",flag:"🌐",name:"UNESCO World Heritage — Architecture",url:"https://whc.unesco.org/en/list/",desc:"Liste des 1200+ sites du patrimoine mondial avec fiches, plans, photos et dossiers de nomination. Référence incontournable pour l'architecture à valeur universelle.",access:"free",tip:"Chercher par catégorie « Cultural » et filtrer par période ou pays. Les dossiers de nomination PDF sont téléchargeables et constituent des sources académiques de premier rang."},
+  {pays:"international",flag:"🌐",name:"ICOMOS — Chartes & Archives",url:"https://www.icomos.org/charters-and-doctrinal-texts/",desc:"Toutes les chartes doctrinales de l'ICOMOS (Venise, Florence, Burra, Cracovie…) en accès libre. Fondements théoriques incontournables de la conservation du patrimoine architectural mondial.",access:"free",tip:"Les chartes sont en plusieurs langues dont le français. Indispensables pour tout mémoire sur la restauration ou la conservation du patrimoine — à citer directement dans les bibliographies."},
+  {pays:"international",flag:"🌐",name:"DOCOMOMO International",url:"https://www.docomomo.com",desc:"Organisation internationale pour la documentation et conservation du mouvement moderne. Registres de bâtiments modernes à protéger, publications et ressources sur l'architecture du XXe siècle dans le monde entier.",access:"free",tip:"La base de données des registres DOCOMOMO par pays est une référence pour tout travail sur le patrimoine moderniste. Les dossiers ISU (International Selection Unique) sont téléchargeables."},
+  {pays:"international",flag:"🌐",name:"Archnet — Architecture islamique MIT",url:"https://archnet.org",desc:"Ressource open access dédiée à l'architecture et l'urbanisme des cultures musulmanes, développée par le MIT et l'Aga Khan Trust. Projets, bibliothèque, images et publications en accès libre.",access:"free",tip:"Riche en plans, photos d'archives et études de cas sur l'architecture du Moyen-Orient, d'Afrique du Nord et d'Asie centrale. Excellent pour les typologies de mosquées, medersas et espaces publics."},
+  {pays:"international",flag:"🌐",name:"SAH Archipedia",url:"https://sah-archipedia.org",desc:"Encyclopédie en ligne de l'architecture mondiale publiée par la Society of Architectural Historians. Histories, photos et cartes de milliers de bâtiments avec bibliographies de référence.",access:"free",tip:"Chaque notice inclut des références bibliographiques vérifiées — très utile pour constituer une bibliographie sur un bâtiment ou un architecte spécifique."},
+  {pays:"international",flag:"🌐",name:"Colossus — Architecture Magazine Archive",url:"https://www.usmodernist.org",desc:"Plus de 5 millions de pages de revues d'architecture modernistes américaines téléchargeables gratuitement. Arts & Architecture, Architectural Forum, Progressive Architecture, Architectural Record...",access:"free",tip:"Rechercher directement par revue puis parcourir par décennie. Arts & Architecture (1929-1967) est particulièrement précieuse pour les Case Study Houses et le modernisme californien."},
+  {pays:"international",flag:"🌐",name:"Archis / Volume Magazine",url:"https://archis.org",desc:"Revue néerlandaise d'architecture critique et d'urbanisme, plateforme de débat international. Articles en anglais sur l'architecture contemporaine et ses enjeux sociaux et politiques.",access:"partial",tip:"Les archives en ligne sont partiellement gratuites. Fortes sur les thèmes urbains critiques, le logement et les questions territoriales — utile pour les mémoires à dimension théorique."},
+
+  // FRANCE
+  {pays:"france",flag:"🇫🇷",name:"Cité de l'Architecture — Portail Documentaire",url:"https://portaildocumentaire.citedelarchitecture.fr",desc:"Portail de la Cité de l'architecture et du patrimoine — revues patrimoniales numérisées, livres anciens libres de droits, archives d'architectes contemporains français depuis la fin du XIXe siècle.",access:"free",tip:"Les revues numérisées incluent L'Architecture, La Construction Moderne, L'Architecte — des sources primaires précieuses pour l'architecture française du XXe siècle."},
+  {pays:"france",flag:"🇫🇷",name:"POP — Plateforme Ouverte du Patrimoine",url:"https://pop.culture.gouv.fr",desc:"Portail du Ministère de la Culture regroupant 8 bases dont Mérimée (275k bâtiments protégés) et Mémoire (600k photographies du patrimoine français). Nouvellement refondu en décembre 2025.",access:"free",tip:"Utiliser le filtre par base pour accéder à Mérimée (architecture) ou Mémoire (photos). La recherche par commune + époque est très efficace pour cibler des bâtiments spécifiques."},
+  {pays:"france",flag:"🇫🇷",name:"Médiathèque du Patrimoine (MPP)",url:"https://www.mediatheque-patrimoine.culture.gouv.fr",desc:"Service national conservant toutes les archives des travaux sur monuments historiques, fonds photographiques, dossiers des architectes en chef. Des millions de documents sur le patrimoine bâti français.",access:"partial",tip:"Le catalogue en ligne permet d'identifier les fonds. Les dossiers de monument historique sont consultables en salle de lecture à Charenton-le-Pont — réserver à l'avance par courriel."},
+  {pays:"france",flag:"🇫🇷",name:"FRAC Centre-Val de Loire",url:"https://www.frac-centre.fr",desc:"Troisième collection d'art et d'architecture au monde après le Centre Pompidou et le MoMA. Architecture expérimentale et radicale des années 1950 à nos jours — 1200+ maquettes, 17000+ dessins d'architectes.",access:"partial",tip:"Le catalogue de collection est consultable en ligne. Les expositions ArchiLab sont de référence pour l'architecture d'avant-garde. Collection idéale pour étudier les utopies architecturales."},
+
+  // ITALIE
+  {pays:"italie",flag:"🇮🇹",name:"Fondazione Zeri — Photothèque",url:"https://fondazionezeri.unibo.it/en",desc:"Archive photographique de Federico Zeri — 290.000+ images d'architecture et d'art italien de toutes les périodes, librement consultables et téléchargeables en haute résolution pour la recherche.",access:"free",tip:"Rechercher par architecte, lieu ou période. Forte sur l'architecture de la Renaissance et du baroque italien. Images téléchargeables en haute résolution pour usage académique."},
+  {pays:"italie",flag:"🇮🇹",name:"MAXXI — Collections Architecture",url:"https://www.maxxi.art/en/collections/architecture/",desc:"Collections d'architecture du Musée national des arts du XXIe siècle (Rome) — dessins originaux, maquettes et archives d'architectes italiens et internationaux contemporains dont Zaha Hadid.",access:"partial",tip:"Le catalogue en ligne donne accès aux fonds. Pour la consultation physique des archives, prendre contact avec le Centre de documentation du MAXXI à Rome."},
+  {pays:"italie",flag:"🇮🇹",name:"Treccani — Architecture",url:"https://www.treccani.it/enciclopedia/architettura",desc:"Encyclopédie italienne de référence avec entrées approfondies sur l'architecture, les architectes, les styles et les monuments. Textes académiques rédigés par des spécialistes.",access:"free",tip:"En italien, mais les entrées sur les grands architectes et styles européens sont des synthèses de référence. Utile pour vérifier des dates, noms et informations factuelles."},
+  {pays:"italie",flag:"🇮🇹",name:"Domus Archive",url:"https://www.domusweb.it/en/archivio.html",desc:"Archive de la revue Domus, fondée en 1928 — l'une des publications d'architecture les plus influentes au monde. Articles et projets sur l'architecture italienne et internationale contemporaine.",access:"partial",tip:"Les archives complètes sont accessibles sur abonnement, mais de nombreux articles récents sont en accès libre. Indispensable pour suivre la pensée critique architecturale italienne."},
+
+  // ROYAUME-UNI
+  {pays:"uk",flag:"🇬🇧",name:"Historic England Archive",url:"https://historicengland.org.uk/images-books/archive/",desc:"Plus d'un million de photographies, plans et dessins du patrimoine bâti anglais depuis 1850. Inclut la collection Aerofilms (photos aériennes 1919-1953) téléchargeables en haute résolution.",access:"free",tip:"La recherche par lieu, type de bâtiment ou période est très précise. Les photos aériennes historiques permettent de reconstituer l'évolution urbaine de n'importe quelle ville anglaise."},
+  {pays:"uk",flag:"🇬🇧",name:"Canmore — Patrimoine Écossais",url:"https://canmore.org.uk",desc:"Base nationale des monuments et bâtiments historiques d'Écosse — 300.000+ notices avec photos, plans et documents historiques. Géré par Historic Environment Scotland.",access:"free",tip:"Couvre l'architecture vernaculaire écossaise avec une exhaustivité remarquable. Les séries de photos d'archives permettent de voir l'évolution d'un bâtiment ou d'un quartier dans le temps."},
+  {pays:"uk",flag:"🇬🇧",name:"C20 Society — Patrimoine XXe siècle",url:"https://c20society.org.uk",desc:"Société de préservation de l'architecture britannique du XXe siècle (depuis 1914). Publications, listes de bâtiments en danger, ressources sur le modernisme et le brutalisme anglais.",access:"free",tip:"La « Buildings at Risk » list est une ressource unique pour identifier les bâtiments modernistes britanniques menacés. Le C20 Journal PDF est téléchargeable gratuitement pour les membres."},
+  {pays:"uk",flag:"🇬🇧",name:"Archives Hub UK",url:"https://archiveshub.jisc.ac.uk",desc:"Portail d'accès unifié aux archives de plus de 300 universités et institutions culturelles britanniques. Idéal pour localiser les fonds d'archives d'architectes et designers britanniques.",access:"free",tip:"Rechercher par nom d'architecte ou par institution pour identifier les fonds archivistiques disponibles. Les notices pointent vers les collections physiques et éventuellement numériques."},
+  {pays:"uk",flag:"🇬🇧",name:"Architectural Association — Archive",url:"https://www.aaschool.ac.uk/AALIFE/LIBRARY/aaarchive.php",desc:"Archives de l'Architectural Association de Londres — l'une des écoles d'architecture les plus influentes au monde. Projets étudiants historiques, conférences et publications depuis 1847.",access:"partial",tip:"Le catalogue d'archives est consultable en ligne. L'AA dispose d'un fonds exceptionnel sur les avant-gardes architecturales des années 1960-1980 (Archigram, etc.)."},
+
+  // ALLEMAGNE & AUTRICHE
+  {pays:"allemagne",flag:"🇩🇪",name:"Bauhaus-Archiv Berlin",url:"https://www.bauhaus.de/en/",desc:"Archive officielle du Bauhaus — documents originaux, dessins, photographies et publications de l'école fondée par Gropius en 1919. Catalogue en ligne avec objets numérisés accessibles.",access:"partial",tip:"L'outil de recherche en ligne donne accès à des milliers d'objets numérisés. Contacter le Bauhaus-Archiv directement pour les recherches approfondies sur un enseignant ou une période."},
+  {pays:"allemagne",flag:"🇩🇪",name:"Deutsches Architekturmuseum — DAM",url:"https://dam-online.de",desc:"Musée allemand de l'architecture (Francfort) — une des plus grandes collections de dessins et maquettes d'architecture au monde. Catalogue en ligne, publications et archives numérisées.",access:"partial",tip:"Le DAM publie des monographies de référence et organise les expositions phares sur l'architecture allemande contemporaine. Le catalogue en ligne est consultable librement."},
+  {pays:"allemagne",flag:"🇩🇪",name:"Wien Geschichte Wiki",url:"https://www.geschichtewiki.wien.gv.at",desc:"Encyclopédie historique de la Ville de Vienne — architecture, urbanisme, biographies d'architectes (Wagner, Loos, Hoffmann…), plans historiques et photos. Référence pour la Sécession viennoise.",access:"free",tip:"Rechercher directement en allemand par nom d'architecte ou de bâtiment. Couvre exceptionnellement bien l'architecture de la Ringstrasse et du Jugendstil viennois."},
+  {pays:"allemagne",flag:"🇩🇪",name:"Deutsche Digitale Bibliothek",url:"https://www.deutsche-digitale-bibliothek.de",desc:"Bibliothèque numérique nationale allemande — millions d'objets culturels numérisés issus de milliers d'institutions, dont archives et collections d'architecture.",access:"free",tip:"Filtrer par « Architektur » dans la recherche par sujet. Donne accès aux fonds numérisés de nombreux musées et archives régionaux allemands."},
+
+  // PAYS-BAS & FLANDRE
+  {pays:"paysbas",flag:"🇳🇱",name:"Het Nieuwe Instituut — Collectie",url:"https://zoeken.nieuweinstituut.nl/en",desc:"Portail de recherche des collections du Nieuwe Instituut — 1,4 million de dessins, 300.000 photos et 3000 maquettes d'architectes néerlandais. Archive nationale hollandaise d'architecture et d'urbanisme.",access:"free",tip:"Rechercher directement par nom d'architecte (OMA, MVRDV, Van Eyck, Bakema, Hertzberger…). Plus de 140.000 images numérisées accessibles en ligne, reste consultable sur place à Rotterdam."},
+  {pays:"paysbas",flag:"🇳🇱",name:"Rijksdienst Cultureel Erfgoed",url:"https://www.cultureelerfgoed.nl",desc:"Service national néerlandais du patrimoine culturel — base de données complète des monuments protégés des Pays-Bas, photographies historiques, cartes et documentation architecturale.",access:"free",tip:"La base de données des monuments (monumentenregister.cultureelerfgoed.nl) est très complète et inclut des photos d'archives et des dates de protection. Interface en néerlandais."},
+  {pays:"paysbas",flag:"🇳🇱",name:"Onroerend Erfgoed Vlaanderen",url:"https://www.onroerenderfgoed.be",desc:"Agence du patrimoine immobilier flamand — base de données, publications de recherche et ressources sur l'architecture flamande. Pendant de la Rijksdienst pour la Flandre.",access:"free",tip:"Complémentaire aux inventaires belges francophones. Riche en architecture industrielle flamande, en Art Nouveau gantois et anversois, et en architecture vernaculaire rurale."},
+
+  // ESPAGNE & PORTUGAL
+  {pays:"espagne",flag:"🇪🇸",name:"Fundación Mies van der Rohe Barcelone",url:"https://miesbcn.com",desc:"Fondation dédiée à Mies van der Rohe et à l'architecture européenne contemporaine. Archive du Pavillon de Barcelone, ressources sur le modernisme et le Prix Mies van der Rohe UE.",access:"free",tip:"La section Archives du Pavillon de Barcelone (1929) comprend des plans originaux, photos et documentation historique. La base de données du Prix Mies référence l'architecture européenne contemporaine."},
+  {pays:"espagne",flag:"🇪🇸",name:"IPCE — Institut du Patrimoine Culturel Espagne",url:"https://ipce.culturaydeporte.gob.es",desc:"Institut du Patrimoine Culturel d'Espagne — dossiers de monuments nationaux, publications de restauration et conservation du patrimoine architectural espagnol.",access:"free",tip:"Forte en documentation technique de restauration. Les plans et relevés des grands monuments espagnols sont consultables dans les publications de l'IPCE, téléchargeables en PDF."},
+  {pays:"espagne",flag:"🇪🇸",name:"SIPA — Patrimoine Architectural Portugal",url:"https://www.patrimoniocultural.gov.pt",desc:"Portail du patrimoine culturel portugais — inventaire du patrimoine architectural, dossiers de monuments nationaux, publications sur le patrimoine bâti ibérique.",access:"free",tip:"La base SIPA (Sistema de Informação para o Património Arquitectónico) contient des milliers de fiches avec plans et photos. Interface multilingue partiellement disponible."},
+
+  // USA
+  {pays:"usa",flag:"🇺🇸",name:"Getty Conservation Institute",url:"https://www.getty.edu/conservation",desc:"Institut américain de référence pour la conservation du patrimoine architectural mondial. Publications gratuites téléchargeables (PDF), recherches sur le modernisme, matériaux et techniques.",access:"free",tip:"Les publications GCI sont téléchargeables gratuitement — en particulier 'Conserving Modern Architecture' et les Preserving Modern Architecture PDFs. Références incontournables en conservation."},
+  {pays:"usa",flag:"🇺🇸",name:"SAH — Society of Architectural Historians",url:"https://www.sah.org",desc:"Principale société académique d'histoire de l'architecture aux USA. JSAH (Journal), Archipedia et listes de dissertations. Référence pour la recherche historique en architecture.",access:"partial",tip:"Le Journal of the Society of Architectural Historians (JSAH) est accessible via JSTOR. SAH Archipedia est en accès libre. Les listes de dissertations permettent de cartographier la recherche en cours."},
+  {pays:"usa",flag:"🇺🇸",name:"MIT OpenCourseWare — Architecture",url:"https://ocw.mit.edu/search/?d=Architecture",desc:"Cours complets du MIT en architecture et urbanisme en accès libre — syllabus, lectures, notes de cours, bibliographies. Ressource pédagogique exceptionnelle pour un master.",access:"free",tip:"Les cours de Kenneth Frampton, Reinhold Martin et des autres professeurs du MIT incluent des bibliographies très complètes — idéales pour construire une bibliographie de mémoire."},
+  {pays:"usa",flag:"🇺🇸",name:"NYPL — Collections Architecture & Cartes",url:"https://digitalcollections.nypl.org/search/index?utf8=%E2%9C%93&keywords=architecture",desc:"Collections numériques de la New York Public Library — cartes historiques, plans d'architecture, photographies et documents d'époque, librement téléchargeables.",access:"free",tip:"Filtrer par type 'Still Image' et 'Maps' pour les documents architecturaux. Les plans de NYC anciens sont particulièrement détaillés. Téléchargement en haute résolution gratuit."},
+  {pays:"usa",flag:"🇺🇸",name:"Case Study Houses — Archive.org",url:"https://archive.org/details/arts-and-architecture",desc:"Archive complète de la revue Arts & Architecture (1943-1967) — le programme Case Study Houses, qui a redéfini l'architecture domestique moderne californienne. John Entenza, Eames, Neutra, Koenig...",access:"free",tip:"Télécharger directement les numéros PDF par année. Les numéros de 1945 à 1966 contiennent les Case Study Houses avec plans originaux et photos de Julius Shulman."},
+];
+
+/* ── INIT PAYS FILTERS ── */
+function initPaysFilters(){
+  const pf=document.getElementById("paysFilters");
+  pf.innerHTML=`<span class="filter-label">Région —</span>`+
+    Object.entries(paysLabels).map(([k,v])=>
+      `<button class="filter-btn${k==="all"?" active":""}" data-pays="${k}" onclick="setPays(this,'${k}')">${v} <span style="opacity:.45;font-size:.85em">(${k==="all"?intlSources.length:intlSources.filter(s=>s.pays===k).length})</span></button>`
+    ).join("");
+}
+function setPays(btn,pays){
+  activePays=pays;
+  document.querySelectorAll("#paysFilters .filter-btn").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+  if(pays!=="all"){
+    activeCat="all";
+    document.querySelectorAll("#catFilters .filter-btn").forEach(b=>b.classList.toggle("active",b.dataset.cat==="all"));
+  }
+  renderIdx();
+}
+
+/* ── INIT FINAL — après intlSources ── */
+document.getElementById("totalCount").textContent=getAllRes().length;
+initPaysFilters();
+renderIdx();
+renderFavs();
 </script>
 </body>
 </html>
