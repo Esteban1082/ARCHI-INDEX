@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Simulation PoolGuard</title>
+  <style>
+    body { font-family: Inter, Arial, sans-serif; background:#0f172a; color:#e2e8f0; margin:0; padding:24px; }
+    h1 { margin:0 0 8px; }
+    .sub { color:#94a3b8; margin-bottom:20px; }
+    .controls { display:flex; gap:12px; flex-wrap:wrap; margin-bottom:16px; }
+    .card { background:#111827; border:1px solid #334155; border-radius:10px; padding:12px; }
+    .deck-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:12px; }
+    .deck { background:#111827; border:1px solid #334155; border-radius:12px; padding:12px; }
+    .state { font-weight:700; }
+    .ok { color:#22c55e; }
+    .warn { color:#f59e0b; }
+    .alert { color:#ef4444; }
+    button, select { background:#1e293b; color:#e2e8f0; border:1px solid #475569; border-radius:8px; padding:7px 10px; cursor:pointer; }
+    .log { max-height:220px; overflow:auto; font-size:14px; line-height:1.4; }
+  </style>
+</head>
+<body>
+  <h1>Simulation du système transats (PoolGuard)</h1>
+  <div class="sub">Prototype pédagogique : détection <strong>personne présente</strong> / <strong>objet seul</strong> avec timer et alerte staff.</div>
+
+  <div class="controls card">
+    <label>Timer avant alerte
+      <select id="threshold">
+        <option value="10">10 min</option>
+        <option value="30" selected>30 min</option>
+        <option value="60">60 min</option>
+      </select>
+    </label>
+    <button onclick="randomStep()">Simuler 5 minutes</button>
+    <button onclick="advance(30)">Simuler 30 minutes</button>
+    <button onclick="resetAll()">Reset</button>
+    <div id="clock">Temps simulé: 00:00</div>
+  </div>
+
+  <div class="deck-grid" id="decks"></div>
+
+  <h3>Journal des alertes</h3>
+  <div class="card log" id="log"></div>
+
+<script>
+const loungers = Array.from({length: 8}, (_, i) => ({ id: i+1, state:'free', objectSince:null, alerted:false }));
+let now = 0;
+
+function fmt(min){ const h=String(Math.floor(min/60)).padStart(2,'0'); const m=String(min%60).padStart(2,'0'); return `${h}:${m}`; }
+function cls(state){ return state==='occupied'?'ok':state==='object'?'warn':'ok'; }
+function label(state){ return state==='occupied'?'Occupé (personne)':state==='object'?'Objet seul':'Libre'; }
+
+function log(msg){ const el=document.getElementById('log'); const row=document.createElement('div'); row.textContent=`[${fmt(now)}] ${msg}`; el.prepend(row); }
+
+function setState(id, state){
+  const l=loungers.find(x=>x.id===id);
+  l.state=state;
+  if(state==='object' && l.objectSince===null) l.objectSince=now;
+  if(state!=='object') { l.objectSince=null; l.alerted=false; }
+  render();
+}
+
+function advance(minutes){
+  now += minutes;
+  const threshold=Number(document.getElementById('threshold').value);
+  loungers.forEach(l=>{
+    if(l.state==='object' && l.objectSince!==null && !l.alerted){
+      const idle = now - l.objectSince;
+      if(idle>=threshold){
+        l.alerted=true;
+        log(`ALERTE transat #${l.id} inoccupé avec objet depuis ${idle} min.`);
+      }
+    }
+  });
+  render();
+}
+
+function randomStep(){
+  loungers.forEach(l=>{
+    const r=Math.random();
+    if(r<0.35) l.state='occupied';
+    else if(r<0.65) l.state='object';
+    else l.state='free';
+    if(l.state==='object' && l.objectSince===null) l.objectSince=now;
+    if(l.state!=='object'){ l.objectSince=null; l.alerted=false; }
+  });
+  advance(5);
+}
+
+function resetAll(){ now=0; loungers.forEach(l=>{l.state='free';l.objectSince=null;l.alerted=false;}); document.getElementById('log').innerHTML=''; render(); }
+
+function render(){
+  document.getElementById('clock').textContent=`Temps simulé: ${fmt(now)}`;
+  const wrap=document.getElementById('decks');
+  wrap.innerHTML='';
+  loungers.forEach(l=>{
+    const idle=l.objectSince===null?0:now-l.objectSince;
+    const alertText=l.alerted?`<span class='state alert'>Alerte envoyée au staff</span>`:'';
+    const card=document.createElement('div');
+    card.className='deck';
+    card.innerHTML=`
+      <div><strong>Transat #${l.id}</strong></div>
+      <div class='state ${cls(l.state)}'>${label(l.state)}</div>
+      <div>Temps objet seul: ${l.state==='object'?idle:0} min</div>
+      <div>${alertText}</div>
+      <div style='display:flex; gap:6px; margin-top:10px;'>
+        <button onclick='setState(${l.id},"occupied")'>Personne</button>
+        <button onclick='setState(${l.id},"object")'>Objet seul</button>
+        <button onclick='setState(${l.id},"free")'>Libre</button>
+      </div>`;
+    wrap.appendChild(card);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
