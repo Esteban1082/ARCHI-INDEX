@@ -1,473 +1,598 @@
 <!DOCTYPE html>
-<html lang="fr" data-theme="dark" data-font="md">
+<html lang="fr" data-font="md">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#f5f5f7">
 <title>ARCHI//INDEX — Ressources Architecture</title>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+<meta name="description" content="Livres, archives, revues, images, outils et institutions belges pour les étudiants en architecture — avec recherche intégrée et assistant IA.">
+<script>
+try{var t=JSON.parse(localStorage.getItem("archiThemeV2"));if(t==="dark")document.documentElement.classList.add("dark");var f=JSON.parse(localStorage.getItem("archiFont"));if(f==="sm"||f==="lg")document.documentElement.dataset.font=f;}catch(e){}
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <style>
-:root {
-  --bg:#080809;--bg2:#0e0e10;--bg3:#141417;
-  --border:rgba(200,180,140,0.12);--border-h:rgba(200,180,140,0.35);
-  --gold:#c9a96e;--gold-dim:rgba(201,169,110,0.6);--gold-faint:rgba(201,169,110,0.08);
-  --text:#e8e0d0;--text-dim:rgba(232,224,208,0.5);--text-muted:rgba(232,224,208,0.28);
-  --mono:'IBM Plex Mono',monospace;--serif:'Cormorant Garamond',Georgia,serif;
+:root{
+  --radius:1rem;
+  --background:oklch(0.972 0.002 286);
+  --foreground:oklch(0.22 0.004 286);
+  --card:oklch(1 0 0);
+  --card-foreground:oklch(0.22 0.004 286);
+  --surface:oklch(0.955 0.003 286);
+  --popover:oklch(1 0 0);
+  --popover-foreground:oklch(0.22 0.004 286);
+  --primary:oklch(0.578 0.196 256);
+  --primary-foreground:oklch(1 0 0);
+  --secondary:oklch(0.93 0.004 286);
+  --secondary-foreground:oklch(0.22 0.004 286);
+  --muted:oklch(0.945 0.003 286);
+  --muted-foreground:oklch(0.5 0.008 286);
+  --faint:oklch(0.6 0.008 286);
+  --accent:oklch(0.578 0.196 256 / 0.09);
+  --accent-foreground:oklch(0.5 0.19 256);
+  --destructive:oklch(0.58 0.21 27);
+  --destructive-foreground:oklch(1 0 0);
+  --border:oklch(0.22 0.004 286 / 0.08);
+  --border-strong:oklch(0.22 0.004 286 / 0.16);
+  --input:oklch(0.22 0.004 286 / 0.1);
+  --ring:oklch(0.578 0.196 256 / 0.45);
+  --glass:oklch(0.985 0.002 286 / 0.8);
+
+  --belgique:oklch(0.62 0.15 60);
+  --intl:oklch(0.55 0.12 200);
+  --access-free:oklch(0.55 0.14 150);
+  --access-partial:oklch(0.6 0.15 60);
+  --access-paywall:oklch(0.57 0.2 27);
+  --access-open:oklch(0.55 0.17 256);
+  --map-archive:oklch(0.7 0.16 60);
+  --map-universite:oklch(0.6 0.18 256);
+  --map-bibliotheque:oklch(0.65 0.16 150);
+  --map-culture:oklch(0.64 0.2 350);
+
+  --gradient-brand:linear-gradient(135deg, oklch(0.62 0.19 256), oklch(0.74 0.13 215));
+  --gradient-text:linear-gradient(100deg, oklch(0.56 0.2 262) 10%, oklch(0.66 0.15 220) 90%);
+  --hero-glow:
+    radial-gradient(60% 55% at 20% 10%, oklch(0.8 0.1 240 / 0.35), transparent 70%),
+    radial-gradient(45% 50% at 85% 20%, oklch(0.88 0.08 70 / 0.45), transparent 70%);
+  --shadow-card-value:0 1px 2px oklch(0 0 0 / 0.04), 0 6px 20px -10px oklch(0 0 0 / 0.12);
+  --shadow-lift-value:0 2px 4px oklch(0 0 0 / 0.04), 0 22px 44px -20px oklch(0 0 0 / 0.25);
+
+  --r-sm:10px;--r-md:12px;--r-lg:14px;--r-xl:16px;--r-2xl:20px;--r-3xl:26px;--r-4xl:34px;
+  --font-text:-apple-system, BlinkMacSystemFont, "SF Pro Text", "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --font-display:-apple-system, BlinkMacSystemFont, "SF Pro Display", "Figtree", "Helvetica Neue", Arial, sans-serif;
+  --font-mono:ui-monospace, "SF Mono", Menlo, monospace;
+  --ease:cubic-bezier(0.2,0.7,0.2,1);
+  --pad:16px;
 }
-[data-theme="light"] {
-  --bg:#f4f1eb;--bg2:#ede9e0;--bg3:#e5e0d4;
-  --border:rgba(100,80,40,0.14);--border-h:rgba(100,80,40,0.38);
-  --gold:#8a6530;--gold-dim:rgba(138,101,48,0.7);--gold-faint:rgba(138,101,48,0.09);
-  --text:#1a1510;--text-dim:rgba(26,21,16,0.55);--text-muted:rgba(26,21,16,0.35);
+.dark{
+  --background:oklch(0 0 0);
+  --foreground:oklch(0.97 0.002 286);
+  --card:oklch(0.21 0.003 286);
+  --card-foreground:oklch(0.97 0.002 286);
+  --surface:oklch(0.25 0.004 286);
+  --popover:oklch(0.23 0.003 286);
+  --popover-foreground:oklch(0.97 0.002 286);
+  --primary:oklch(0.67 0.17 252);
+  --primary-foreground:oklch(1 0 0);
+  --secondary:oklch(0.28 0.004 286);
+  --secondary-foreground:oklch(0.97 0.002 286);
+  --muted:oklch(0.25 0.004 286);
+  --muted-foreground:oklch(0.74 0.006 286);
+  --faint:oklch(0.6 0.008 286);
+  --accent:oklch(0.67 0.17 252 / 0.16);
+  --accent-foreground:oklch(0.75 0.15 252);
+  --border:oklch(1 0 0 / 0.1);
+  --border-strong:oklch(1 0 0 / 0.2);
+  --input:oklch(1 0 0 / 0.12);
+  --ring:oklch(0.67 0.17 252 / 0.5);
+  --glass:oklch(0.16 0.003 286 / 0.78);
+
+  --belgique:oklch(0.8 0.14 70);
+  --intl:oklch(0.78 0.11 200);
+  --access-free:oklch(0.78 0.15 150);
+  --access-partial:oklch(0.8 0.13 70);
+  --access-paywall:oklch(0.72 0.17 25);
+  --access-open:oklch(0.75 0.13 252);
+  --map-archive:oklch(0.8 0.14 70);
+  --map-universite:oklch(0.72 0.15 252);
+  --map-bibliotheque:oklch(0.78 0.15 150);
+  --map-culture:oklch(0.74 0.17 350);
+
+  --gradient-text:linear-gradient(100deg, oklch(0.72 0.16 255) 10%, oklch(0.82 0.11 210) 90%);
+  --hero-glow:
+    radial-gradient(60% 55% at 20% 10%, oklch(0.5 0.15 255 / 0.3), transparent 70%),
+    radial-gradient(45% 50% at 85% 20%, oklch(0.55 0.1 60 / 0.2), transparent 70%);
+  --shadow-card-value:0 0 0 1px oklch(1 0 0 / 0.04);
+  --shadow-lift-value:0 0 0 1px oklch(1 0 0 / 0.08), 0 22px 44px -20px oklch(0 0 0 / 0.8);
+  color-scheme:dark;
 }
-[data-font="sm"] { font-size:13px; }
-[data-font="md"] { font-size:15px; }
-[data-font="lg"] { font-size:17px; }
+@media (min-width:640px){:root{--pad:24px}}
+
+html{font-size:16px;-webkit-text-size-adjust:100%;scroll-padding-top:120px}
+html[data-font="sm"]{font-size:14px}
+html[data-font="lg"]{font-size:18px}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden;transition:background .25s,color .25s;}
-body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:0;
-  background-image:linear-gradient(rgba(201,169,110,.035) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,110,.035) 1px,transparent 1px),linear-gradient(rgba(201,169,110,.015) 1px,transparent 1px),linear-gradient(90deg,rgba(201,169,110,.015) 1px,transparent 1px);
-  background-size:80px 80px,80px 80px,20px 20px,20px 20px;}
-[data-theme="light"] body::before{opacity:.4;}
-body::after{content:'';position:fixed;top:0;left:0;width:160px;height:160px;pointer-events:none;z-index:1;
-  background:linear-gradient(var(--gold),var(--gold)) top left/40px 1px no-repeat,linear-gradient(var(--gold),var(--gold)) top left/1px 40px no-repeat;opacity:.2;}
-.corner-br{position:fixed;bottom:0;right:0;width:160px;height:160px;pointer-events:none;z-index:1;
-  background:linear-gradient(var(--gold),var(--gold)) bottom right/40px 1px no-repeat,linear-gradient(var(--gold),var(--gold)) bottom right/1px 40px no-repeat;opacity:.2;}
-.wrapper{position:relative;z-index:2;max-width:1300px;margin:0 auto;padding:48px 32px 100px;}
+body{background:var(--background);color:var(--foreground);font-family:var(--font-text);font-size:1rem;line-height:1.5;letter-spacing:-.005em;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;min-height:100vh;display:flex;flex-direction:column;overflow-x:hidden;transition:background-color .3s,color .3s}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+a{color:var(--primary)}
+.ic{flex:none;display:block}
+:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.noscroll{scrollbar-width:none}
+.noscroll::-webkit-scrollbar{display:none}
+[hidden]{display:none!important}
 
-/* HEADER */
-header{margin-bottom:40px;display:flex;flex-direction:column;gap:14px;}
-.header-top{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;}
-.logo-label{font-size:.6em;font-weight:500;letter-spacing:.3em;color:var(--gold);text-transform:uppercase;margin-bottom:8px;}
-h1{font-family:var(--serif);font-size:clamp(38px,5.5vw,72px);font-weight:300;line-height:.9;letter-spacing:-.02em;}
-h1 em{font-style:italic;color:var(--gold);}
-.header-right{display:flex;flex-direction:column;align-items:flex-end;gap:10px;padding-top:6px;}
-.stat{font-size:.6em;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;}
-.stat span{color:var(--gold-dim);font-weight:500;}
-.header-controls{display:flex;align-items:center;gap:6px;flex-wrap:wrap;justify-content:flex-end;}
-.icon-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.12em;padding:5px 9px;cursor:pointer;transition:all .18s;text-transform:uppercase;}
-.icon-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--gold-faint);}
-.icon-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
-.font-group{display:flex;gap:3px;}
-.divider{width:100%;height:1px;background:linear-gradient(90deg,var(--gold) 0%,rgba(201,169,110,.1) 60%,transparent 100%);opacity:.3;margin:4px 0;}
-.header-desc{font-size:.7em;color:var(--text-dim);letter-spacing:.04em;line-height:1.8;max-width:640px;}
-
-/* TABS */
-.tabs{display:flex;gap:0;margin-bottom:40px;border-bottom:1px solid var(--border);}
-.tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;color:var(--text-muted);font-family:var(--mono);font-size:.62em;letter-spacing:.22em;text-transform:uppercase;padding:11px 20px;cursor:pointer;transition:all .2s;margin-bottom:-1px;}
-.tab-btn:hover{color:var(--text-dim);}
-.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-/* NOUVEAUTES */
-.section-label{font-size:.58em;letter-spacing:.28em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:10px;}
-.section-label::after{content:'';flex:1;height:1px;background:var(--border);}
-.new-strip{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:36px;}
-.new-chip{background:var(--gold-faint);border:1px solid rgba(201,169,110,.2);padding:7px 13px;font-size:.62em;letter-spacing:.08em;color:var(--gold-dim);cursor:pointer;transition:all .18s;text-decoration:none;display:flex;align-items:center;gap:7px;}
-.new-chip:hover{border-color:var(--gold);color:var(--gold);background:rgba(201,169,110,.12);}
-.chip-badge{font-size:.85em;opacity:.7;}
-
-/* CONTROLS */
-.controls{display:flex;flex-direction:column;gap:14px;margin-bottom:32px;}
-.controls-row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;}
-.search-wrap{position:relative;flex:1;min-width:200px;}
-.search-icon{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--gold-dim);font-size:.75em;pointer-events:none;}
-.search-input{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.72em;padding:12px 14px 12px 40px;outline:none;transition:border-color .2s;letter-spacing:.04em;}
-.search-input::placeholder{color:var(--text-muted);}
-.search-input:focus{border-color:var(--border-h);}
-.filters{display:flex;flex-wrap:wrap;gap:5px;align-items:center;}
-.filter-label{font-size:.56em;letter-spacing:.25em;color:var(--text-muted);text-transform:uppercase;margin-right:2px;}
-.filter-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.58em;letter-spacing:.1em;padding:5px 11px;cursor:pointer;transition:all .18s;text-transform:uppercase;display:flex;align-items:center;gap:4px;}
-.filter-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--gold-faint);}
-.filter-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
-.filter-btn .dot{width:4px;height:4px;border-radius:50%;background:currentColor;opacity:.55;}
-.filter-btn.belgique{border-color:rgba(232,200,74,.2);color:rgba(232,200,74,.5);}
-.filter-btn.belgique:hover{border-color:rgba(232,200,74,.5);color:rgba(232,200,74,.85);background:rgba(232,200,74,.05);}
-.filter-btn.belgique.active{border-color:#e8c84a;color:#e8c84a;background:rgba(232,200,74,.06);}
-.sort-select{background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.58em;letter-spacing:.08em;padding:5px 10px;outline:none;cursor:pointer;}
-.view-toggle{display:flex;gap:3px;}
-.results-meta{font-size:.58em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;margin-bottom:16px;}
-.results-meta span{color:var(--gold-dim);}
-
-/* GRID/LIST */
-.resource-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:2px;}
-.resource-grid.list-mode{grid-template-columns:1fr;}
-
-/* CARD */
-.card{background:var(--bg2);border:1px solid var(--border);padding:20px;transition:border-color .2s,background .2s;display:flex;flex-direction:column;gap:11px;animation:fadeIn .3s ease both;}
-.card:hover{border-color:var(--border-h);background:var(--bg3);}
-.card.belgique-card{border-left:2px solid rgba(232,200,74,.2);}
-.card.belgique-card:hover{border-left-color:rgba(232,200,74,.45);}
-@keyframes fadeIn{from{opacity:0;transform:translateY(5px)}to{opacity:1;transform:none}}
-.list-mode .card{flex-direction:row;align-items:flex-start;gap:16px;padding:14px 20px;}
-.list-mode .card-body{flex:1;display:flex;flex-direction:column;gap:7px;}
-.list-mode .card-tip{display:none;}
-.list-mode .card-desc{font-size:.65em;}
-.list-mode .card-side{display:flex;flex-direction:column;align-items:flex-end;gap:5px;flex-shrink:0;}
-.card-header{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.card-cat{font-size:.55em;letter-spacing:.25em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:3px;}
-.card-name{font-family:var(--serif);font-size:1.1em;font-weight:400;line-height:1.15;}
-.badge{font-size:.5em;letter-spacing:.15em;text-transform:uppercase;padding:2px 6px;border:1px solid;white-space:nowrap;}
-.badge-free{border-color:rgba(100,180,100,.4);color:rgba(120,200,120,.8);}
-.badge-partial{border-color:rgba(200,160,80,.4);color:rgba(200,160,80,.8);}
-.badge-paywall{border-color:rgba(200,80,80,.3);color:rgba(200,100,100,.7);}
-.badge-bypass{border-color:rgba(100,150,220,.4);color:rgba(100,170,240,.8);}
-.card-desc{font-size:.67em;line-height:1.75;color:var(--text-dim);letter-spacing:.02em;}
-.card-tip{background:rgba(201,169,110,.04);border-left:2px solid rgba(201,169,110,.25);padding:8px 12px;font-size:.6em;line-height:1.7;color:rgba(201,169,110,.6);}
-.card-tip strong{color:var(--gold-dim);font-weight:500;}
-.card-footer{display:flex;align-items:center;justify-content:space-between;margin-top:auto;padding-top:3px;gap:6px;}
-.card-url{font-size:.55em;color:var(--text-muted);letter-spacing:.07em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
-.card-actions{display:flex;gap:4px;flex-shrink:0;align-items:center;}
-.card-link{display:inline-flex;align-items:center;font-size:.56em;letter-spacing:.15em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,169,110,.25);padding:4px 10px;transition:all .18s;}
-.card-link:hover{background:var(--gold);color:var(--bg);}
-.card-link::after{content:' →';}
-.btn-ico{background:transparent;border:1px solid var(--border);color:var(--text-muted);padding:4px 7px;font-size:.75em;cursor:pointer;transition:all .18s;line-height:1;}
-.btn-ico:hover{border-color:var(--border-h);color:var(--text);}
-.btn-ico.fav-on{border-color:var(--gold);color:var(--gold);}
-.btn-ico.ok{border-color:rgba(100,200,100,.5);color:rgba(120,210,120,.8);}
-.empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--text-muted);}
-.empty-t{font-family:var(--serif);font-size:2em;font-weight:300;font-style:italic;margin-bottom:8px;}
-.empty-s{font-size:.65em;letter-spacing:.1em;}
-
-/* RECHERCHE */
-.rtab-head{margin-bottom:24px;}
-.rtab-head h2{font-family:var(--serif);font-size:clamp(22px,3vw,38px);font-weight:300;margin-bottom:5px;}
-.rtab-head p{font-size:.67em;color:var(--text-dim);line-height:1.75;letter-spacing:.03em;}
-.search-bar-big{display:flex;gap:7px;margin-bottom:14px;}
-.search-bar-big input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--serif);font-size:1.15em;font-style:italic;padding:14px 18px;outline:none;transition:border-color .2s;letter-spacing:.02em;}
-.search-bar-big input::placeholder{color:var(--text-muted);}
-.search-bar-big input:focus{border-color:var(--border-h);}
-.btn-search{background:var(--gold);color:var(--bg);border:none;font-family:var(--mono);font-size:.6em;letter-spacing:.18em;text-transform:uppercase;padding:0 24px;cursor:pointer;transition:opacity .18s;white-space:nowrap;}
-.btn-search:hover{opacity:.85;}
-.btn-search:disabled{opacity:.4;cursor:default;}
-.type-filters{display:flex;gap:5px;margin-bottom:24px;}
-.type-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.58em;letter-spacing:.12em;padding:5px 13px;cursor:pointer;transition:all .18s;text-transform:uppercase;}
-.type-btn:hover{border-color:var(--border-h);color:var(--text);}
-.type-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
-.hist-block{margin-bottom:22px;}
-.hist-label{font-size:.56em;letter-spacing:.22em;color:var(--text-muted);text-transform:uppercase;margin-bottom:7px;}
-.hist-chips{display:flex;gap:5px;flex-wrap:wrap;}
-.hist-chip{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--mono);font-size:.58em;letter-spacing:.07em;padding:3px 9px;cursor:pointer;transition:all .18s;}
-.hist-chip:hover{border-color:var(--border-h);color:var(--text);}
-.res-sec{margin-bottom:32px;}
-.res-sec-title{font-size:.6em;letter-spacing:.22em;color:var(--gold);text-transform:uppercase;margin-bottom:12px;display:flex;align-items:center;gap:8px;}
-.res-sec-title::after{content:'';flex:1;height:1px;background:var(--border);}
-.api-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:7px;}
-.res-card{background:var(--bg2);border:1px solid var(--border);padding:14px;display:flex;flex-direction:column;gap:9px;transition:border-color .2s;}
-.res-card:hover{border-color:var(--border-h);}
-.res-card-top{display:flex;gap:11px;align-items:flex-start;}
-.res-cover{width:44px;height:60px;object-fit:cover;border:1px solid var(--border);flex-shrink:0;background:var(--bg3);}
-.res-title{font-family:var(--serif);font-size:.95em;font-weight:400;line-height:1.2;margin-bottom:3px;}
-.res-author{font-size:.6em;color:var(--text-dim);letter-spacing:.04em;margin-bottom:3px;}
-.res-year{font-size:.55em;color:var(--text-muted);letter-spacing:.08em;}
-.res-source{font-size:.52em;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-top:3px;}
-.res-link{font-size:.58em;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,169,110,.2);padding:4px 9px;transition:all .18s;align-self:flex-start;}
-.res-link:hover{background:var(--gold);color:var(--bg);}
-.res-link::after{content:' →';}
-.direct-links{display:flex;flex-wrap:wrap;gap:7px;}
-.direct-link{display:flex;align-items:center;gap:7px;background:var(--bg2);border:1px solid var(--border);padding:10px 14px;text-decoration:none;color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.08em;transition:all .2s;}
-.direct-link:hover{border-color:var(--border-h);color:var(--text);background:var(--bg3);}
-.direct-link::after{content:'↗';font-size:.8em;color:var(--gold-dim);}
-.loading{display:flex;align-items:center;gap:11px;padding:22px 0;color:var(--text-muted);font-size:.62em;letter-spacing:.08em;}
-.spinner{width:16px;height:16px;border:2px solid var(--border);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0;}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 @keyframes spin{to{transform:rotate(360deg)}}
-.no-res{padding:36px 0;text-align:center;color:var(--text-muted);font-size:.67em;letter-spacing:.08em;}
+.spin{animation:spin .8s linear infinite}
 
-/* CARTE */
-.carte-layout{display:grid;grid-template-columns:270px 1fr;gap:0;border:1px solid var(--border);}
-@media(max-width:700px){.carte-layout{grid-template-columns:1fr;}}
-.carte-sidebar{border-right:1px solid var(--border);padding:18px 14px;background:var(--bg2);max-height:580px;overflow-y:auto;}
-.carte-sidebar h3{font-family:var(--serif);font-size:1.05em;font-weight:300;margin-bottom:10px;}
-.carte-sidebar p{font-size:.6em;color:var(--text-dim);line-height:1.7;margin-bottom:14px;}
-.carte-type-filters{display:flex;flex-direction:column;gap:3px;margin-bottom:14px;}
-.cfilter{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.56em;letter-spacing:.1em;padding:5px 9px;cursor:pointer;transition:all .18s;text-transform:uppercase;text-align:left;}
-.cfilter:hover{border-color:var(--border-h);color:var(--text);}
-.cfilter.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
-.inst-list{display:flex;flex-direction:column;gap:3px;}
-.inst-item{padding:9px 11px;border:1px solid var(--border);cursor:pointer;transition:all .18s;font-size:.6em;letter-spacing:.04em;}
-.inst-item:hover{border-color:var(--border-h);background:var(--bg3);}
-.inst-item.active{border-color:var(--gold);background:var(--gold-faint);}
-.inst-name{font-family:var(--serif);font-size:1.1em;margin-bottom:2px;}
-.inst-type{font-size:.85em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;}
-#map{height:580px;background:var(--bg3);}
-.leaflet-popup-content-wrapper{background:var(--bg2);border:1px solid var(--border);border-radius:0;box-shadow:0 4px 20px rgba(0,0,0,.4);color:var(--text);font-family:var(--mono);}
-.leaflet-popup-tip{background:var(--bg2);}
-.leaflet-popup-content{margin:13px 15px;font-size:.63em;line-height:1.7;}
-.popup-name{font-family:var(--serif);font-size:1.4em;font-weight:400;margin-bottom:5px;}
-.popup-type{font-size:.85em;letter-spacing:.18em;text-transform:uppercase;color:var(--gold-dim);margin-bottom:7px;}
-.popup-info{color:var(--text-dim);font-size:.95em;margin-bottom:3px;}
-.popup-link{color:var(--gold);text-decoration:none;font-size:.9em;letter-spacing:.08em;}
-.popup-link:hover{text-decoration:underline;}
-.leaflet-control-zoom a{background:var(--bg2)!important;color:var(--text)!important;border-color:var(--border)!important;}
+/* ── BARRE DU HAUT ── */
+.topbar{position:sticky;top:0;z-index:1000;background:var(--glass);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px);border-bottom:1px solid var(--border)}
+.topbar-in{max-width:1120px;margin:0 auto;padding:0 var(--pad);display:grid;grid-template-columns:auto 1fr auto;grid-template-areas:"logo . tools" "nav nav nav";align-items:center}
+.logo{grid-area:logo;height:56px;display:flex;align-items:center;font-family:var(--font-display);font-weight:600;font-size:1.05rem;letter-spacing:-.02em;color:var(--foreground);text-decoration:none;white-space:nowrap}
+.logo span{color:var(--primary)}
+.tools{grid-area:tools;display:flex;align-items:center;gap:8px}
+.nav{grid-area:nav;display:flex;gap:4px;overflow-x:auto;margin:0 calc(var(--pad) * -1);padding:0 var(--pad) 10px;scrollbar-width:none}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{flex:none;border:0;background:transparent;color:var(--muted-foreground);font-size:.85rem;font-weight:500;padding:6px 13px;border-radius:999px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;transition:background-color .2s,color .2s,transform .15s}
+.nav-btn:hover{color:var(--foreground)}
+.nav-btn:active{transform:scale(.96)}
+.nav-btn.active{background:var(--foreground);color:var(--background)}
+.nav-count{background:var(--primary);color:var(--primary-foreground);font-size:.68rem;font-weight:600;min-width:18px;height:18px;padding:0 5px;border-radius:999px;display:inline-flex;align-items:center;justify-content:center;line-height:1}
+@media (min-width:768px){
+  .topbar-in{grid-template-areas:"logo nav tools";grid-template-columns:1fr auto 1fr}
+  .tools{justify-content:flex-end}
+  .nav{margin:0;padding:0;overflow:visible}
+  .nav-btn.active{background:var(--secondary);color:var(--foreground)}
+}
 
-/* ── AI ASSISTANT ── */
-.ai-layout{display:grid;grid-template-columns:200px 1fr;gap:0;border:1px solid var(--border);min-height:560px;}
-@media(max-width:700px){.ai-layout{grid-template-columns:1fr;}}
-.ai-sidebar{border-right:1px solid var(--border);background:var(--bg2);padding:20px 14px;display:flex;flex-direction:column;gap:6px;}
-.ai-sidebar-title{font-size:.58em;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
-.ai-mode-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.1em;padding:10px 12px;cursor:pointer;transition:all .18s;text-transform:uppercase;text-align:left;display:flex;flex-direction:column;gap:3px;}
-.ai-mode-btn:hover{border-color:var(--border-h);color:var(--text);}
-.ai-mode-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
-.ai-mode-btn small{font-size:.85em;opacity:.6;letter-spacing:.05em;text-transform:none;}
-.ai-sidebar-sep{height:1px;background:var(--border);margin:8px 0;}
-.ai-sidebar-info{font-size:.55em;color:var(--text-muted);line-height:1.6;letter-spacing:.03em;padding:4px 0;}
+.seg{display:inline-flex;background:var(--secondary);border-radius:999px;padding:3px;gap:2px;max-width:100%}
+.seg button{border:0;background:transparent;color:var(--muted-foreground);border-radius:999px;padding:5px 12px;font-size:.82rem;font-weight:500;white-space:nowrap;display:inline-flex;align-items:center;justify-content:center;gap:6px;transition:background-color .2s,color .2s,box-shadow .2s,transform .15s}
+.seg button:hover{color:var(--foreground)}
+.seg button:active{transform:scale(.96)}
+.seg button.on{background:var(--card);color:var(--foreground);box-shadow:0 1px 3px oklch(0 0 0 / .12)}
+.dark .seg button.on{background:oklch(0.38 0.004 286)}
+.seg-font button{padding:4px 9px;line-height:1;min-width:28px;height:26px;font-weight:600}
+.icon-btn{width:34px;height:34px;border-radius:999px;border:0;background:var(--secondary);color:var(--foreground);display:inline-flex;align-items:center;justify-content:center;flex:none;transition:transform .15s,background-color .2s}
+.icon-btn:active{transform:scale(.9)}
 
-.ai-main{display:flex;flex-direction:column;background:var(--bg);}
-.ai-messages{flex:1;overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:14px;min-height:380px;max-height:460px;}
-.ai-msg{display:flex;flex-direction:column;gap:4px;animation:fadeIn .2s ease;}
-.ai-msg.user{align-items:flex-end;}
-.ai-msg.assistant{align-items:flex-start;}
-.ai-bubble{max-width:80%;padding:12px 16px;font-size:.68em;line-height:1.75;letter-spacing:.02em;}
-.ai-msg.user .ai-bubble{background:var(--gold-faint);border:1px solid rgba(201,169,110,.25);color:var(--text);}
-.ai-msg.assistant .ai-bubble{background:var(--bg2);border:1px solid var(--border);color:var(--text-dim);}
-.ai-msg.assistant .ai-bubble strong{color:var(--gold-dim);}
-.ai-bubble-src{font-size:.55em;letter-spacing:.08em;color:var(--gold-dim);opacity:.7;margin-top:2px;}
-.ai-msg.user .ai-bubble-src{text-align:right;}
+/* ── STRUCTURE ── */
+.main{flex:1;width:100%;max-width:1120px;margin:0 auto;padding:32px var(--pad) 80px}
+@media (min-width:640px){.main{padding-top:56px}}
+.panel{display:none}
+.panel.active{display:block;animation:rise .5s var(--ease) both}
+.sec{margin-top:48px}
+@media (min-width:640px){.sec{margin-top:64px}}
+.eyebrow{color:var(--primary);font-weight:600;font-size:.82rem;letter-spacing:-.005em;margin-bottom:10px}
+.page-title{font-family:var(--font-display);font-weight:600;font-size:clamp(2rem,6.5vw,3.5rem);line-height:1.05;letter-spacing:-.035em}
+.soft{color:var(--muted-foreground)}
+.grad{background:var(--gradient-text);-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+.page-intro{color:var(--muted-foreground);font-size:1.05rem;line-height:1.55;max-width:640px;margin-top:14px}
+@media (min-width:640px){.page-intro{font-size:1.125rem}}
+.h-sec{font-family:var(--font-display);font-weight:600;font-size:1.6rem;line-height:1.12;letter-spacing:-.025em}
+@media (min-width:640px){.h-sec{font-size:1.875rem}}
+.filter-label{font-size:.78rem;font-weight:600;color:var(--muted-foreground);margin-bottom:8px}
 
-.ai-suggestions{display:flex;flex-direction:column;gap:4px;margin:0 20px 12px;}
-.ai-sug-label{font-size:.55em;letter-spacing:.2em;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;}
-.ai-sug-chips{display:flex;flex-wrap:wrap;gap:5px;}
-.ai-sug-chip{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--mono);font-size:.58em;letter-spacing:.06em;padding:4px 10px;cursor:pointer;transition:all .18s;}
-.ai-sug-chip:hover{border-color:var(--border-h);color:var(--text);}
+/* ── ACCUEIL ── */
+.hero{position:relative;text-align:center;padding:8px 0 0;isolation:isolate}
+.hero::before{content:"";position:absolute;z-index:-1;top:-140px;bottom:-40px;left:50%;width:100vw;transform:translateX(-50%);background:var(--hero-glow);pointer-events:none}
+.hero-title{font-family:var(--font-display);font-weight:600;font-size:clamp(2.6rem,9vw,5.5rem);line-height:1.02;letter-spacing:-.04em}
+.hero-intro{color:var(--muted-foreground);font-size:1.05rem;line-height:1.55;max-width:600px;margin:18px auto 0}
+@media (min-width:640px){.hero-intro{font-size:1.125rem}}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:28px}
+.stat{background:color-mix(in oklch, var(--card) 72%, transparent);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-radius:var(--r-xl);box-shadow:var(--shadow-card-value);padding:10px 18px;min-width:112px;text-align:center}
+.stat b{display:block;font-family:var(--font-display);font-size:1.25rem;font-weight:600;letter-spacing:-.02em;line-height:1.2}
+.stat span{font-size:.75rem;color:var(--muted-foreground)}
 
-.ai-input-area{border-top:1px solid var(--border);padding:14px 16px;display:flex;gap:8px;background:var(--bg2);}
-.ai-input{flex:1;background:var(--bg);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.7em;padding:10px 14px;outline:none;transition:border-color .2s;letter-spacing:.03em;resize:none;height:42px;min-height:42px;}
-.ai-input:focus{border-color:var(--border-h);}
-.ai-input::placeholder{color:var(--text-muted);}
-.ai-send{background:var(--gold);color:var(--bg);border:none;font-family:var(--mono);font-size:.6em;letter-spacing:.15em;text-transform:uppercase;padding:0 18px;cursor:pointer;transition:opacity .18s;white-space:nowrap;flex-shrink:0;}
-.ai-send:hover{opacity:.85;}
-.ai-send:disabled{opacity:.35;cursor:default;}
-.ai-clear{background:transparent;border:1px solid var(--border);color:var(--text-muted);font-family:var(--mono);font-size:.58em;letter-spacing:.1em;padding:0 12px;cursor:pointer;transition:all .18s;text-transform:uppercase;}
-.ai-clear:hover{border-color:var(--border-h);color:var(--text);}
+.feat{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;scroll-padding:0 var(--pad);margin:16px calc(var(--pad) * -1) 0;padding:6px var(--pad) 22px;scrollbar-width:none}
+.feat::-webkit-scrollbar{display:none}
+.feat-card{flex:0 0 220px;scroll-snap-align:start;min-height:150px;background:var(--card);border-radius:var(--r-3xl);padding:20px;box-shadow:var(--shadow-card-value);display:flex;flex-direction:column;justify-content:space-between;gap:24px;text-decoration:none;color:var(--foreground);transition:transform .3s var(--ease),box-shadow .3s;animation:rise .5s var(--ease) both}
+.feat-badge{align-self:flex-start;font-size:.72rem;font-weight:600;color:var(--accent-foreground);background:var(--accent);padding:3px 10px;border-radius:999px}
+.feat-bottom{display:flex;align-items:flex-end;justify-content:space-between;gap:10px}
+.feat-name{font-family:var(--font-display);font-weight:600;font-size:1.05rem;line-height:1.2;letter-spacing:-.02em}
+.feat-arrow{color:var(--primary);transition:transform .3s var(--ease)}
+@media (hover:hover){
+  .feat-card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift-value)}
+  .feat-card:hover .feat-arrow{transform:translate(2px,-2px)}
+}
 
-/* resource suggestion cards inside AI */
-.ai-res-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
-.ai-res-chip{display:flex;align-items:center;gap:6px;background:var(--bg3);border:1px solid var(--border);padding:4px 10px;font-size:.58em;letter-spacing:.06em;color:var(--text-dim);text-decoration:none;transition:all .18s;}
-.ai-res-chip:hover{border-color:var(--gold);color:var(--gold);}
-.ai-res-chip::after{content:'↗';font-size:.9em;color:var(--gold-dim);}
+/* ── OUTILS INDEX ── */
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.field{position:relative;flex:1 1 260px;display:block}
+.field .ic{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--muted-foreground);pointer-events:none}
+.field input{width:100%;height:44px;border-radius:999px;border:1px solid var(--border);background:var(--card);padding:0 16px 0 42px;font-size:.95rem;box-shadow:var(--shadow-card-value);outline:none;-webkit-appearance:none;appearance:none;transition:box-shadow .2s}
+.field input::placeholder{color:var(--faint)}
+.field input:focus{box-shadow:0 0 0 3px var(--ring)}
+.field input::-webkit-search-cancel-button{-webkit-appearance:none}
+.select-wrap{position:relative;flex:none}
+.select-wrap select{height:44px;border-radius:999px;border:1px solid var(--border);background:var(--card);padding:0 38px 0 16px;font-size:.88rem;box-shadow:var(--shadow-card-value);-webkit-appearance:none;appearance:none;outline:none;cursor:pointer}
+.select-wrap select:focus-visible{box-shadow:0 0 0 3px var(--ring)}
+.select-wrap .ic{position:absolute;right:14px;top:50%;transform:translateY(-50%) rotate(90deg);color:var(--muted-foreground);pointer-events:none}
+.seg-view button{padding:7px 11px;height:38px}
+.filter-group{margin-top:18px}
+.pills{display:flex;gap:8px;overflow-x:auto;margin:0 calc(var(--pad) * -1);padding:2px var(--pad) 6px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+@media (min-width:640px){.pills{flex-wrap:wrap;overflow:visible;margin:0;padding:2px 0 6px}}
+.pill{flex:none;border:1px solid var(--border);background:var(--card);color:var(--foreground);border-radius:999px;padding:7px 14px;font-size:.85rem;font-weight:500;white-space:nowrap;box-shadow:0 1px 2px oklch(0 0 0 / .04);display:inline-flex;align-items:center;gap:7px;transition:background-color .2s,color .2s,transform .15s,box-shadow .2s}
+.pill:hover{border-color:var(--border-strong)}
+.pill:active{transform:scale(.96)}
+.pill.on{background:var(--foreground);color:var(--background);border-color:transparent}
+.pill .n{color:var(--faint);font-size:.76rem;font-weight:600}
+.pill.on .n{color:inherit;opacity:.65}
+.dot{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.count{font-size:.85rem;color:var(--muted-foreground);margin:26px 0 12px}
 
-.ai-key-prompt{padding:28px 24px;display:flex;flex-direction:column;gap:14px;border-bottom:1px solid var(--border);background:rgba(201,169,110,.03);}
-.ai-key-prompt p{font-size:.67em;color:var(--text-dim);line-height:1.75;letter-spacing:.03em;}
-.ai-key-prompt strong{color:var(--gold-dim);}
-.ai-key-row{display:flex;gap:7px;}
-.ai-key-input{flex:1;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.68em;padding:10px 13px;outline:none;transition:border-color .2s;letter-spacing:.04em;}
-.ai-key-input:focus{border-color:var(--border-h);}
-.ai-key-input::placeholder{color:var(--text-muted);}
-.ai-key-save{background:var(--gold);color:var(--bg);border:none;font-family:var(--mono);font-size:.6em;letter-spacing:.15em;text-transform:uppercase;padding:0 16px;cursor:pointer;transition:opacity .18s;white-space:nowrap;}
-.ai-key-save:hover{opacity:.85;}
-.ai-key-note{font-size:.58em;color:var(--text-muted);letter-spacing:.04em;line-height:1.6;}
-display:flex;gap:4px;align-items:center;padding:8px 0;}
-.ai-typing span{width:5px;height:5px;background:var(--gold-dim);border-radius:50%;animation:blink 1.2s infinite;}
-.ai-typing span:nth-child(2){animation-delay:.2s;}
-.ai-typing span:nth-child(3){animation-delay:.4s;}
-@keyframes blink{0%,80%,100%{opacity:.15;}40%{opacity:.9;}}
+/* ── CARTES DE RESSOURCES ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(300px,100%),1fr));gap:16px}
+.grid.list{grid-template-columns:1fr;gap:12px}
+.card{background:var(--card);color:var(--card-foreground);border-radius:var(--r-3xl);padding:20px;box-shadow:var(--shadow-card-value);display:flex;flex-direction:column;gap:14px;min-width:0;transition:transform .3s var(--ease),box-shadow .3s;animation:rise .5s var(--ease) both}
+@media (min-width:640px){.card{padding:24px}}
+@media (hover:hover){.card:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift-value)}}
+.card-main{display:flex;flex-direction:column;gap:10px;min-width:0}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.card-titles{min-width:0}
+.card-cat{font-size:.78rem;font-weight:600;color:var(--primary);margin-bottom:4px}
+.card-cat.be{color:var(--belgique)}
+.card-cat.intl{color:var(--intl)}
+.card-name{font-family:var(--font-display);font-size:1.2rem;font-weight:600;line-height:1.2;letter-spacing:-.02em;overflow-wrap:anywhere}
+.badge{flex:none;font-size:.7rem;font-weight:600;padding:2px 10px;border-radius:999px;white-space:nowrap;line-height:1.6}
+.b-free{color:var(--access-free);background:color-mix(in oklch, var(--access-free) 12%, transparent)}
+.b-partial{color:var(--access-partial);background:color-mix(in oklch, var(--access-partial) 12%, transparent)}
+.b-paywall{color:var(--access-paywall);background:color-mix(in oklch, var(--access-paywall) 12%, transparent)}
+.b-bypass{color:var(--access-open);background:color-mix(in oklch, var(--access-open) 12%, transparent)}
+.card-desc{font-size:.9rem;line-height:1.6;color:var(--muted-foreground)}
+.card-tip{background:var(--accent);border-radius:var(--r-lg);padding:10px 14px;font-size:.84rem;line-height:1.55;color:var(--foreground)}
+.card-tip b{color:var(--accent-foreground);font-weight:600}
+.card-foot{margin-top:auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.card-url{font-size:.78rem;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+.card-actions{display:flex;gap:6px;align-items:center;flex:none}
+.act{width:36px;height:36px;border-radius:999px;border:0;background:var(--secondary);color:var(--muted-foreground);display:inline-flex;align-items:center;justify-content:center;flex:none;transition:transform .15s,background-color .2s,color .2s}
+.act:hover{color:var(--foreground)}
+.act:active{transform:scale(.9)}
+.act.fav-on{color:var(--belgique);background:color-mix(in oklch, var(--belgique) 15%, transparent)}
+.act.fav-on svg{fill:currentColor}
+.act.ok{color:var(--access-free);background:color-mix(in oklch, var(--access-free) 13%, transparent)}
+.btn-go{display:inline-flex;align-items:center;gap:4px;height:36px;padding:0 15px;border-radius:999px;background:var(--primary);color:var(--primary-foreground);font-weight:600;font-size:.85rem;text-decoration:none;white-space:nowrap;transition:transform .15s,filter .2s}
+.btn-go:hover{filter:brightness(1.08)}
+.btn-go:active{transform:scale(.96)}
+.grid.list .card-tip{display:none}
+@media (min-width:768px){
+  .grid.list .card{flex-direction:row;align-items:center;border-radius:var(--r-2xl);padding:16px 24px;gap:24px}
+  .grid.list .card-main{flex:1;gap:6px}
+  .grid.list .card-foot{margin-top:0;flex-direction:column;align-items:flex-end;gap:8px;flex:none;max-width:280px}
+}
+.empty{grid-column:1/-1;background:var(--card);border-radius:var(--r-3xl);padding:44px 24px;text-align:center;box-shadow:var(--shadow-card-value)}
+.empty h3{font-family:var(--font-display);font-size:1.25rem;font-weight:600;letter-spacing:-.02em;margin-bottom:6px}
+.empty p{color:var(--muted-foreground);font-size:.92rem}
 
-.ai-welcome{padding:32px 20px;text-align:center;color:var(--text-muted);}
-.ai-welcome-title{font-family:var(--serif);font-size:1.6em;font-weight:300;font-style:italic;margin-bottom:8px;color:var(--text-dim);}
-.ai-welcome-sub{font-size:.62em;line-height:1.7;letter-spacing:.04em;max-width:420px;margin:0 auto;}
+/* ── RECHERCHE ── */
+.sbar{display:flex;align-items:center;gap:6px;background:var(--card);border-radius:999px;padding:6px;box-shadow:var(--shadow-lift-value);margin-top:28px;max-width:760px}
+.sbar>.ic{margin-left:12px;color:var(--muted-foreground)}
+.sbar input{flex:1;min-width:0;height:44px;border:0;background:transparent;outline:none;font-size:1rem;padding:0 6px}
+.sbar input::placeholder{color:var(--faint)}
+.sbar:focus-within{box-shadow:var(--shadow-lift-value),0 0 0 3px var(--ring)}
+.btn-primary{height:44px;padding:0 22px;border-radius:999px;border:0;background:var(--primary);color:var(--primary-foreground);font-weight:600;font-size:.92rem;white-space:nowrap;display:inline-flex;align-items:center;gap:8px;flex:none;transition:transform .15s,filter .2s,opacity .2s}
+.btn-primary:hover:not(:disabled){filter:brightness(1.08)}
+.btn-primary:active:not(:disabled){transform:scale(.96)}
+.btn-primary:disabled{opacity:.45;cursor:default}
+.btn-primary.sm{height:38px;padding:0 16px;font-size:.85rem}
+.seg-wrap{overflow-x:auto;margin:16px calc(var(--pad) * -1) 0;padding:0 var(--pad);scrollbar-width:none}
+.seg-wrap::-webkit-scrollbar{display:none}
+.seg-type button{padding:7px 14px;font-size:.85rem}
+.hist{margin-top:22px}
+.hist-head{display:flex;align-items:center;justify-content:space-between;gap:10px;max-width:760px}
+.hist-head .filter-label{margin:0}
+.link-btn{border:0;background:none;color:var(--primary);font-size:.82rem;font-weight:500;padding:4px 2px}
+.link-btn:hover{text-decoration:underline}
+.hist .pills{margin-top:8px}
+.loading{display:flex;align-items:center;gap:10px;color:var(--muted-foreground);padding:28px 0;font-size:.95rem}
+.rs-sec{margin-top:36px}
+.rs-title{font-family:var(--font-display);font-weight:600;font-size:1.3rem;letter-spacing:-.02em;margin-bottom:14px}
+.books{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(260px,100%),1fr));gap:12px}
+.book{display:flex;gap:14px;align-items:flex-start;background:var(--card);border-radius:var(--r-2xl);padding:14px;box-shadow:var(--shadow-card-value);text-decoration:none;color:var(--foreground);min-width:0;transition:transform .3s var(--ease),box-shadow .3s;animation:rise .5s var(--ease) both}
+@media (hover:hover){.book:hover{transform:translateY(-2px);box-shadow:var(--shadow-lift-value)}}
+.cover{width:56px;height:84px;flex:none;border-radius:8px;object-fit:cover;background:var(--muted);display:flex;align-items:center;justify-content:center;color:var(--faint)}
+.book-txt{min-width:0;display:flex;flex-direction:column;gap:3px}
+.book-title{font-weight:600;font-size:.95rem;line-height:1.3;letter-spacing:-.01em;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.book-author{font-size:.84rem;color:var(--muted-foreground);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.book-meta{font-size:.78rem;color:var(--faint)}
+.book-src{color:var(--primary);font-weight:600}
+.src-note{font-size:.8rem;color:var(--faint);margin-top:12px}
+.groups{display:grid;gap:20px}
+@media (min-width:640px){.groups{grid-template-columns:1fr 1fr}}
+.group-h{font-size:.78rem;font-weight:600;color:var(--muted-foreground);padding:0 16px 7px}
+.group{background:var(--card);border-radius:var(--r-2xl);box-shadow:var(--shadow-card-value);overflow:hidden}
+.group a{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 16px;color:var(--foreground);text-decoration:none;font-size:.95rem;position:relative;transition:background-color .2s}
+.group a+a::before{content:"";position:absolute;top:0;left:16px;right:0;border-top:1px solid var(--border)}
+.group a:hover{background:var(--muted)}
+.group a .ic{color:var(--faint)}
 
-/* INTL TAB */
-.intl-layout{display:grid;grid-template-columns:220px 1fr;gap:0;border:1px solid var(--border);}
-@media(max-width:700px){.intl-layout{grid-template-columns:1fr;}}
-.intl-sidebar{border-right:1px solid var(--border);background:var(--bg2);padding:18px 14px;display:flex;flex-direction:column;gap:4px;max-height:640px;overflow-y:auto;}
-.intl-sidebar-title{font-size:.58em;letter-spacing:.25em;color:var(--gold);text-transform:uppercase;margin-bottom:10px;}
-.country-btn{background:transparent;border:1px solid var(--border);color:var(--text-dim);font-family:var(--mono);font-size:.6em;letter-spacing:.1em;padding:9px 12px;cursor:pointer;transition:all .18s;text-transform:uppercase;text-align:left;display:flex;align-items:center;gap:8px;width:100%;}
-.country-btn:hover{border-color:var(--border-h);color:var(--text);background:var(--gold-faint);}
-.country-btn.active{border-color:var(--gold);color:var(--gold);background:var(--gold-faint);}
-.country-btn .cnt{font-size:.85em;opacity:.5;margin-left:auto;}
-.intl-main{padding:24px;overflow-y:auto;max-height:640px;flex:1;}
-.intl-header{margin-bottom:18px;}
-.intl-header h3{font-family:var(--serif);font-size:1.5em;font-weight:300;margin-bottom:4px;}
-.intl-header p{font-size:.63em;color:var(--text-dim);line-height:1.7;letter-spacing:.03em;}
-.intl-search-wrap{position:relative;margin-bottom:18px;}
-.intl-search{width:100%;background:var(--bg2);border:1px solid var(--border);color:var(--text);font-family:var(--mono);font-size:.68em;padding:10px 14px 10px 38px;outline:none;transition:border-color .2s;letter-spacing:.04em;}
-.intl-search::placeholder{color:var(--text-muted);}
-.intl-search:focus{border-color:var(--border-h);}
-.intl-search-icon{position:absolute;left:14px;top:50%;transform:translateY(-50%);color:var(--gold-dim);font-size:.75em;pointer-events:none;}
-.intl-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:2px;}
-.intl-card{background:var(--bg2);border:1px solid var(--border);padding:18px;display:flex;flex-direction:column;gap:10px;transition:border-color .2s,background .2s;animation:fadeIn .25s ease both;}
-.intl-card:hover{border-color:var(--border-h);background:var(--bg3);}
-.intl-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.intl-card-meta{flex:1;}
-.intl-card-country{font-size:.54em;letter-spacing:.22em;color:var(--gold-dim);text-transform:uppercase;margin-bottom:3px;}
-.intl-card-name{font-family:var(--serif);font-size:1.05em;font-weight:400;line-height:1.15;}
-.intl-card-desc{font-size:.63em;line-height:1.72;color:var(--text-dim);letter-spacing:.02em;}
-.intl-card-foot{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:auto;}
-.intl-card-url{font-size:.54em;color:var(--text-muted);letter-spacing:.06em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:55%;}
-.intl-link{font-size:.56em;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);text-decoration:none;border:1px solid rgba(201,169,110,.25);padding:4px 10px;transition:all .18s;flex-shrink:0;}
-.intl-link:hover{background:var(--gold);color:var(--bg);}
-.intl-link::after{content:' →';}
-.intl-empty{grid-column:1/-1;padding:48px 20px;text-align:center;color:var(--text-muted);}
-.intl-empty-t{font-family:var(--serif);font-size:1.4em;font-style:italic;font-weight:300;}
+/* ── CARTE ── */
+.map-wrap{display:flex;flex-direction:column;gap:16px;margin-top:20px}
+#map{height:380px;border-radius:var(--r-3xl);overflow:hidden;box-shadow:var(--shadow-card-value);background:var(--muted);z-index:0;order:-1}
+.inst-list{background:var(--card);border-radius:var(--r-3xl);box-shadow:var(--shadow-card-value);overflow-y:auto;max-height:620px}
+@media (min-width:768px){
+  .map-wrap{display:grid;grid-template-columns:300px minmax(0,1fr)}
+  #map{height:620px;order:0}
+  .inst-list{height:620px}
+}
+.inst{display:flex;align-items:center;gap:12px;width:100%;border:0;background:transparent;text-align:left;padding:12px 16px;position:relative;transition:background-color .2s}
+.inst+.inst::before{content:"";position:absolute;top:0;left:36px;right:0;border-top:1px solid var(--border)}
+.inst:hover{background:var(--muted)}
+.inst.on{background:var(--accent)}
+.inst.on .inst-name{color:var(--accent-foreground)}
+.inst-txt{display:flex;flex-direction:column;min-width:0}
+.inst-name{font-size:.92rem;font-weight:600;line-height:1.3;letter-spacing:-.01em}
+.inst-type{font-size:.76rem;color:var(--muted-foreground)}
+.mk{display:block;width:14px;height:14px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 4px oklch(0 0 0 / .35)}
+.map-fail{height:100%;display:flex;align-items:center;justify-content:center;color:var(--muted-foreground);padding:24px;text-align:center}
+.leaflet-container{font-family:var(--font-text);background:var(--muted)}
+.leaflet-popup-content-wrapper{background:var(--popover);color:var(--popover-foreground);border-radius:18px;box-shadow:var(--shadow-lift-value)}
+.leaflet-popup-tip{background:var(--popover)}
+.leaflet-popup-content{margin:14px 18px 16px 16px;font-size:.85rem;line-height:1.5;min-width:200px}
+.leaflet-container a.leaflet-popup-close-button{color:var(--muted-foreground);top:6px;right:6px}
+.pp-type{font-size:.72rem;font-weight:600}
+.pp-name{font-family:var(--font-display);font-weight:600;font-size:1.05rem;line-height:1.25;letter-spacing:-.015em;margin:2px 0 8px}
+.pp-row{display:flex;gap:7px;align-items:flex-start;color:var(--muted-foreground);margin-bottom:4px}
+.pp-row .ic{margin-top:3px}
+.leaflet-container a.pp-btn{display:inline-flex;align-items:center;gap:4px;margin-top:8px;background:var(--primary);color:var(--primary-foreground);border-radius:999px;padding:6px 14px;font-weight:600;text-decoration:none}
+.leaflet-bar{border:0!important;box-shadow:var(--shadow-card-value)!important;border-radius:12px!important;overflow:hidden}
+.leaflet-bar a{background:var(--card)!important;color:var(--foreground)!important;border-bottom-color:var(--border)!important}
+.leaflet-control-attribution{background:color-mix(in oklch, var(--card) 80%, transparent)!important;color:var(--muted-foreground)!important}
+.leaflet-control-attribution a{color:var(--primary)!important}
 
-footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
-.footer-text{font-size:.56em;letter-spacing:.18em;color:var(--text-muted);text-transform:uppercase;}
-.footer-note{font-family:var(--serif);font-size:.72em;color:var(--text-muted);font-style:italic;}
-@media(max-width:580px){.wrapper{padding:28px 14px 70px;}.tabs{overflow-x:auto;}.tab-btn{padding:9px 12px;}}
+/* ── ASSISTANT ── */
+.mark{width:32px;height:32px;flex:none;border-radius:28%;background:var(--gradient-brand);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px -4px oklch(0.6 0.18 250 / .55)}
+.mark svg{width:62%;height:62%}
+.mark.lg{width:64px;height:64px}
+.chat{position:relative;margin-top:28px;background:var(--card);border-radius:var(--r-3xl);box-shadow:var(--shadow-lift-value);border:1px solid var(--border);display:flex;flex-direction:column;height:70vh;min-height:460px;overflow:hidden}
+@media (min-width:768px){.chat{height:620px}}
+.chat-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;padding:12px 14px;border-bottom:1px solid var(--border)}
+.chat-modes{display:flex;flex-direction:column;gap:6px;min-width:0;flex:0 1 auto}
+#modeSeg{overflow-x:auto;scrollbar-width:none}
+#modeSeg::-webkit-scrollbar{display:none}
+#modeSeg button{flex:none}
+.mode-desc{font-size:.76rem;color:var(--muted-foreground);padding-left:6px}
+.chat-tools{display:flex;gap:6px;align-items:center;flex:none}
+.chip-btn{border:0;background:var(--secondary);color:var(--foreground);border-radius:999px;height:34px;padding:0 12px;font-size:.8rem;font-weight:500;display:inline-flex;align-items:center;gap:7px;white-space:nowrap;transition:transform .15s}
+.chip-btn:active{transform:scale(.95)}
+.kdot{width:7px;height:7px;border-radius:50%;background:var(--access-partial)}
+.kdot.ok{background:var(--access-free)}
+@media (max-width:639px){.chip-btn .lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.chip-btn{width:34px;padding:0;justify-content:center;position:relative}}
+.chat-body{flex:1;overflow-y:auto;padding:20px 16px;display:flex;flex-direction:column;gap:18px;overscroll-behavior:contain}
+@media (min-width:640px){.chat-body{padding:24px}}
+.welcome{margin:auto 0;display:flex;flex-direction:column;align-items:center;text-align:center;gap:10px;padding:8px 0}
+.welcome-t{font-family:var(--font-display);font-weight:600;font-size:1.45rem;letter-spacing:-.025em;margin-top:6px}
+.welcome-s{color:var(--muted-foreground);font-size:.95rem;max-width:460px}
+.sugs{display:flex;gap:8px;overflow-x:auto;margin:10px -16px 0;padding:2px 16px 6px;max-width:calc(100% + 32px);scrollbar-width:none}
+.sugs::-webkit-scrollbar{display:none}
+@media (min-width:640px){.sugs{flex-wrap:wrap;justify-content:center;overflow:visible;margin:10px 0 0;padding:2px 0;max-width:640px}}
+.sug{white-space:nowrap;font-size:.84rem}
+.msg-u{align-self:flex-end;max-width:85%;background:var(--primary);color:var(--primary-foreground);border-radius:20px 20px 6px 20px;padding:10px 16px;font-size:.95rem;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;animation:rise .35s var(--ease) both}
+.msg-a{display:flex;gap:12px;align-items:flex-start;animation:rise .35s var(--ease) both}
+@media (max-width:639px){.msg-a>.mark{display:none}}
+.md{flex:1;min-width:0;font-size:.95rem;line-height:1.65;overflow-wrap:anywhere}
+.md>*+*{margin-top:10px}
+.md h4{font-family:var(--font-display);font-size:1.02rem;font-weight:600;letter-spacing:-.01em;margin-top:16px}
+.md ul,.md ol{padding-left:1.3em}
+.md li+li{margin-top:4px}
+.md strong{font-weight:600}
+.md a{color:var(--primary);text-decoration:underline;text-underline-offset:2px}
+.md code{font-family:var(--font-mono);font-size:.86em;background:var(--muted);padding:1px 5px;border-radius:6px}
+.md blockquote{border-left:3px solid var(--border-strong);padding-left:12px;color:var(--muted-foreground)}
+.md hr{border:0;border-top:1px solid var(--border)}
+.md .tbl{overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border)}
+.md table{border-collapse:collapse;width:100%;font-size:.86rem}
+.md th,.md td{padding:7px 10px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+.md th{background:var(--muted);font-weight:600}
+.md tr:last-child td{border-bottom:0}
+.thinking{display:inline-flex;align-items:center;gap:8px;color:var(--muted-foreground)}
+.msg-err{color:var(--destructive)}
+.msg-note{color:var(--faint);font-size:.85rem}
+.rchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.rchip{display:inline-flex;align-items:center;gap:4px;background:var(--accent);color:var(--accent-foreground);border-radius:999px;padding:6px 12px;font-size:.82rem;font-weight:600;text-decoration:none!important;transition:transform .15s}
+.rchip:active{transform:scale(.96)}
+.to-bottom{position:absolute;left:50%;bottom:88px;transform:translateX(-50%);width:36px;height:36px;border-radius:50%;border:1px solid var(--border);background:var(--card);color:var(--foreground);box-shadow:var(--shadow-lift-value);display:flex;align-items:center;justify-content:center;z-index:2}
+.chat-input{padding:12px 14px;border-top:1px solid var(--border)}
+.chat-box{display:flex;align-items:flex-end;gap:8px;background:var(--secondary);border-radius:25.6px;padding:6px 6px 6px 16px}
+.chat-box textarea{flex:1;min-width:0;border:0;background:transparent;resize:none;outline:none;font-size:.95rem;line-height:1.45;padding:7px 0;max-height:140px;height:36px}
+.chat-box textarea::placeholder{color:var(--faint)}
+.chat-box:focus-within{box-shadow:0 0 0 3px var(--ring)}
+.send{width:34px;height:34px;border-radius:50%;border:0;background:var(--primary);color:var(--primary-foreground);display:flex;align-items:center;justify-content:center;flex:none;transition:transform .15s,opacity .2s}
+.send:active:not(:disabled){transform:scale(.9)}
+.send:disabled{opacity:.35;cursor:default}
+.send.stop{background:var(--foreground);color:var(--background)}
+.fine{font-size:.78rem;color:var(--faint);margin-top:12px;text-align:center}
+.keybox{width:100%;max-width:520px;margin:4px auto 0;background:var(--surface);border-radius:var(--r-2xl);padding:16px;text-align:left;display:flex;flex-direction:column;gap:10px}
+.keybox-h{display:flex;align-items:center;gap:8px;font-weight:600}
+.keybox p{font-size:.86rem;color:var(--muted-foreground);line-height:1.5}
+.keyrow{display:flex;gap:8px}
+.keyrow input{flex:1;min-width:0;height:38px;border-radius:999px;border:1px solid var(--border);background:var(--card);padding:0 14px;font-size:.9rem;outline:none}
+.keyrow input:focus{box-shadow:0 0 0 3px var(--ring)}
+.keyrow input.bad{border-color:var(--destructive)}
+
+/* ── PIED DE PAGE ── */
+.foot{border-top:1px solid var(--border)}
+.foot-in{max-width:1120px;margin:0 auto;padding:32px var(--pad);display:flex;flex-direction:column;gap:6px;font-size:.82rem;color:var(--muted-foreground)}
+@media (min-width:640px){.foot-in{flex-direction:row;justify-content:space-between}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}
+  .card:hover,.book:hover,.feat-card:hover{transform:none!important}
+}
 </style>
 </head>
 <body>
-<div class="corner-br"></div>
-<div class="wrapper">
 
-<header>
-  <div class="header-top">
-    <div>
-      <div class="logo-label">Index de ressources · Architecture</div>
-      <h1>ARCHI<em>//</em><br>INDEX</h1>
-    </div>
-    <div class="header-right">
-      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;">
-        <div class="stat">Ressources <span id="totalCount">—</span></div>
-        <div class="stat">Catégories <span>06</span></div>
-        <div class="stat">Accès <span>Maj. gratuit</span></div>
+<header class="topbar">
+  <div class="topbar-in">
+    <a class="logo" href="#index" data-tab="index">ARCHI<span>//</span>INDEX</a>
+    <nav class="nav" id="nav" aria-label="Sections">
+      <button class="nav-btn active" data-tab="index" aria-current="page">Index</button>
+      <button class="nav-btn" data-tab="recherche">Recherche</button>
+      <button class="nav-btn" data-tab="carte">Carte Belgique</button>
+      <button class="nav-btn" data-tab="favoris">Favoris<span class="nav-count" id="favCount" hidden></span></button>
+      <button class="nav-btn" data-tab="assistant">Assistant IA</button>
+    </nav>
+    <div class="tools">
+      <div class="seg seg-font" role="group" aria-label="Taille du texte">
+        <button data-font="sm" aria-label="Petit texte" title="Petit texte" style="font-size:11px">A</button>
+        <button data-font="md" aria-label="Texte normal" title="Texte normal" style="font-size:13px">A</button>
+        <button data-font="lg" aria-label="Grand texte" title="Grand texte" style="font-size:16px">A</button>
       </div>
-      <div class="header-controls">
-        <div class="font-group">
-          <button class="icon-btn" id="fSm" onclick="setFont('sm')">A−</button>
-          <button class="icon-btn active" id="fMd" onclick="setFont('md')">A</button>
-          <button class="icon-btn" id="fLg" onclick="setFont('lg')">A+</button>
-        </div>
-        <button class="icon-btn" id="themeBtn" onclick="toggleTheme()">☾ Dark</button>
-      </div>
+      <button class="icon-btn" id="themeBtn" aria-label="Passer en mode sombre" title="Passer en mode sombre"></button>
     </div>
   </div>
-  <div class="divider"></div>
-  <p class="header-desc">Répertoire de sources pour l'architecture — livres, archives, revues, ressources visuelles, outils et institutions belges. Recherche intégrée sur Open Library, Gutenberg & Archive.org avec liens directs vers toutes les plateformes.</p>
 </header>
 
-<div class="tabs">
-  <button class="tab-btn active" onclick="switchTab('index')">// Index</button>
-  <button class="tab-btn" onclick="switchTab('recherche')">// Recherche</button>
-  <button class="tab-btn" onclick="switchTab('carte')">// Carte Belgique</button>
-  <button class="tab-btn" onclick="switchTab('favoris')">// Favoris <span id="fav-count"></span></button>
-  <button class="tab-btn" onclick="switchTab('assistant')">// Assistant IA</button>
-</div>
+<main class="main" id="main">
 
-<!-- TAB INDEX -->
-<div class="tab-panel active" id="tab-index">
-  <div class="section-label">Ressources mises en avant</div>
-  <div class="new-strip" id="nouvStrip"></div>
-  <div class="controls">
-    <div class="controls-row">
-      <div class="search-wrap">
-        <span class="search-icon">⌕</span>
-        <input type="text" class="search-input" id="idxSearch" placeholder="Filtrer par nom, description, tip…" autocomplete="off">
+<!-- INDEX -->
+<section class="panel active" id="tab-index" aria-label="Index">
+  <div class="hero">
+    <p class="eyebrow">Index de ressources · Architecture</p>
+    <h1 class="hero-title">Toutes tes sources.<br><span class="grad">Un seul index.</span></h1>
+    <p class="hero-intro">Livres, archives, revues, images, outils et institutions belges — avec une recherche intégrée et un assistant IA spécialisé.</p>
+    <div class="stats">
+      <div class="stat"><b id="totalCount">—</b><span>Ressources</span></div>
+      <div class="stat"><b>7</b><span>Catégories</span></div>
+      <div class="stat"><b>Majorité</b><span>En accès libre</span></div>
+    </div>
+  </div>
+
+  <section class="sec">
+    <h2 class="h-sec">À la une. <span class="soft">Les ressources à connaître.</span></h2>
+    <div class="feat" id="featStrip"></div>
+  </section>
+
+  <section class="sec">
+    <h2 class="h-sec">Explorer. <span class="soft">Filtre par type ou par région.</span></h2>
+    <div class="toolbar">
+      <label class="field">
+        <span class="sr-only">Rechercher une ressource</span>
+        <svg-ic name="search"></svg-ic>
+        <input type="search" id="idxSearch" placeholder="Rechercher une ressource…" autocomplete="off">
+      </label>
+      <div class="select-wrap">
+        <select id="sortSel" aria-label="Trier les ressources">
+          <option value="def">Tri : par défaut</option>
+          <option value="name">Tri : nom A→Z</option>
+          <option value="access">Tri : accès</option>
+          <option value="cat">Tri : catégorie</option>
+        </select>
+        <svg-ic name="chevronRight" size="14"></svg-ic>
       </div>
-      <select class="sort-select" id="sortSel" onchange="renderIdx()">
-        <option value="def">Tri : défaut</option>
-        <option value="name">Tri : nom A→Z</option>
-        <option value="access">Tri : accès</option>
-        <option value="cat">Tri : catégorie</option>
-      </select>
-      <div class="view-toggle">
-        <button class="icon-btn active" id="btnGrid" onclick="setView('grid')">⊞ Grille</button>
-        <button class="icon-btn" id="btnList" onclick="setView('list')">☰ Liste</button>
+      <div class="seg seg-view" role="group" aria-label="Affichage">
+        <button id="btnGrid" class="on" aria-pressed="true" aria-label="Affichage en grille" title="Grille"><svg-ic name="grid"></svg-ic></button>
+        <button id="btnList" aria-pressed="false" aria-label="Affichage en liste" title="Liste"><svg-ic name="list"></svg-ic></button>
       </div>
     </div>
-    <div class="filters" id="catFilters"></div>
-    <div class="filters" id="paysFilters" style="padding-top:4px;border-top:1px solid var(--border);margin-top:6px;"></div>
-  </div>
-  <div class="results-meta">Affichage <span id="visCnt">—</span> ressource(s)</div>
-  <div class="resource-grid" id="resGrid"></div>
-</div>
-
-<!-- TAB RECHERCHE -->
-<div class="tab-panel" id="tab-recherche">
-  <div class="rtab-head">
-    <h2>Rechercher un <em>titre</em> ou un <em>auteur</em></h2>
-    <p>Résultats en direct depuis Open Library, Gutenberg et Archive.org — plus des liens de recherche rapide vers Z-Library, LibGen, Sci-Hub, Google Scholar et les archives belges.</p>
-  </div>
-  <div class="search-bar-big">
-    <input type="text" id="bookSearch" placeholder="Ex: Viollet-le-Duc, Rem Koolhaas, Vers une architecture…" autocomplete="off">
-    <button class="btn-search" id="searchBtn" onclick="doSearch()">Chercher</button>
-  </div>
-  <div class="type-filters">
-    <button class="type-btn active" onclick="setType(this,'all')">Tout</button>
-    <button class="type-btn" onclick="setType(this,'books')">Livres</button>
-    <button class="type-btn" onclick="setType(this,'texts')">Articles & textes</button>
-    <button class="type-btn" onclick="setType(this,'archive')">Archives</button>
-  </div>
-  <div class="hist-block" id="histBlock" style="display:none">
-    <div class="hist-label">Recherches récentes —</div>
-    <div class="hist-chips" id="histChips"></div>
-  </div>
-  <div id="searchResults"></div>
-</div>
-
-<!-- TAB CARTE -->
-<div class="tab-panel" id="tab-carte">
-  <div class="carte-layout">
-    <div class="carte-sidebar">
-      <h3>Institutions <em>belges</em></h3>
-      <p>Archives, bibliothèques et centres de recherche accessibles physiquement en Belgique.</p>
-      <div class="carte-type-filters" id="carteFilters"></div>
-      <div class="inst-list" id="instList"></div>
+    <div class="filter-group">
+      <div class="filter-label" id="lblType">Type</div>
+      <div class="pills" id="catFilters" role="group" aria-labelledby="lblType"></div>
     </div>
-    <div id="map"></div>
-  </div>
-</div>
-
-<!-- TAB FAVORIS -->
-<div class="tab-panel" id="tab-favoris">
-  <div class="section-label" style="margin-bottom:8px;">Mes favoris</div>
-  <p style="font-size:.67em;color:var(--text-dim);letter-spacing:.03em;line-height:1.7;margin-bottom:24px;">Vos ressources marquées d'une étoile — sauvegardées localement dans ce navigateur.</p>
-  <div class="resource-grid" id="favGrid"></div>
-</div>
-
-<!-- TAB ASSISTANT IA -->
-<div class="tab-panel" id="tab-assistant">
-  <div class="ai-layout">
-    <div class="ai-sidebar">
-      <div class="ai-sidebar-title">Mode</div>
-      <button class="ai-mode-btn active" id="modeLibre" onclick="setAiMode('libre')">
-        Question & Analyse
-        <small>Architecture, styles, bâtiments, analyse de projet</small>
-      </button>
-      <button class="ai-mode-btn" id="modeRecherche" onclick="setAiMode('recherche')">
-        Aide à la recherche
-        <small>Décris ton sujet, l'IA suggère où chercher</small>
-      </button>
-      <div class="ai-sidebar-sep"></div>
-      <div class="ai-sidebar-info">Modèle : Llama 3.3 70B via Groq</div>
-      <div class="ai-sidebar-info">Répond en français · Spécialisé architecture</div>
-      <div class="ai-sidebar-sep"></div>
-      <button class="ai-mode-btn" onclick="showKeyPrompt()" style="font-size:.56em;padding:7px 10px;">
-        🔑 Clé API Groq
-        <small id="keyStatus">Non configurée</small>
-      </button>
+    <div class="filter-group">
+      <div class="filter-label" id="lblPays">Sources internationales par région</div>
+      <div class="pills" id="paysFilters" role="group" aria-labelledby="lblPays"></div>
     </div>
-    <div class="ai-main">
-      <div class="ai-messages" id="aiMessages">
-        <div class="ai-welcome" id="aiWelcome">
-          <div class="ai-welcome-title">Bonjour, que puis-je faire pour toi ?</div>
-          <div class="ai-welcome-sub">Pose une question sur l'architecture, un style, un architecte, ou décris ton sujet de recherche pour que je t'oriente vers les meilleures ressources de l'index.</div>
+    <p class="count" id="visCnt" aria-live="polite"></p>
+    <div class="grid" id="resGrid"></div>
+  </section>
+</section>
+
+<!-- RECHERCHE -->
+<section class="panel" id="tab-recherche" aria-label="Recherche">
+  <p class="eyebrow">Recherche</p>
+  <h1 class="page-title">Un titre, un auteur. <span class="grad">Tout est là.</span></h1>
+  <p class="page-intro">Résultats en direct depuis Open Library, Gutenberg et Archive.org — plus des raccourcis vers Google Scholar, JSTOR et les catalogues belges.</p>
+  <form class="sbar" id="searchForm" role="search">
+    <svg-ic name="search" size="20"></svg-ic>
+    <input type="search" id="bookSearch" placeholder="Viollet-le-Duc, Koolhaas…" autocomplete="off" aria-label="Titre ou auteur">
+    <button class="btn-primary" id="searchBtn" type="submit" disabled>Chercher</button>
+  </form>
+  <div class="seg-wrap">
+    <div class="seg seg-type" id="typeSeg" role="group" aria-label="Type de résultats">
+      <button class="on" data-type="all" aria-pressed="true">Tout</button>
+      <button data-type="books" aria-pressed="false">Livres</button>
+      <button data-type="texts" aria-pressed="false">Articles &amp; textes</button>
+      <button data-type="archive" aria-pressed="false">Archives</button>
+    </div>
+  </div>
+  <div class="hist" id="histBlock" hidden>
+    <div class="hist-head"><span class="filter-label">Recherches récentes</span><button class="link-btn" id="histClear" type="button">Effacer</button></div>
+    <div class="pills" id="histChips"></div>
+  </div>
+  <div id="searchResults" aria-live="polite"></div>
+</section>
+
+<!-- CARTE -->
+<section class="panel" id="tab-carte" aria-label="Carte Belgique">
+  <p class="eyebrow">Carte Belgique</p>
+  <h1 class="page-title">Où consulter. <span class="soft">Partout en Belgique.</span></h1>
+  <p class="page-intro">Archives, bibliothèques et centres de recherche accessibles sur place — adresses, horaires et sites web.</p>
+  <div class="filter-group">
+    <div class="pills" id="carteFilters" role="group" aria-label="Type d'institution"></div>
+  </div>
+  <div class="map-wrap">
+    <div class="inst-list" id="instList" role="list"></div>
+    <div id="map" role="region" aria-label="Carte des institutions"></div>
+  </div>
+</section>
+
+<!-- FAVORIS -->
+<section class="panel" id="tab-favoris" aria-label="Favoris">
+  <p class="eyebrow">Favoris</p>
+  <h1 class="page-title">Tes sources. <span class="soft">Toujours sous la main.</span></h1>
+  <p class="page-intro">Les ressources marquées d’une étoile, sauvegardées dans ce navigateur.</p>
+  <div class="grid" id="favGrid" style="margin-top:32px"></div>
+</section>
+
+<!-- ASSISTANT IA -->
+<section class="panel" id="tab-assistant" aria-label="Assistant IA">
+  <p class="eyebrow">Assistant IA</p>
+  <h1 class="page-title">Pose ta question. <span class="grad">Trouve tes sources.</span></h1>
+  <p class="page-intro">Spécialisé architecture, niveau master, répond en français — fonctionne avec ta clé Groq gratuite, gardée uniquement dans ton navigateur.</p>
+  <div class="chat" id="chat">
+    <div class="chat-top">
+      <div class="chat-modes">
+        <div class="seg" id="modeSeg" role="group" aria-label="Mode de l'assistant">
+          <button class="on" data-mode="libre" aria-pressed="true">Question &amp; Analyse</button>
+          <button data-mode="recherche" aria-pressed="false">Aide à la recherche</button>
         </div>
+        <div class="mode-desc" id="modeDesc"></div>
       </div>
-      <div class="ai-suggestions" id="aiSuggestions">
-        <div class="ai-sug-label">Suggestions —</div>
-        <div class="ai-sug-chips" id="aiSugChips"></div>
+      <div class="chat-tools">
+        <button class="chip-btn" id="keyBtn" type="button"><span class="kdot" id="keyDot"></span><span class="lbl">Clé Groq</span></button>
+        <button class="chip-btn" id="newChat" type="button" aria-label="Nouvelle conversation" title="Nouvelle conversation"><svg-ic name="rotate"></svg-ic><span class="lbl">Nouvelle conversation</span></button>
       </div>
-      <div class="ai-input-area">
-        <textarea class="ai-input" id="aiInput" placeholder="Écris ta question ici…" rows="1"></textarea>
-        <button class="ai-clear" onclick="clearChat()" title="Effacer la conversation">↺</button>
-        <button class="ai-send" id="aiSend" onclick="sendMessage()">Envoyer</button>
+    </div>
+    <div class="chat-body" id="aiMessages"></div>
+    <button class="to-bottom" id="toBottom" type="button" aria-label="Revenir en bas de la conversation" hidden><svg-ic name="arrowDown"></svg-ic></button>
+    <div class="chat-input">
+      <div class="chat-box">
+        <textarea id="aiInput" rows="1" placeholder="Écris ta question sur l'architecture…" aria-label="Ton message"></textarea>
+        <button class="send" id="aiSend" type="button" aria-label="Envoyer" title="Envoyer" disabled><svg-ic name="arrowUp" size="18"></svg-ic></button>
       </div>
     </div>
   </div>
-</div>
+  <p class="fine">Modèle GPT-OSS 120B via Groq · L’IA peut se tromper : vérifie toujours les références citées.</p>
+</section>
 
+</main>
 
-<footer>
-  <div class="footer-text">ARCHI//INDEX · Usage personnel & académique</div>
-  <div class="footer-note">Pour les étudiants en architecture, par un ami bienveillant.</div>
+<footer class="foot">
+  <div class="foot-in">
+    <span>ARCHI//INDEX · Usage personnel &amp; académique</span>
+    <span>Pour les étudiants en architecture, par un ami bienveillant.</span>
+  </div>
 </footer>
-</div>
 
 <script>
-/* ── DATA ── */
+/* ══════════ DONNÉES ══════════ */
 const resources=[
   {cat:"livres",name:"Project Gutenberg",url:"https://gutenberg.org",access:"free",desc:"Plus de 70 000 livres libres de droits en texte intégral. Idéal pour les textes théoriques anciens : Vitruve, Ruskin, Viollet-le-Duc, et les grands traités d'architecture pré-XXe siècle.",tip:"Utiliser la recherche avancée avec les termes « architecture », « building », « construction » — beaucoup de titres sont en anglais même pour des auteurs français."},
   {cat:"livres",name:"Z-Library",url:"https://z-library.sk",access:"bypass",desc:"La plus grande bibliothèque numérique du monde — des millions de livres et articles en PDF ou EPUB. Couvre pratiquement tout le corpus académique en architecture, design et urbanisme.",tip:"Créer un compte gratuit pour lever la limite quotidienne. Rechercher directement par ISBN ou titre exact. Si le site est inaccessible, essayer singlelogin.re comme miroir."},
@@ -482,7 +607,7 @@ const resources=[
   {cat:"archives",name:"Library of Congress — Maps",url:"https://loc.gov/maps/collections",access:"free",desc:"Collections cartographiques et architecturales de la Bibliothèque du Congrès américain. Inclut les relevés HABS/HAER — des milliers de plans et photos de bâtiments historiques.",tip:"Les collections HABS (Historic American Buildings Survey) sont exceptionnelles : plans cotés, façades, coupes et photos de bâtiments souvent démolis."},
   {cat:"archives",name:"Wikimedia Commons — Architecture",url:"https://commons.wikimedia.org/wiki/Category:Architecture",access:"free",desc:"Millions d'images, plans et médias libres de droits. Catégories très fines par style architectural, époque, pays et type de bâtiment.",tip:"Chercher « Floor plans », « Architectural drawings », « Building sections » pour trouver des documents techniques précis."},
   {cat:"archives",name:"ETH Zürich — e-collection",url:"https://www.research-collection.ethz.ch",access:"free",desc:"Archives ouvertes de l'École Polytechnique Fédérale de Zurich. Thèses, mémoires, publications de recherche de l'une des meilleures écoles d'architecture au monde.",tip:"Chercher directement par thème ou par nom d'enseignant. La qualité des travaux graphiques est un excellent modèle de référence."},
-  {cat:"archives",name:"RIBA Architecture Library",url:"https://www.architecture.com/knowledge-and-resources/riba-library",access:"partial",desc:"Archives du Royal Institute of British Architects — l'une des plus importantes collections d'archives d'architecture au monde. Dessins originaux, photographies, collections privées.",tip:"L'accès complet est réservé aux membres RIBA, mais les catalogues sont consultables gratuitement. Utile pour identifier des sources à demander via le prêt inter-bibliothèques."},
+  {cat:"archives",name:"RIBA Architecture Library",url:"https://www.riba.org/explore/riba-collections/riba-library/",access:"partial",desc:"Archives du Royal Institute of British Architects — l'une des plus importantes collections d'archives d'architecture au monde. Dessins originaux, photographies, collections privées.",tip:"L'accès complet est réservé aux membres RIBA, mais les catalogues sont consultables gratuitement. Utile pour identifier des sources à demander via le prêt inter-bibliothèques."},
   {cat:"archives",name:"Avery Index — Columbia University",url:"https://library.columbia.edu/libraries/avery/avery-index.html",access:"partial",desc:"Index de référence mondial des périodiques et livres d'architecture depuis 1934. Géré par Columbia University. Recense des milliers de revues internationales.",tip:"Accès gratuit via beaucoup d'universités (disponible via ProQuest ou EBSCO). Une fois un article repéré, utiliser Unpaywall ou Sci-Hub pour accéder au PDF."},
   {cat:"archives",name:"OpenStreetMap",url:"https://openstreetmap.org",access:"free",desc:"Carte mondiale collaborative et open source. Export de données vectorielles pour tout contexte urbain, analyse urbaine ou fond de plan — directement utilisable sous QGIS ou AutoCAD.",tip:"Utiliser l'outil « Export » ou passer par overpass-turbo.eu pour des requêtes sur mesure (bâtiments, voiries, espaces verts d'un périmètre précis)."},
   {cat:"revues",name:"JSTOR",url:"https://jstor.org",access:"partial",desc:"Archive numérique de milliers de revues académiques. Contient les grandes revues d'architecture : Journal of the Society of Architectural Historians, Architectural History, etc.",tip:"Créer un compte gratuit MyJSTOR pour accéder à 100 articles gratuits par mois. Pour le reste, archive.is fonctionne souvent, ou utiliser Unpaywall."},
@@ -497,7 +622,6 @@ const resources=[
   {cat:"revues",name:"OpenEdition Journals",url:"https://journals.openedition.org",access:"free",desc:"Portail européen de revues en sciences humaines et sociales en open access. Des centaines de revues francophones en architecture, urbanisme, patrimoine et géographie, avec des articles en texte intégral librement accessibles.",tip:"Utiliser la recherche par discipline « Architecture » ou « Géographie, aménagement » pour cibler les revues pertinentes. Beaucoup de numéros thématiques sur le patrimoine bruxellois et wallon."},
   {cat:"revues",name:"In Situ — Revue du patrimoine",url:"https://journals.openedition.org/insitu",access:"free",desc:"Revue française du patrimoine culturel, 100% gratuite et en open access. Couvre l'architecture historique, la restauration, le patrimoine industriel et paysager — très pertinente pour les travaux sur le patrimoine bâti belge.",tip:"Les numéros thématiques sont particulièrement denses : chercher les numéros consacrés à l'architecture du XXe siècle, au patrimoine industriel ou aux villes. Tous les articles sont en texte intégral."},
   {cat:"revues",name:"BASE — Bielefeld Academic Search",url:"https://base-search.net",access:"free",desc:"Un des plus grands moteurs de recherche académique en open access — plus de 300 millions de documents dont des thèses européennes, remplaçant officiellement DART-Europe fermé en 2025. Couvre les dépôts institutionnels belges et européens.",tip:"Filtrer par type de document « Thesis » et par langue ou pays pour cibler les thèses belges. Combiner avec une recherche sur DI-fusion (ULB) ou le dépôt institutionnel de l'université concernée pour les travaux les plus récents."},
-  {cat:"belgique",name:"BICTEL — Thèses belges",url:"http://www.bictel.be",access:"free",desc:"Portail spécifique des thèses de doctorat des universités belges francophones — ULB, UCLouvain, ULiège, UNamur, UMONS. Accès direct aux thèses en architecture, urbanisme et sciences du territoire défendues en Belgique.",tip:"Rechercher par mots-clés ou par université d'origine. Les thèses récentes sont généralement disponibles en texte intégral. Outil indispensable pour identifier les travaux de recherche belges sur l'architecture locale."},
   {cat:"revues",name:"Divisare — Archive",url:"https://divisare.com",access:"partial",desc:"Archive éditoriale de référence sur l'architecture contemporaine. Projets photographiés, plans, coupes et mémoires explicatifs de très haute qualité graphique.",tip:"Les premiers accès sont gratuits, certaines sections nécessitent un abonnement. Excellent pour étudier comment les agences présentent leurs projets."},
   {cat:"archives",name:"Smarthistory",url:"https://smarthistory.org",access:"free",desc:"Encyclopédie en ligne gratuite et de référence sur l'histoire de l'art et de l'architecture — articles rédigés par des universitaires, illustrés, couvrant toutes les périodes et cultures. Alternative sérieuse aux manuels payants.",tip:"Chercher par période, mouvement ou bâtiment. Les sections « Architecture » et « Gothic », « Baroque », « Modernism » sont particulièrement développées. Tout le contenu est sous licence Creative Commons."},
   {cat:"archives",name:"archINFORM",url:"https://archinform.net",access:"free",desc:"La plus grande base de données internationale d'architecture — plus de 84.000 bâtiments et projets non réalisés, de toutes les époques et tous les pays. Recherche par architecte, ville, style ou mot-clé.",tip:"Rechercher par architecte pour avoir une vue d'ensemble de son œuvre avec références bibliographiques. Les fiches incluent adresse, date, maître d'ouvrage et liens vers la littérature spécialisée."},
@@ -540,7 +664,7 @@ function getAllRes(){return[...resources.map(r=>({...r,pays:null})),...intlSourc
 
 const nouveautes=[
   {name:"Kanal Architecture",url:"https://catalogue.kanal.brussels",badge:"Nouveau"},
-  {name:"Digithèque ULB",url:"https://digistore.bib.ulb.ac.be",badge:"ULB"},
+  {name:"DI-fusion ULB",url:"https://difusion.ulb.be",badge:"ULB"},
   {name:"WalOnMap LiDAR",url:"https://geoportail.wallonie.be",badge:"Géo"},
   {name:"ETH Zürich e-collection",url:"https://www.research-collection.ethz.ch",badge:"Thèses"},
   {name:"Getty Open Content",url:"https://search.getty.edu/gateway/search?q=&cat=type&rows=10&mediatype=images",badge:"Gratuit"}
@@ -550,339 +674,473 @@ const institutions=[
   {name:"Kanal Architecture (ex-CIVA)",type:"culture",lat:50.8641,lng:4.3512,adresse:"Quai de Willebroek 6, 1000 Bruxelles",horaires:"Ouverture prévue novembre 2026",url:"https://kanal.brussels"},
   {name:"KBR — Bibliothèque Royale",type:"bibliotheque",lat:50.8429,lng:4.3618,adresse:"Bd de l'Empereur 4, 1000 Bruxelles",horaires:"Lun–Ven 9h–20h, Sam 9h–17h",url:"https://kbr.be"},
   {name:"Archives de la Ville de Bruxelles",type:"archive",lat:50.8461,lng:4.3548,adresse:"Rue des Tanneurs 65, 1000 Bruxelles",horaires:"Lun–Ven 9h–12h & 13h–16h",url:"https://archives.bruxelles.be"},
-  {name:"Archives de l'État — Bruxelles",type:"archive",lat:50.8560,lng:4.3625,adresse:"Rue de Ruysbroeck 2-6, 1000 Bruxelles",horaires:"Lun–Ven 9h–12h30 & 13h–17h",url:"https://arch.be"},  {name:"ULB — Bibliothèque d'Architecture",type:"universite",lat:50.8125,lng:4.3820,adresse:"Avenue Antoine Depage 1, 1050 Ixelles",horaires:"Lun–Ven 9h–18h (archives sur RDV)",url:"https://bib.ulb.be/fr/bibliotheques/architecture"},
+  {name:"Archives de l'État — Bruxelles",type:"archive",lat:50.8560,lng:4.3625,adresse:"Rue de Ruysbroeck 2-6, 1000 Bruxelles",horaires:"Lun–Ven 9h–12h30 & 13h–17h",url:"https://www.arch.be"},
+  {name:"ULB — Bibliothèque d'Architecture",type:"universite",lat:50.8125,lng:4.3820,adresse:"Avenue Antoine Depage 1, 1050 Ixelles",horaires:"Lun–Ven 9h–18h (archives sur RDV)",url:"https://bib.ulb.be/fr/bibliotheques/architecture"},
   {name:"UCLouvain — BAIU (Saint-Luc BXL)",type:"universite",lat:50.8340,lng:4.3490,adresse:"Rue d'Irlande 57, 1060 Saint-Gilles",horaires:"Lun–Ven 9h–17h",url:"https://uclouvain.be/fr/bibliotheques/baiu"},
-  {name:"Archives de l'État — Liège",type:"archive",lat:50.6448,lng:5.5735,adresse:"Rue du Chéra 79, 4000 Liège",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
-  {name:"Archives de l'État — Gand",type:"archive",lat:51.0498,lng:3.7254,adresse:"Academiestraat 14, 9000 Gand",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
-  {name:"Archives de l'État — Bruges",type:"archive",lat:51.2097,lng:3.2239,adresse:"Academiestraat 14, 8000 Bruges",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
-  {name:"Archives de l'État — Namur",type:"archive",lat:50.4669,lng:4.8680,adresse:"Rue d'Arquet 45, 5000 Namur",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
-  {name:"Archives de l'État — Mons",type:"archive",lat:50.4543,lng:3.9538,adresse:"Place du Parc 23, 7000 Mons",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://arch.be"},
+  {name:"Archives de l'État — Liège",type:"archive",lat:50.6448,lng:5.5735,adresse:"Rue du Chéra 79, 4000 Liège",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://www.arch.be"},
+  {name:"Archives de l'État — Gand",type:"archive",lat:51.0498,lng:3.7254,adresse:"Academiestraat 14, 9000 Gand",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://www.arch.be"},
+  {name:"Archives de l'État — Bruges",type:"archive",lat:51.2097,lng:3.2239,adresse:"Academiestraat 14, 8000 Bruges",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://www.arch.be"},
+  {name:"Archives de l'État — Namur",type:"archive",lat:50.4669,lng:4.8680,adresse:"Rue d'Arquet 45, 5000 Namur",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://www.arch.be"},
+  {name:"Archives de l'État — Mons",type:"archive",lat:50.4543,lng:3.9538,adresse:"Place du Parc 23, 7000 Mons",horaires:"Lun–Ven 9h–12h & 13h–17h",url:"https://www.arch.be"},
   {name:"Universiteitsbibliotheek Gent",type:"universite",lat:51.0534,lng:3.7218,adresse:"Rozier 9, 9000 Gand",horaires:"Lun–Ven 8h30–22h, Sam 10h–18h",url:"https://lib.ugent.be"},
   {name:"KU Leuven — BSCS Architecture",type:"universite",lat:50.8764,lng:4.7040,adresse:"Kasteelpark Arenberg 1, 3001 Louvain",horaires:"Lun–Ven 9h–17h",url:"https://bib.kuleuven.be"}
 ];
 
 const typeLabels={all:"Tous",archive:"Archives d'État",universite:"Universités",bibliotheque:"Bibliothèques",culture:"Culture & Patrimoine"};
-const typeColors={archive:"#c9a96e",universite:"#7aabcf",bibliotheque:"#87c98a",culture:"#cf87bf"};
 
-/* ── STATE ── */
+const intlSources = [
+  // INTERNATIONAL
+  {pays:"international",flag:"🌐",name:"UNESCO World Heritage — Architecture",url:"https://whc.unesco.org/en/list/",desc:"Liste des 1200+ sites du patrimoine mondial avec fiches, plans, photos et dossiers de nomination. Référence incontournable pour l'architecture à valeur universelle.",access:"free",tip:"Chercher par catégorie « Cultural » et filtrer par période ou pays. Les dossiers de nomination PDF sont téléchargeables et constituent des sources académiques de premier rang."},
+  {pays:"international",flag:"🌐",name:"ICOMOS — Chartes & Archives",url:"https://www.icomos.org/charters-and-doctrinal-texts/",desc:"Toutes les chartes doctrinales de l'ICOMOS (Venise, Florence, Burra, Cracovie…) en accès libre. Fondements théoriques incontournables de la conservation du patrimoine architectural mondial.",access:"free",tip:"Les chartes sont en plusieurs langues dont le français. Indispensables pour tout mémoire sur la restauration ou la conservation du patrimoine — à citer directement dans les bibliographies."},
+  {pays:"international",flag:"🌐",name:"DOCOMOMO International",url:"https://www.docomomo.com",desc:"Organisation internationale pour la documentation et conservation du mouvement moderne. Registres de bâtiments modernes à protéger, publications et ressources sur l'architecture du XXe siècle dans le monde entier.",access:"free",tip:"La base de données des registres DOCOMOMO par pays est une référence pour tout travail sur le patrimoine moderniste. Les dossiers ISU (International Selection Unique) sont téléchargeables."},
+  {pays:"international",flag:"🌐",name:"Archnet — Architecture islamique MIT",url:"https://archnet.org",desc:"Ressource open access dédiée à l'architecture et l'urbanisme des cultures musulmanes, développée par le MIT et l'Aga Khan Trust. Projets, bibliothèque, images et publications en accès libre.",access:"free",tip:"Riche en plans, photos d'archives et études de cas sur l'architecture du Moyen-Orient, d'Afrique du Nord et d'Asie centrale. Excellent pour les typologies de mosquées, medersas et espaces publics."},
+  {pays:"international",flag:"🌐",name:"SAH Archipedia",url:"https://sah-archipedia.org",desc:"Encyclopédie en ligne de l'architecture mondiale publiée par la Society of Architectural Historians. Histories, photos et cartes de milliers de bâtiments avec bibliographies de référence.",access:"free",tip:"Chaque notice inclut des références bibliographiques vérifiées — très utile pour constituer une bibliographie sur un bâtiment ou un architecte spécifique."},
+  {pays:"international",flag:"🌐",name:"Colossus — Architecture Magazine Archive",url:"https://www.usmodernist.org",desc:"Plus de 5 millions de pages de revues d'architecture modernistes américaines téléchargeables gratuitement. Arts & Architecture, Architectural Forum, Progressive Architecture, Architectural Record...",access:"free",tip:"Rechercher directement par revue puis parcourir par décennie. Arts & Architecture (1929-1967) est particulièrement précieuse pour les Case Study Houses et le modernisme californien."},
+  {pays:"international",flag:"🌐",name:"Archis / Volume Magazine",url:"https://archis.org",desc:"Revue néerlandaise d'architecture critique et d'urbanisme, plateforme de débat international. Articles en anglais sur l'architecture contemporaine et ses enjeux sociaux et politiques.",access:"partial",tip:"Les archives en ligne sont partiellement gratuites. Fortes sur les thèmes urbains critiques, le logement et les questions territoriales — utile pour les mémoires à dimension théorique."},
+
+  // FRANCE
+  {pays:"france",flag:"🇫🇷",name:"Cité de l'Architecture — Portail Documentaire",url:"https://portaildocumentaire.citedelarchitecture.fr",desc:"Portail de la Cité de l'architecture et du patrimoine — revues patrimoniales numérisées, livres anciens libres de droits, archives d'architectes contemporains français depuis la fin du XIXe siècle.",access:"free",tip:"Les revues numérisées incluent L'Architecture, La Construction Moderne, L'Architecte — des sources primaires précieuses pour l'architecture française du XXe siècle."},
+  {pays:"france",flag:"🇫🇷",name:"POP — Plateforme Ouverte du Patrimoine",url:"https://pop.culture.gouv.fr",desc:"Portail du Ministère de la Culture regroupant 8 bases dont Mérimée (275k bâtiments protégés) et Mémoire (600k photographies du patrimoine français). Nouvellement refondu en décembre 2025.",access:"free",tip:"Utiliser le filtre par base pour accéder à Mérimée (architecture) ou Mémoire (photos). La recherche par commune + époque est très efficace pour cibler des bâtiments spécifiques."},
+  {pays:"france",flag:"🇫🇷",name:"Médiathèque du Patrimoine (MPP)",url:"https://www.mediatheque-patrimoine.culture.gouv.fr",desc:"Service national conservant toutes les archives des travaux sur monuments historiques, fonds photographiques, dossiers des architectes en chef. Des millions de documents sur le patrimoine bâti français.",access:"partial",tip:"Le catalogue en ligne permet d'identifier les fonds. Les dossiers de monument historique sont consultables en salle de lecture à Charenton-le-Pont — réserver à l'avance par courriel."},
+  {pays:"france",flag:"🇫🇷",name:"FRAC Centre-Val de Loire",url:"https://www.frac-centre.fr",desc:"Troisième collection d'art et d'architecture au monde après le Centre Pompidou et le MoMA. Architecture expérimentale et radicale des années 1950 à nos jours — 1200+ maquettes, 17000+ dessins d'architectes.",access:"partial",tip:"Le catalogue de collection est consultable en ligne. Les expositions ArchiLab sont de référence pour l'architecture d'avant-garde. Collection idéale pour étudier les utopies architecturales."},
+
+  // ITALIE
+  {pays:"italie",flag:"🇮🇹",name:"Fondazione Zeri — Photothèque",url:"https://fondazionezeri.unibo.it/en",desc:"Archive photographique de Federico Zeri — 290.000+ images d'architecture et d'art italien de toutes les périodes, librement consultables et téléchargeables en haute résolution pour la recherche.",access:"free",tip:"Rechercher par architecte, lieu ou période. Forte sur l'architecture de la Renaissance et du baroque italien. Images téléchargeables en haute résolution pour usage académique."},
+  {pays:"italie",flag:"🇮🇹",name:"MAXXI — Collections Architecture",url:"https://www.maxxi.art/en/collections/architecture/",desc:"Collections d'architecture du Musée national des arts du XXIe siècle (Rome) — dessins originaux, maquettes et archives d'architectes italiens et internationaux contemporains dont Zaha Hadid.",access:"partial",tip:"Le catalogue en ligne donne accès aux fonds. Pour la consultation physique des archives, prendre contact avec le Centre de documentation du MAXXI à Rome."},
+  {pays:"italie",flag:"🇮🇹",name:"Treccani — Architecture",url:"https://www.treccani.it/enciclopedia/architettura",desc:"Encyclopédie italienne de référence avec entrées approfondies sur l'architecture, les architectes, les styles et les monuments. Textes académiques rédigés par des spécialistes.",access:"free",tip:"En italien, mais les entrées sur les grands architectes et styles européens sont des synthèses de référence. Utile pour vérifier des dates, noms et informations factuelles."},
+  {pays:"italie",flag:"🇮🇹",name:"Domus Archive",url:"https://www.domusweb.it/en/from-the-archive.html",desc:"Archive de la revue Domus, fondée en 1928 — l'une des publications d'architecture les plus influentes au monde. Articles et projets sur l'architecture italienne et internationale contemporaine.",access:"partial",tip:"Les archives complètes sont accessibles sur abonnement, mais de nombreux articles récents sont en accès libre. Indispensable pour suivre la pensée critique architecturale italienne."},
+
+  // ROYAUME-UNI
+  {pays:"uk",flag:"🇬🇧",name:"Historic England Archive",url:"https://historicengland.org.uk/images-books/archive/",desc:"Plus d'un million de photographies, plans et dessins du patrimoine bâti anglais depuis 1850. Inclut la collection Aerofilms (photos aériennes 1919-1953) téléchargeables en haute résolution.",access:"free",tip:"La recherche par lieu, type de bâtiment ou période est très précise. Les photos aériennes historiques permettent de reconstituer l'évolution urbaine de n'importe quelle ville anglaise."},
+  {pays:"uk",flag:"🇬🇧",name:"Canmore — Patrimoine Écossais",url:"https://canmore.org.uk",desc:"Base nationale des monuments et bâtiments historiques d'Écosse — 300.000+ notices avec photos, plans et documents historiques. Géré par Historic Environment Scotland.",access:"free",tip:"Couvre l'architecture vernaculaire écossaise avec une exhaustivité remarquable. Les séries de photos d'archives permettent de voir l'évolution d'un bâtiment ou d'un quartier dans le temps."},
+  {pays:"uk",flag:"🇬🇧",name:"C20 Society — Patrimoine XXe siècle",url:"https://c20society.org.uk",desc:"Société de préservation de l'architecture britannique du XXe siècle (depuis 1914). Publications, listes de bâtiments en danger, ressources sur le modernisme et le brutalisme anglais.",access:"free",tip:"La « Buildings at Risk » list est une ressource unique pour identifier les bâtiments modernistes britanniques menacés. Le C20 Journal PDF est téléchargeable gratuitement pour les membres."},
+  {pays:"uk",flag:"🇬🇧",name:"Archives Hub UK",url:"https://archiveshub.jisc.ac.uk",desc:"Portail d'accès unifié aux archives de plus de 300 universités et institutions culturelles britanniques. Idéal pour localiser les fonds d'archives d'architectes et designers britanniques.",access:"free",tip:"Rechercher par nom d'architecte ou par institution pour identifier les fonds archivistiques disponibles. Les notices pointent vers les collections physiques et éventuellement numériques."},
+  {pays:"uk",flag:"🇬🇧",name:"Architectural Association — Archive",url:"https://www.aaschool.ac.uk/AALIFE/LIBRARY/aaarchive.php",desc:"Archives de l'Architectural Association de Londres — l'une des écoles d'architecture les plus influentes au monde. Projets étudiants historiques, conférences et publications depuis 1847.",access:"partial",tip:"Le catalogue d'archives est consultable en ligne. L'AA dispose d'un fonds exceptionnel sur les avant-gardes architecturales des années 1960-1980 (Archigram, etc.)."},
+
+  // ALLEMAGNE & AUTRICHE
+  {pays:"allemagne",flag:"🇩🇪",name:"Bauhaus-Archiv Berlin",url:"https://www.bauhaus.de/en/",desc:"Archive officielle du Bauhaus — documents originaux, dessins, photographies et publications de l'école fondée par Gropius en 1919. Catalogue en ligne avec objets numérisés accessibles.",access:"partial",tip:"L'outil de recherche en ligne donne accès à des milliers d'objets numérisés. Contacter le Bauhaus-Archiv directement pour les recherches approfondies sur un enseignant ou une période."},
+  {pays:"allemagne",flag:"🇩🇪",name:"Deutsches Architekturmuseum — DAM",url:"https://dam-online.de",desc:"Musée allemand de l'architecture (Francfort) — une des plus grandes collections de dessins et maquettes d'architecture au monde. Catalogue en ligne, publications et archives numérisées.",access:"partial",tip:"Le DAM publie des monographies de référence et organise les expositions phares sur l'architecture allemande contemporaine. Le catalogue en ligne est consultable librement."},
+  {pays:"allemagne",flag:"🇩🇪",name:"Wien Geschichte Wiki",url:"https://www.geschichtewiki.wien.gv.at",desc:"Encyclopédie historique de la Ville de Vienne — architecture, urbanisme, biographies d'architectes (Wagner, Loos, Hoffmann…), plans historiques et photos. Référence pour la Sécession viennoise.",access:"free",tip:"Rechercher directement en allemand par nom d'architecte ou de bâtiment. Couvre exceptionnellement bien l'architecture de la Ringstrasse et du Jugendstil viennois."},
+  {pays:"allemagne",flag:"🇩🇪",name:"Deutsche Digitale Bibliothek",url:"https://www.deutsche-digitale-bibliothek.de",desc:"Bibliothèque numérique nationale allemande — millions d'objets culturels numérisés issus de milliers d'institutions, dont archives et collections d'architecture.",access:"free",tip:"Filtrer par « Architektur » dans la recherche par sujet. Donne accès aux fonds numérisés de nombreux musées et archives régionaux allemands."},
+
+  // PAYS-BAS & FLANDRE
+  {pays:"paysbas",flag:"🇳🇱",name:"Het Nieuwe Instituut — Collectie",url:"https://zoeken.nieuweinstituut.nl/en",desc:"Portail de recherche des collections du Nieuwe Instituut — 1,4 million de dessins, 300.000 photos et 3000 maquettes d'architectes néerlandais. Archive nationale hollandaise d'architecture et d'urbanisme.",access:"free",tip:"Rechercher directement par nom d'architecte (OMA, MVRDV, Van Eyck, Bakema, Hertzberger…). Plus de 140.000 images numérisées accessibles en ligne, reste consultable sur place à Rotterdam."},
+  {pays:"paysbas",flag:"🇳🇱",name:"Rijksdienst Cultureel Erfgoed",url:"https://www.cultureelerfgoed.nl",desc:"Service national néerlandais du patrimoine culturel — base de données complète des monuments protégés des Pays-Bas, photographies historiques, cartes et documentation architecturale.",access:"free",tip:"La base de données des monuments (monumentenregister.cultureelerfgoed.nl) est très complète et inclut des photos d'archives et des dates de protection. Interface en néerlandais."},
+  {pays:"paysbas",flag:"🇳🇱",name:"Onroerend Erfgoed Vlaanderen",url:"https://www.onroerenderfgoed.be",desc:"Agence du patrimoine immobilier flamand — base de données, publications de recherche et ressources sur l'architecture flamande. Pendant de la Rijksdienst pour la Flandre.",access:"free",tip:"Complémentaire aux inventaires belges francophones. Riche en architecture industrielle flamande, en Art Nouveau gantois et anversois, et en architecture vernaculaire rurale."},
+
+  // ESPAGNE & PORTUGAL
+  {pays:"espagne",flag:"🇪🇸",name:"Fundación Mies van der Rohe Barcelone",url:"https://miesbcn.com",desc:"Fondation dédiée à Mies van der Rohe et à l'architecture européenne contemporaine. Archive du Pavillon de Barcelone, ressources sur le modernisme et le Prix Mies van der Rohe UE.",access:"free",tip:"La section Archives du Pavillon de Barcelone (1929) comprend des plans originaux, photos et documentation historique. La base de données du Prix Mies référence l'architecture européenne contemporaine."},
+  {pays:"espagne",flag:"🇪🇸",name:"IPCE — Institut du Patrimoine Culturel Espagne",url:"https://ipce.culturaydeporte.gob.es",desc:"Institut du Patrimoine Culturel d'Espagne — dossiers de monuments nationaux, publications de restauration et conservation du patrimoine architectural espagnol.",access:"free",tip:"Forte en documentation technique de restauration. Les plans et relevés des grands monuments espagnols sont consultables dans les publications de l'IPCE, téléchargeables en PDF."},
+  {pays:"espagne",flag:"🇪🇸",name:"SIPA — Patrimoine Architectural Portugal",url:"https://www.patrimoniocultural.gov.pt",desc:"Portail du patrimoine culturel portugais — inventaire du patrimoine architectural, dossiers de monuments nationaux, publications sur le patrimoine bâti ibérique.",access:"free",tip:"La base SIPA (Sistema de Informação para o Património Arquitectónico) contient des milliers de fiches avec plans et photos. Interface multilingue partiellement disponible."},
+
+  // USA
+  {pays:"usa",flag:"🇺🇸",name:"Getty Conservation Institute",url:"https://www.getty.edu/conservation",desc:"Institut américain de référence pour la conservation du patrimoine architectural mondial. Publications gratuites téléchargeables (PDF), recherches sur le modernisme, matériaux et techniques.",access:"free",tip:"Les publications GCI sont téléchargeables gratuitement — en particulier 'Conserving Modern Architecture' et les Preserving Modern Architecture PDFs. Références incontournables en conservation."},
+  {pays:"usa",flag:"🇺🇸",name:"SAH — Society of Architectural Historians",url:"https://www.sah.org",desc:"Principale société académique d'histoire de l'architecture aux USA. JSAH (Journal), Archipedia et listes de dissertations. Référence pour la recherche historique en architecture.",access:"partial",tip:"Le Journal of the Society of Architectural Historians (JSAH) est accessible via JSTOR. SAH Archipedia est en accès libre. Les listes de dissertations permettent de cartographier la recherche en cours."},
+  {pays:"usa",flag:"🇺🇸",name:"MIT OpenCourseWare — Architecture",url:"https://ocw.mit.edu/search/?d=Architecture",desc:"Cours complets du MIT en architecture et urbanisme en accès libre — syllabus, lectures, notes de cours, bibliographies. Ressource pédagogique exceptionnelle pour un master.",access:"free",tip:"Les cours de Kenneth Frampton, Reinhold Martin et des autres professeurs du MIT incluent des bibliographies très complètes — idéales pour construire une bibliographie de mémoire."},
+  {pays:"usa",flag:"🇺🇸",name:"NYPL — Collections Architecture & Cartes",url:"https://digitalcollections.nypl.org/search/index?utf8=%E2%9C%93&keywords=architecture",desc:"Collections numériques de la New York Public Library — cartes historiques, plans d'architecture, photographies et documents d'époque, librement téléchargeables.",access:"free",tip:"Filtrer par type 'Still Image' et 'Maps' pour les documents architecturaux. Les plans de NYC anciens sont particulièrement détaillés. Téléchargement en haute résolution gratuit."},
+  {pays:"usa",flag:"🇺🇸",name:"Case Study Houses — Archive.org",url:"https://archive.org/search?query=%22arts+and+architecture%22+magazine",desc:"Archive complète de la revue Arts & Architecture (1943-1967) — le programme Case Study Houses, qui a redéfini l'architecture domestique moderne californienne. John Entenza, Eames, Neutra, Koenig...",access:"free",tip:"Chaque numéro est scanné séparément (identifiants « sim_arts-architecture_AAAA-MM »). Chercher par année dans les résultats : les numéros de 1945 à 1966 contiennent les Case Study Houses avec plans originaux et photos de Julius Shulman."},
+];
+
+/* ══════════ OUTILS ══════════ */
+const $=id=>document.getElementById(id);
+const IC={
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  star:'<polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>',
+  copy:'<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  arrowUpRight:'<path d="M7 7h10v10"/><path d="M7 17 17 7"/>',
+  grid:'<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/>',
+  list:'<path d="M3 12h.01"/><path d="M3 18h.01"/><path d="M3 6h.01"/><path d="M8 12h13"/><path d="M8 18h13"/><path d="M8 6h13"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  rotate:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/>',
+  chevronRight:'<path d="m9 18 6-6-6-6"/>',
+  book:'<path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>',
+  loader:'<path d="M21 12a9 9 0 1 1-6.219-8.56"/>',
+  arrowUp:'<path d="m5 12 7-7 7 7"/><path d="M12 19V5"/>',
+  arrowDown:'<path d="M12 5v14"/><path d="m19 12-7 7-7-7"/>',
+  stop:'<rect width="12" height="12" x="6" y="6" rx="2" fill="currentColor" stroke="none"/>',
+  key:'<path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"/><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"/>',
+  mapPin:'<path d="M20 10c0 4.993-5.539 10.193-7.399 11.799a1 1 0 0 1-1.202 0C9.539 20.193 4 14.993 4 10a8 8 0 0 1 16 0"/><circle cx="12" cy="10" r="3"/>',
+  clock:'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>'
+};
+function ic(n,s=16,cls=""){return `<svg class="ic ${cls}" width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${IC[n]}</svg>`;}
+const SPIN=ic("loader",18,"spin");
+const MARK='<svg viewBox="0 0 40 40" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M9 33V19a11 11 0 0 1 22 0v14"/><path d="M15 33V20a5 5 0 0 1 10 0v13" stroke-opacity="0.7"/><path d="M5 33h30"/></svg>';
+document.querySelectorAll("svg-ic").forEach(el=>{el.outerHTML=ic(el.getAttribute("name"),+(el.getAttribute("size")||16));});
+function esc(s){return String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));}
+function load(k,d){try{const v=JSON.parse(localStorage.getItem(k));return v??d;}catch(e){return d;}}
+function store(k,v){try{localStorage.setItem(k,JSON.stringify(v));}catch(e){}}
+function isHttp(u){return /^https?:\/\//i.test(String(u||""));}
+function dispUrl(u){return u.replace(/^https?:\/\//,"").replace(/^www\./,"").replace(/\/$/,"");}
+
+/* ══════════ ÉTAT ══════════ */
+const ALL=getAllRes();
 let activeCat="all",activePays="all",viewMode="grid",idxQ="",searchType="all",carteFilter="all";
-let favorites=JSON.parse(localStorage.getItem("archiFav")||"[]");
-let history=JSON.parse(localStorage.getItem("archiHist")||"[]");
-let mapInst=null,mapMarkers=[];
+let favorites=load("archiFav",[]);if(!Array.isArray(favorites))favorites=[];
+let searchHistory=load("archiHist",[]);if(!Array.isArray(searchHistory))searchHistory=[];
+let searchBusy=false;
+let mapInst=null,tileLayer=null,mapMarkers=[],visibleInst=[],selInst=-1;
 
-/* ── BOOT ── */
-// Nouveautés
-const ns=document.getElementById("nouvStrip");
-nouveautes.forEach(n=>{
-  const a=document.createElement("a");
-  a.className="new-chip";a.href=n.url;a.target="_blank";a.rel="noopener";
-  a.innerHTML=`<span class="chip-badge">[${n.badge}]</span>${n.name}`;
-  ns.appendChild(a);
-});
-// Cat filters (type)
-const cf=document.getElementById("catFilters");
-cf.innerHTML=`<span class="filter-label">Type —</span><button class="filter-btn active" data-cat="all"><span class="dot"></span>Tout</button>${Object.entries(catLabels).map(([k,v])=>`<button class="filter-btn${k==="belgique"?" belgique":""}" data-cat="${k}"><span class="dot"></span>${v}</button>`).join("")}`;
-cf.querySelectorAll(".filter-btn").forEach(b=>b.addEventListener("click",()=>{
-  cf.querySelectorAll(".filter-btn").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");
-  activeCat=b.dataset.cat;
-  activePays="all";
-  document.querySelectorAll("#paysFilters .filter-btn").forEach(x=>x.classList.toggle("active",x.dataset.pays==="all"));
-  renderIdx();
-}));
-// Pays filters — initialisés à la fin du script après intlSources
-document.getElementById("idxSearch").addEventListener("input",e=>{idxQ=e.target.value;renderIdx();});
-document.getElementById("bookSearch").addEventListener("keydown",e=>{if(e.key==="Enter")doSearch();});
-updateFavCount();renderHist();
-
-/* ── INDEX RENDER ── */
-function renderIdx(){
-  const grid=document.getElementById("resGrid");
-  const q=idxQ.toLowerCase().trim();
-  let fl=getAllRes().filter(r=>{
-    const cm=activeCat==="all"||r.cat===activeCat;
-    const pm=activePays==="all"||(r.pays===activePays);
-    // If pays filter is active: only show intl sources matching pays (ignore cat)
-    // If cat filter is active (not all): only show resources matching cat (pays must be all)
-    let show;
-    if(activePays!=="all") show=r.cat==="intl"&&r.pays===activePays;
-    else if(activeCat!=="all") show=cm;
-    else show=true;
-    const sm=!q||[r.name,r.desc||"",r.tip||"",catLabels[r.cat]||""].some(s=>s.toLowerCase().includes(q));
-    return show&&sm;
-  });
-  const sort=document.getElementById("sortSel").value;
-  if(sort==="name")fl.sort((a,b)=>a.name.localeCompare(b.name));
-  else if(sort==="access")fl.sort((a,b)=>(accOrd[a.access]||3)-(accOrd[b.access]||3));
-  else if(sort==="cat")fl.sort((a,b)=>a.cat.localeCompare(b.cat));
-  document.getElementById("visCnt").textContent=fl.length;
-  grid.innerHTML=fl.length?"":`<div class="empty"><div class="empty-t">Aucun résultat</div><div class="empty-s">Essayez des mots-clés différents ou réinitialisez les filtres</div></div>`;
-  fl.forEach((r,i)=>grid.appendChild(buildCard(r,i)));
-}
-
-function buildCard(r,i=0){
-  const acc=accLabels[r.access]||{l:"?",c:""};
-  const fav=favorites.includes(r.url);
-  const card=document.createElement("div");
-  const isIntl=r.cat==="intl";
-  card.className="card"+(r.cat==="belgique"?" belgique-card":"")+(isIntl?" intl-card-merged":"");
-  if(isIntl) card.style.borderLeft="2px solid rgba(100,150,220,.2)";
-  card.style.animationDelay=Math.min(i*22,380)+"ms";
-  const dispUrl=r.url.replace(/^https?:\/\//,"").replace(/\/$/,"");
-  const catDisplay=isIntl?`${r.flag||"🌍"} ${paysLabels[r.pays]||r.pays}`:catLabels[r.cat]||r.cat;
-  card.innerHTML=`
-    <div class="card-header">
-      <div><div class="card-cat">${catDisplay}</div><div class="card-name">${r.name}</div></div>
-      <span class="badge ${acc.c}">${acc.l}</span>
-    </div>
-    <div class="card-desc">${r.desc||""}</div>
-    ${r.tip?`<div class="card-tip"><strong>// Tip —</strong> ${r.tip}</div>`:""}
-    <div class="card-footer">
-      <span class="card-url">${dispUrl}</span>
-      <div class="card-actions">
-        <button class="btn-ico fav-btn${fav?" fav-on":""}" title="${fav?"Retirer":"Ajouter aux favoris"}">★</button>
-        <button class="btn-ico copy-btn" title="Copier le lien">⧉</button>
-        <a class="card-link" href="${r.url}" target="_blank" rel="noopener">Accéder</a>
-      </div>
-    </div>`;
-  card.querySelector(".fav-btn").addEventListener("click",()=>toggleFav(r.url,card.querySelector(".fav-btn")));
-  card.querySelector(".copy-btn").addEventListener("click",()=>copyLink(r.url,card.querySelector(".copy-btn")));
-  return card;
-}
-
-/* ── FAVORITES ── */
-function toggleFav(url,btn){
-  const i=favorites.indexOf(url);
-  if(i===-1){favorites.push(url);btn.classList.add("fav-on");btn.title="Retirer des favoris";}
-  else{favorites.splice(i,1);btn.classList.remove("fav-on");btn.title="Ajouter aux favoris";}
-  localStorage.setItem("archiFav",JSON.stringify(favorites));
-  updateFavCount();renderFavs();
-}
-function renderFavs(){
-  const grid=document.getElementById("favGrid");
-  const pool=getAllRes();
-  const fl=pool.filter(r=>favorites.includes(r.url));
-  if(!fl.length){grid.innerHTML=`<div class="empty"><div class="empty-t">Aucun favori</div><div class="empty-s">Cliquez sur ★ sur une ressource pour l'ajouter ici</div></div>`;return;}
-  grid.innerHTML="";fl.forEach((r,i)=>grid.appendChild(buildCard(r,i)));
-}
-function updateFavCount(){const e=document.getElementById("fav-count");e.textContent=favorites.length?`(${favorites.length})`:""}
-
-/* ── COPY ── */
-function copyLink(url,btn){
-  navigator.clipboard.writeText(url).then(()=>{
-    btn.textContent="✓";btn.classList.add("ok");
-    setTimeout(()=>{btn.textContent="⧉";btn.classList.remove("ok");},1800);
-  }).catch(()=>prompt("Copier le lien :",url));
-}
-
-/* ── VIEW / SORT ── */
-function setView(v){
-  viewMode=v;
-  document.getElementById("resGrid").classList.toggle("list-mode",v==="list");
-  document.getElementById("btnGrid").classList.toggle("active",v==="grid");
-  document.getElementById("btnList").classList.toggle("active",v==="list");
-  renderIdx();
-}
-
-/* ── THEME / FONT ── */
-function toggleTheme(){
-  const d=document.documentElement;
-  const dark=d.dataset.theme==="dark";
-  d.dataset.theme=dark?"light":"dark";
-  document.getElementById("themeBtn").textContent=dark?"☀ Light":"☾ Dark";
-  if(mapInst){
-    mapInst.eachLayer(l=>{if(l._url){mapInst.removeLayer(l);}});
-    const url=dark?"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png":"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png";
-    L.tileLayer(url,{attribution:"© CARTO",maxZoom:18}).addTo(mapInst);
-    mapInst.invalidateSize();
-  }
+/* ══════════ THÈME / TAILLE ══════════ */
+function applyTheme(t){
+  const dark=t==="dark";
+  document.documentElement.classList.toggle("dark",dark);
+  const b=$("themeBtn"),lbl=dark?"Passer en mode clair":"Passer en mode sombre";
+  b.innerHTML=ic(dark?"sun":"moon",17);b.setAttribute("aria-label",lbl);b.title=lbl;
+  document.querySelector('meta[name="theme-color"]').content=dark?"#000000":"#f5f5f7";
+  if(mapInst)setTiles();
 }
 function setFont(s){
   document.documentElement.dataset.font=s;
-  [{id:"fSm",v:"sm"},{id:"fMd",v:"md"},{id:"fLg",v:"lg"}].forEach(f=>{
-    document.getElementById(f.id).classList.toggle("active",f.v===s);
-  });
+  store("archiFont",s);
+  syncFontSeg();
+  if(mapInst)setTimeout(()=>mapInst.invalidateSize(),50);
 }
+function syncFontSeg(){
+  const s=document.documentElement.dataset.font||"md";
+  document.querySelectorAll(".seg-font button").forEach(b=>{const on=b.dataset.font===s;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);});
+}
+$("themeBtn").addEventListener("click",()=>{const t=document.documentElement.classList.contains("dark")?"light":"dark";store("archiThemeV2",t);applyTheme(t);});
+document.querySelectorAll(".seg-font button").forEach(b=>b.addEventListener("click",()=>setFont(b.dataset.font)));
 
-/* ── TABS ── */
-function switchTab(tab){
-  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.remove("active"));
-  document.querySelectorAll(".tab-btn").forEach(b=>b.classList.remove("active"));
-  document.getElementById("tab-"+tab).classList.add("active");
-  document.querySelectorAll(".tab-btn").forEach(b=>{if(b.getAttribute("onclick").includes("'"+tab+"'"))b.classList.add("active");});
-  if(tab==="carte"&&!mapInst)initMap();
+/* ══════════ ONGLETS ══════════ */
+const TABS=["index","recherche","carte","favoris","assistant"];
+function switchTab(tab,opts={}){
+  if(!TABS.includes(tab))tab="index";
+  document.querySelectorAll(".panel").forEach(p=>p.classList.toggle("active",p.id==="tab-"+tab));
+  document.querySelectorAll(".nav-btn").forEach(b=>{
+    const on=b.dataset.tab===tab;b.classList.toggle("active",on);
+    if(on)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current");
+  });
+  const nav=$("nav"),act=nav.querySelector(`.nav-btn[data-tab="${tab}"]`);
+  if(act&&nav.scrollWidth>nav.clientWidth)nav.scrollTo({left:act.offsetLeft-(nav.clientWidth-act.offsetWidth)/2,behavior:opts.instant?"auto":"smooth"});
+  if(!opts.keepScroll)window.scrollTo(0,0);
+  if(location.hash!=="#"+tab)window.history.replaceState(null,"","#"+tab);
+  if(tab==="carte"){if(!mapInst)initMap();else setTimeout(()=>mapInst.invalidateSize(),0);}
   if(tab==="favoris")renderFavs();
 }
+document.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",e=>{e.preventDefault();switchTab(b.dataset.tab);}));
+window.addEventListener("hashchange",()=>switchTab(location.hash.slice(1),{keepScroll:false}));
 
-/* ── SEARCH TAB ── */
-function setType(btn,t){
-  searchType=t;
-  document.querySelectorAll(".type-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
+/* ══════════ INDEX ══════════ */
+function renderFeat(){
+  $("featStrip").innerHTML=nouveautes.map((n,i)=>`<a class="feat-card" href="${esc(n.url)}" target="_blank" rel="noopener noreferrer" style="animation-delay:${i*40}ms"><span class="feat-badge">${esc(n.badge)}</span><span class="feat-bottom"><span class="feat-name">${esc(n.name)}</span><span class="feat-arrow">${ic("arrowUpRight",18)}</span></span></a>`).join("");
+}
+function renderFilters(){
+  $("catFilters").innerHTML=[["all","Tout"],...Object.entries(catLabels)].map(([k,v])=>{
+    const on=k==="all"?(activeCat==="all"&&activePays==="all"):activeCat===k;
+    return `<button class="pill${on?" on":""}" data-cat="${k}" aria-pressed="${on}">${esc(v)}</button>`;
+  }).join("");
+  $("paysFilters").innerHTML=Object.entries(paysLabels).filter(([k])=>k!=="all").map(([k,v])=>{
+    const on=activePays===k,n=intlSources.filter(s=>s.pays===k).length;
+    return `<button class="pill${on?" on":""}" data-pays="${k}" aria-pressed="${on}">${esc(v)} <span class="n">${n}</span></button>`;
+  }).join("");
+}
+$("catFilters").addEventListener("click",e=>{
+  const b=e.target.closest("[data-cat]");if(!b)return;
+  activeCat=b.dataset.cat;activePays="all";
+  renderFilters();renderIdx();
+});
+$("paysFilters").addEventListener("click",e=>{
+  const b=e.target.closest("[data-pays]");if(!b)return;
+  activePays=activePays===b.dataset.pays?"all":b.dataset.pays;activeCat="all";
+  renderFilters();renderIdx();
+});
+$("idxSearch").addEventListener("input",e=>{idxQ=e.target.value;renderIdx();});
+$("sortSel").addEventListener("change",renderIdx);
+function setView(v){
+  viewMode=v;
+  $("resGrid").classList.toggle("list",v==="list");
+  [["btnGrid","grid"],["btnList","list"]].forEach(([id,m])=>{$(id).classList.toggle("on",m===v);$(id).setAttribute("aria-pressed",m===v);});
+  renderIdx();
+}
+$("btnGrid").addEventListener("click",()=>setView("grid"));
+$("btnList").addEventListener("click",()=>setView("list"));
+
+function renderIdx(){
+  const q=idxQ.toLowerCase().trim();
+  let fl=ALL.filter(r=>{
+    let show;
+    if(activePays!=="all")show=r.cat==="intl"&&r.pays===activePays;
+    else if(activeCat!=="all")show=r.cat===activeCat;
+    else show=true;
+    const sm=!q||[r.name,r.desc||"",r.tip||"",catLabels[r.cat]||"",paysLabels[r.pays]||""].some(s=>s.toLowerCase().includes(q));
+    return show&&sm;
+  });
+  const sort=$("sortSel").value;
+  if(sort==="name")fl=[...fl].sort((a,b)=>a.name.localeCompare(b.name,"fr"));
+  else if(sort==="access")fl=[...fl].sort((a,b)=>(accOrd[a.access]??3)-(accOrd[b.access]??3));
+  else if(sort==="cat")fl=[...fl].sort((a,b)=>a.cat.localeCompare(b.cat));
+  $("visCnt").textContent=`${fl.length} ressource${fl.length>1?"s":""}`;
+  const grid=$("resGrid");grid.innerHTML="";
+  if(!fl.length){grid.innerHTML=`<div class="empty"><h3>Aucun résultat</h3><p>Essaie d’autres mots-clés ou réinitialise les filtres.</p></div>`;return;}
+  const frag=document.createDocumentFragment();
+  fl.forEach((r,i)=>frag.appendChild(buildCard(r,i)));
+  grid.appendChild(frag);
 }
 
-function renderHist(){
-  const b=document.getElementById("histBlock"),c=document.getElementById("histChips");
-  if(!history.length){b.style.display="none";return;}
-  b.style.display="block";
-  c.innerHTML=history.map(q=>`<button class="hist-chip" onclick="useHist('${q.replace(/'/g,"\\'")}')">${q}</button>`).join("");
+function buildCard(r,i=0){
+  const acc=accLabels[r.access]||{l:r.access};
+  const fav=favorites.includes(r.url);
+  const isIntl=r.cat==="intl",isBe=r.cat==="belgique";
+  const cat=isIntl?(paysLabels[r.pays]||r.pays):(catLabels[r.cat]||r.cat);
+  const favLbl=fav?"Retirer des favoris":"Ajouter aux favoris";
+  const card=document.createElement("article");
+  card.className="card";
+  card.style.animationDelay=Math.min(i*25,400)+"ms";
+  card.innerHTML=`<div class="card-main">
+      <div class="card-head">
+        <div class="card-titles"><div class="card-cat${isBe?" be":isIntl?" intl":""}">${esc(cat)}</div><h3 class="card-name">${esc(r.name)}</h3></div>
+        <span class="badge b-${esc(r.access)}">${esc(acc.l)}</span>
+      </div>
+      <p class="card-desc">${esc(r.desc)}</p>
+      ${r.tip?`<p class="card-tip"><b>Astuce ·</b> ${esc(r.tip)}</p>`:""}
+    </div>
+    <div class="card-foot">
+      <span class="card-url" title="${esc(r.url)}">${esc(dispUrl(r.url))}</span>
+      <div class="card-actions">
+        <button class="act fav-btn${fav?" fav-on":""}" type="button" aria-pressed="${fav}" aria-label="${favLbl}" title="${favLbl}">${ic("star")}</button>
+        <button class="act copy-btn" type="button" aria-label="Copier le lien" title="Copier le lien">${ic("copy")}</button>
+        <a class="btn-go" href="${esc(r.url)}" target="_blank" rel="noopener noreferrer">Accéder ${ic("arrowUpRight",14)}</a>
+      </div>
+    </div>`;
+  const fb=card.querySelector(".fav-btn");fb.dataset.url=r.url;
+  fb.addEventListener("click",()=>toggleFav(r.url));
+  card.querySelector(".copy-btn").addEventListener("click",e=>copyLink(r.url,e.currentTarget));
+  return card;
 }
-function useHist(q){document.getElementById("bookSearch").value=q;doSearch();}
 
-async function doSearch(){
-  const q=document.getElementById("bookSearch").value.trim();
-  if(!q)return;
-  history=[q,...history.filter(h=>h!==q)].slice(0,10);
-  localStorage.setItem("archiHist",JSON.stringify(history));renderHist();
-  const cont=document.getElementById("searchResults");
-  cont.innerHTML=`<div class="loading"><div class="spinner"></div>Recherche en cours pour « ${q} »…</div>`;
-  document.getElementById("searchBtn").disabled=true;
+/* ══════════ FAVORIS ══════════ */
+function toggleFav(url){
+  const i=favorites.indexOf(url);
+  if(i===-1)favorites.push(url);else favorites.splice(i,1);
+  store("archiFav",favorites);
+  const on=favorites.includes(url),lbl=on?"Retirer des favoris":"Ajouter aux favoris";
+  document.querySelectorAll(".fav-btn").forEach(b=>{if(b.dataset.url===url){b.classList.toggle("fav-on",on);b.setAttribute("aria-pressed",on);b.setAttribute("aria-label",lbl);b.title=lbl;}});
+  updateFavCount();
+  if($("tab-favoris").classList.contains("active"))renderFavs();
+}
+function renderFavs(){
+  const g=$("favGrid"),fl=ALL.filter(r=>favorites.includes(r.url));
+  g.innerHTML="";
+  if(!fl.length){g.innerHTML=`<div class="empty"><h3>Aucun favori pour l’instant</h3><p>Touche l’étoile d’une ressource pour la retrouver ici.</p></div>`;return;}
+  const frag=document.createDocumentFragment();fl.forEach((r,i)=>frag.appendChild(buildCard(r,i)));g.appendChild(frag);
+}
+function updateFavCount(){
+  const n=ALL.filter(r=>favorites.includes(r.url)).length,e=$("favCount");
+  e.hidden=!n;e.textContent=n;e.setAttribute("aria-label",`${n} favori${n>1?"s":""}`);
+}
+async function copyLink(url,btn){
   try{
-    const [ol,gut,arc]=await Promise.allSettled([fetchOL(q),fetchGut(q),fetchArc(q)]);
-    const all=[...(ol.value||[]),...(gut.value||[]),...(arc.value||[])];
-    cont.innerHTML="";
-    if(all.length){
-      const sec=document.createElement("div");sec.className="res-sec";
-      sec.innerHTML=`<div class="res-sec-title">Résultats directs (${all.length} trouvés)</div><div class="api-grid" id="apiGrid"></div>`;
-      cont.appendChild(sec);
-      const g=sec.querySelector("#apiGrid");
-      all.forEach(r=>g.appendChild(buildResCard(r)));
-    }else{
-      cont.innerHTML=`<div class="no-res">Aucun résultat direct trouvé — utilisez les liens de recherche ci-dessous.</div>`;
-    }
-    const ls=document.createElement("div");ls.className="res-sec";
-    ls.innerHTML=`<div class="res-sec-title">Chercher aussi sur…</div><div class="direct-links">${buildDLinks(q)}</div>`;
-    cont.appendChild(ls);
-  }catch(e){
-    cont.innerHTML=`<div class="no-res">Erreur lors de la recherche. Vérifiez votre connexion.</div>`;
-  }
-  document.getElementById("searchBtn").disabled=false;
+    await navigator.clipboard.writeText(url);
+    btn.innerHTML=ic("check");btn.classList.add("ok");btn.setAttribute("aria-label","Lien copié");
+    clearTimeout(btn._t);
+    btn._t=setTimeout(()=>{btn.innerHTML=ic("copy");btn.classList.remove("ok");btn.setAttribute("aria-label","Copier le lien");},1600);
+  }catch(e){window.prompt("Copie le lien :",url);}
 }
 
-function buildResCard(r){
-  const d=document.createElement("div");d.className="res-card";
-  d.innerHTML=`<div class="res-card-top">${r.cover?`<img class="res-cover" src="${r.cover}" alt="" loading="lazy">`:""}
-    <div><div class="res-title">${r.title}</div>${r.author?`<div class="res-author">${r.author}</div>`:""}${r.year?`<div class="res-year">${r.year}</div>`:""}
-    <div class="res-source">${r.source}</div></div></div>
-    <a class="res-link" href="${r.url}" target="_blank" rel="noopener">Accéder</a>`;
-  return d;
+/* ══════════ RECHERCHE ══════════ */
+async function fetchJson(url,ms=8000){
+  const ctl=new AbortController(),t=setTimeout(()=>ctl.abort(),ms);
+  try{
+    const r=await fetch(url,{signal:ctl.signal});
+    if(!r.ok)throw new Error("HTTP "+r.status);
+    return await r.json();
+  }finally{clearTimeout(t);}
 }
-
 async function fetchOL(q){
-  if(searchType==="archive")return[];
-  const r=await fetch(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&fields=key,title,author_name,first_publish_year,cover_i&limit=9`);
-  const d=await r.json();
+  if(searchType==="archive")return null;
+  const d=await fetchJson(`https://openlibrary.org/search.json?q=${encodeURIComponent(q)}&fields=key,title,author_name,first_publish_year,cover_i&limit=9`);
   return(d.docs||[]).slice(0,9).map(x=>({title:x.title,author:x.author_name?.join(", ")||"",year:x.first_publish_year||"",cover:x.cover_i?`https://covers.openlibrary.org/b/id/${x.cover_i}-M.jpg`:null,url:`https://openlibrary.org${x.key}`,source:"Open Library"}));
 }
 async function fetchGut(q){
-  if(searchType==="archive")return[];
-  const r=await fetch(`https://gutendex.com/books/?search=${encodeURIComponent(q)}&languages=fr,en`);
-  const d=await r.json();
+  if(searchType==="archive")return null;
+  const d=await fetchJson(`https://gutendex.com/books/?search=${encodeURIComponent(q)}&languages=fr,en`);
   return(d.results||[]).slice(0,5).map(x=>({title:x.title,author:x.authors?.map(a=>a.name).join(", ")||"",year:"",cover:x.formats?.["image/jpeg"]||null,url:x.formats?.["text/html"]||`https://www.gutenberg.org/ebooks/${x.id}`,source:"Project Gutenberg"}));
 }
 async function fetchArc(q){
-  if(searchType==="books")return[];
-  try{
-    const mt=searchType==="texts"?"texts":searchType==="archive"?"image":"texts";
-    const target=`https://archive.org/advancedsearch.php?q=${encodeURIComponent(q)}&fl=identifier,title,creator,year&rows=6&mediatype=${mt}&output=json`;
-    const r=await fetch(`https://corsproxy.io/?url=${encodeURIComponent(target)}`);
-    const d=await r.json();
-    return(d.response?.docs||[]).slice(0,6).map(x=>({title:x.title||x.identifier,author:x.creator||"",year:x.year||"",cover:null,url:`https://archive.org/details/${x.identifier}`,source:"Internet Archive"}));
-  }catch(e){return[];}
+  if(searchType==="books")return null;
+  const mt=searchType==="archive"?"image":"texts";
+  const d=await fetchJson(`https://archive.org/advancedsearch.php?q=${encodeURIComponent(`(${q}) AND mediatype:${mt}`)}&fl[]=identifier&fl[]=title&fl[]=creator&fl[]=year&rows=6&output=json`);
+  return(d.response?.docs||[]).slice(0,6).map(x=>({title:x.title||x.identifier,author:Array.isArray(x.creator)?x.creator.join(", "):(x.creator||""),year:x.year||"",cover:null,url:`https://archive.org/details/${x.identifier}`,source:"Internet Archive"}));
 }
+const SOURCES=[{name:"Open Library",fn:fetchOL},{name:"Gutenberg",fn:fetchGut},{name:"Archive.org",fn:fetchArc}];
 
+function updateSearchBtn(){$("searchBtn").disabled=searchBusy||!$("bookSearch").value.trim();}
+$("bookSearch").addEventListener("input",updateSearchBtn);
+$("searchForm").addEventListener("submit",e=>{e.preventDefault();doSearch();});
+$("typeSeg").addEventListener("click",e=>{
+  const b=e.target.closest("[data-type]");if(!b)return;
+  searchType=b.dataset.type;
+  $("typeSeg").querySelectorAll("button").forEach(x=>{const on=x===b;x.classList.toggle("on",on);x.setAttribute("aria-pressed",on);});
+});
+function renderHist(){
+  $("histBlock").hidden=!searchHistory.length;
+  $("histChips").innerHTML=searchHistory.map(q=>`<button class="pill" type="button" data-q="${esc(q)}">${esc(q)}</button>`).join("");
+}
+$("histChips").addEventListener("click",e=>{const b=e.target.closest("[data-q]");if(!b)return;$("bookSearch").value=b.dataset.q;updateSearchBtn();doSearch();});
+$("histClear").addEventListener("click",()=>{searchHistory=[];store("archiHist",searchHistory);renderHist();});
+
+async function doSearch(){
+  const q=$("bookSearch").value.trim();
+  if(!q||searchBusy)return;
+  searchHistory=[q,...searchHistory.filter(h=>h!==q)].slice(0,10);
+  store("archiHist",searchHistory);renderHist();
+  searchBusy=true;updateSearchBtn();
+  const cont=$("searchResults");
+  cont.innerHTML=`<div id="resBox"><div class="loading">${SPIN}<span>Recherche en cours pour « ${esc(q)} »…</span></div></div>
+    <section class="rs-sec"><h2 class="rs-title">Chercher aussi sur…</h2><div class="groups">${buildDLinks(q)}</div></section>`;
+  const box=$("resBox");
+  const sec=document.createElement("section");sec.className="rs-sec";sec.style.marginTop="28px";
+  sec.innerHTML=`<h2 class="rs-title">Résultats directs · <span class="soft"></span></h2><div class="books"></div>`;
+  const g=sec.querySelector(".books"),failed=[];let n=0,asked=0;
+  const add=list=>{
+    if(!list)return;asked++;
+    const ok=list.filter(r=>isHttp(r.url));
+    if(!ok.length)return;
+    if(!n){box.innerHTML="";box.appendChild(sec);}
+    ok.forEach(r=>g.appendChild(buildResCard(r,n++)));
+    sec.querySelector(".soft").textContent=n;
+  };
+  await Promise.allSettled(SOURCES.map(s=>s.fn(q).then(add,()=>{asked++;failed.push(s.name);})));
+  if(!n){
+    const allFailed=failed.length&&failed.length===asked;
+    box.innerHTML=`<div class="empty" style="margin-top:28px"><h3>${allFailed?"Les sources n’ont pas répondu":"Aucun résultat direct"}</h3><p>${allFailed?"Vérifie ta connexion ou réessaie dans un instant — les raccourcis ci-dessous restent disponibles.":"Essaie d’autres mots-clés, ou les raccourcis ci-dessous."}</p></div>`;
+  }
+  if(failed.length&&!(n===0&&failed.length===asked)){
+    const p=document.createElement("p");p.className="src-note";
+    p.textContent=`${failed.join(" et ")} n’${failed.length>1?"ont":"a"} pas répondu à temps.`;
+    box.appendChild(p);
+  }
+  searchBusy=false;updateSearchBtn();
+}
+function coverPh(){return `<div class="cover" aria-hidden="true">${ic("book",22)}</div>`;}
+function buildResCard(r,i){
+  const a=document.createElement("a");
+  a.className="book";a.href=r.url;a.target="_blank";a.rel="noopener noreferrer";
+  a.style.animationDelay=Math.min(i*30,400)+"ms";
+  a.innerHTML=`${isHttp(r.cover)?`<img class="cover" src="${esc(r.cover)}" alt="" loading="lazy">`:coverPh()}
+    <div class="book-txt"><div class="book-title">${esc(r.title)}</div>${r.author?`<div class="book-author">${esc(r.author)}</div>`:""}
+    <div class="book-meta"><span class="book-src">${esc(r.source)}</span>${r.year?` · ${esc(r.year)}`:""}</div></div>`;
+  const img=a.querySelector("img");
+  if(img)img.addEventListener("error",()=>{img.insertAdjacentHTML("afterend",coverPh());img.remove();});
+  return a;
+}
 function buildDLinks(q){
   const e=encodeURIComponent(q);
-  const groups = [
-    { label:"Général", links:[
-      {n:"Z-Library",u:`https://z-library.sk/s/${e}`},
+  const groups=[
+    {label:"Général",links:[
       {n:"Anna's Archive",u:`https://annas-archive.gl/search?q=${e}`},
+      {n:"Z-Library",u:`https://z-library.sk/s/${e}`},
       {n:"Google Scholar",u:`https://scholar.google.com/scholar?q=${e}`},
       {n:"JSTOR",u:`https://www.jstor.org/action/doBasicSearch?Query=${e}`},
       {n:"Sci-Hub",u:`https://sci-hub.st/${e}`},
       {n:"ResearchGate",u:`https://www.researchgate.net/search?q=${e}`},
+      {n:"BASE",u:`https://www.base-search.net/Search/Results?lookfor=${e}`},
     ]},
-    { label:"🇧🇪 Belgique", links:[
+    {label:"🇧🇪 Belgique",links:[
       {n:"Kanal Architecture",u:`https://catalogue.kanal.brussels/cgi-bin/koha/opac-search.pl?q=${e}`},
       {n:"DI-fusion ULB",u:`https://difusion.ulb.be/vufind/Search/Results?lookfor=${e}`},
-      {n:"ETH Zürich",u:`https://www.research-collection.ethz.ch/discover?query=${e}`},
+      {n:"DIAL UCLouvain",u:`https://research.dial.uclouvain.be/search?query=${e}`},
+      {n:"ORBi ULiège",u:`https://orbi.uliege.be/simple-search?query=${e}`},
     ]},
-    { label:"🇫🇷 France", links:[
+    {label:"🇫🇷 France",links:[
       {n:"Gallica BnF",u:`https://gallica.bnf.fr/services/engine/search/sru?operation=searchRetrieve&query=dc.title+adj+%22${e}%22`},
       {n:"Persée",u:`https://www.persee.fr/search?q=${e}`},
-      {n:"Cité Architecture",u:`https://portaildocumentaire.citedelarchitecture.fr/ipac20/ipac.jsp?session=&menu=search&aspect=basic_search&npp=10&ipp=20&spp=20&profile=main&ri=&index=.GK&term=${e}`},
+      {n:"OpenEdition",u:`https://search.openedition.org/?q=${e}`},
       {n:"POP Patrimoine",u:`https://pop.culture.gouv.fr/search/mosaic?base=merimee&mainSearch=${e}`},
     ]},
-    { label:"🌐 International", links:[
+    {label:"🌐 International",links:[
+      {n:"ETH Zürich",u:`https://www.research-collection.ethz.ch/discover?query=${e}`},
       {n:"UNESCO WHC",u:`https://whc.unesco.org/en/list/?search=${e}`},
       {n:"Archnet",u:`https://archnet.org/search?q=${e}`},
       {n:"SAH Archipedia",u:`https://sah-archipedia.org/search?q=${e}`},
-      {n:"archINFORM",u:`https://www.archinform.net/arch/-a.htm?s=${e}`},
+      {n:"archINFORM",u:`https://duckduckgo.com/?q=site%3Aarchinform.net+${e}`},
       {n:"Het Nieuwe Instituut",u:`https://zoeken.nieuweinstituut.nl/en?q=${e}`},
     ]},
   ];
-  return groups.map(g=>`
-    <div style="width:100%;font-size:.55em;letter-spacing:.2em;color:var(--gold-dim);text-transform:uppercase;padding:8px 0 4px;border-top:1px solid var(--border);margin-top:4px;">${g.label}</div>
-    ${g.links.map(l=>`<a class="direct-link" href="${l.u}" target="_blank" rel="noopener">${l.n}</a>`).join("")}
-  `).join("");
+  return groups.map(g=>`<div><div class="group-h">${esc(g.label)}</div><div class="group">${g.links.map(l=>`<a href="${esc(l.u)}" target="_blank" rel="noopener noreferrer"><span>${esc(l.n)}</span>${ic("chevronRight")}</a>`).join("")}</div></div>`).join("");
 }
 
-/* ── CARTE ── */
+/* ══════════ CARTE ══════════ */
+const TYPE_VAR={archive:"--map-archive",universite:"--map-universite",bibliotheque:"--map-bibliotheque",culture:"--map-culture"};
+const typeColor=t=>`var(${TYPE_VAR[t]||"--primary"})`;
+function computeVisible(){visibleInst=institutions.filter(x=>carteFilter==="all"||x.type===carteFilter);}
+function renderCarteFilters(){
+  $("carteFilters").innerHTML=Object.entries(typeLabels).map(([k,v])=>{
+    const on=carteFilter===k;
+    return `<button class="pill${on?" on":""}" data-type="${k}" aria-pressed="${on}">${k==="all"?"":`<span class="dot" style="background:${typeColor(k)}"></span>`}${esc(v)}</button>`;
+  }).join("");
+}
+$("carteFilters").addEventListener("click",e=>{
+  const b=e.target.closest("[data-type]");if(!b)return;
+  carteFilter=b.dataset.type;selInst=-1;
+  if(mapInst)mapInst.closePopup();
+  computeVisible();renderCarteFilters();renderInstList();renderMarkers();
+});
+function renderInstList(){
+  $("instList").innerHTML=visibleInst.map((x,i)=>`<button class="inst${i===selInst?" on":""}" type="button" role="listitem" data-i="${i}"><span class="dot" style="background:${typeColor(x.type)}"></span><span class="inst-txt"><span class="inst-name">${esc(x.name)}</span><span class="inst-type">${esc(typeLabels[x.type]||x.type)}</span></span></button>`).join("");
+}
+$("instList").addEventListener("click",e=>{const b=e.target.closest("[data-i]");if(b)selectInst(+b.dataset.i,true);});
+function popupHtml(x){
+  return `<div class="pp-type" style="color:${typeColor(x.type)}">${esc(typeLabels[x.type]||x.type)}</div>
+    <div class="pp-name">${esc(x.name)}</div>
+    <div class="pp-row">${ic("mapPin",14)}<span>${esc(x.adresse)}</span></div>
+    <div class="pp-row">${ic("clock",14)}<span>${esc(x.horaires)}</span></div>
+    <a class="pp-btn" href="${esc(x.url)}" target="_blank" rel="noopener noreferrer">Site web ${ic("arrowUpRight",13)}</a>`;
+}
+function setTiles(){
+  const dark=document.documentElement.classList.contains("dark");
+  if(tileLayer)mapInst.removeLayer(tileLayer);
+  tileLayer=L.tileLayer(`https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${dark?"Dark":"Light"}_Gray_Base/MapServer/tile/{z}/{y}/{x}`,{attribution:"Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ",maxZoom:16}).addTo(mapInst);
+}
 function initMap(){
-  const dark=document.documentElement.dataset.theme==="dark";
-  mapInst=L.map("map",{zoomControl:true}).setView([50.5,4.5],8);
-  L.tileLayer(dark?"https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png":"https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png",{attribution:"© CARTO",maxZoom:18}).addTo(mapInst);
-  // carte filters
-  const cf=document.getElementById("carteFilters");
-  cf.innerHTML=Object.entries(typeLabels).map(([k,v])=>`<button class="cfilter${k==="all"?" active":""}" onclick="filterCarte(this,'${k}')">${v}</button>`).join("");
-  renderMarkers();renderInstList();
-}
-
-function mkIcon(c){
-  return L.divIcon({html:`<div style="width:11px;height:11px;background:${c};border:2px solid rgba(255,255,255,.25);border-radius:0;box-shadow:0 0 8px ${c}66;"></div>`,className:"",iconSize:[11,11],iconAnchor:[5,5]});
+  if(typeof L==="undefined"){$("map").innerHTML=`<div class="map-fail">La carte n’a pas pu se charger. Vérifie ta connexion puis recharge la page.</div>`;return;}
+  mapInst=L.map("map",{scrollWheelZoom:false,maxZoom:16}).setView([50.6,4.5],8);
+  setTiles();renderMarkers();
+  setTimeout(()=>mapInst.invalidateSize(),0);
 }
 function renderMarkers(){
-  mapMarkers.forEach(m=>m.remove());mapMarkers=[];
-  institutions.filter(inst=>carteFilter==="all"||inst.type===carteFilter).forEach((inst,i)=>{
-    const c=typeColors[inst.type]||"#c9a96e";
-    const m=L.marker([inst.lat,inst.lng],{icon:mkIcon(c)}).addTo(mapInst);
-    m.bindPopup(`<div class="popup-name">${inst.name}</div><div class="popup-type">${typeLabels[inst.type]||inst.type}</div><div class="popup-info">📍 ${inst.adresse}</div><div class="popup-info">🕐 ${inst.horaires}</div><a class="popup-link" href="${inst.url}" target="_blank" rel="noopener">→ Site web</a>`);
-    mapMarkers.push(m);
+  if(!mapInst)return;
+  mapMarkers.forEach(m=>m.remove());
+  mapMarkers=visibleInst.map((x,i)=>{
+    const m=L.marker([x.lat,x.lng],{title:x.name,alt:x.name,icon:L.divIcon({className:"",html:`<span class="mk" style="background:${typeColor(x.type)}"></span>`,iconSize:[14,14],iconAnchor:[7,7],popupAnchor:[0,-8]})}).addTo(mapInst);
+    m.bindPopup(popupHtml(x),{maxWidth:280});
+    m.on("click",()=>selectInst(i,false));
+    return m;
   });
 }
-function renderInstList(){
-  const list=document.getElementById("instList");
-  const fl=institutions.filter(inst=>carteFilter==="all"||inst.type===carteFilter);
-  list.innerHTML=fl.map((inst,i)=>`<div class="inst-item" onclick="focusInst(${i})"><div class="inst-name">${inst.name}</div><div class="inst-type">${typeLabels[inst.type]||inst.type}</div></div>`).join("");
-}
-function filterCarte(btn,type){
-  carteFilter=type;
-  document.querySelectorAll(".cfilter").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");renderMarkers();renderInstList();
-}
-function focusInst(i){
-  const fl=institutions.filter(inst=>carteFilter==="all"||inst.type===carteFilter);
-  const inst=fl[i];if(!inst||!mapInst)return;
-  mapInst.setView([inst.lat,inst.lng],14);
-  if(mapMarkers[i])mapMarkers[i].openPopup();
-  document.querySelectorAll(".inst-item").forEach((el,j)=>el.classList.toggle("active",j===i));
-}
-/* ── AI ASSISTANT ── */
-const GROQ_MODEL = "llama-3.3-70b-versatile";
-let aiMode = "libre";
-let aiMessages = [];
-
-function getGroqKey() {
-  return localStorage.getItem("archiGroqKey") || "";
+function selectInst(i,fromList){
+  const x=visibleInst[i];if(!x)return;
+  selInst=i;
+  const list=$("instList");
+  list.querySelectorAll(".inst").forEach(b=>b.classList.toggle("on",+b.dataset.i===i));
+  if(fromList){
+    if(!mapInst)return;
+    mapInst.setView([x.lat,x.lng],14);
+    mapMarkers[i]?.openPopup();
+    if(window.innerWidth<768){const r=$("map").getBoundingClientRect();if(r.top<70||r.bottom>window.innerHeight)$("map").scrollIntoView({behavior:"smooth",block:"center"});}
+  }else{
+    const row=list.querySelector(`[data-i="${i}"]`);
+    if(row&&list.scrollHeight>list.clientHeight)list.scrollTo({top:row.offsetTop-list.clientHeight/2+row.offsetHeight/2,behavior:"smooth"});
+  }
 }
 
-function saveGroqKey(key) {
-  localStorage.setItem("archiGroqKey", key.trim());
-}
+/* ══════════ ASSISTANT IA ══════════ */
+const GROQ_MODEL="openai/gpt-oss-120b";
+const GROQ_URL="https://api.groq.com/openai/v1/chat/completions";
+let aiMode="libre",aiMessages=[],aiBusy=false,aiAbort=null;
+const MODE_DESC={libre:"Architecture, styles, bâtiments, analyse de projet",recherche:"Décris ton sujet, l’IA suggère où chercher"};
+const WELCOME_SUB={libre:"Pose une question sur l’architecture, un style, un architecte ou un concept — réponses sourcées, niveau master.",recherche:"Décris ton sujet de recherche et je t’oriente vers les meilleures ressources de l’index."};
+const PLACEHOLDER={libre:"Écris ta question sur l’architecture…",recherche:"Décris ton sujet ou ce que tu cherches…"};
 
+function getGroqKey(){try{return localStorage.getItem("archiGroqKey")||"";}catch(e){return "";}}
+function saveGroqKey(k){try{localStorage.setItem("archiGroqKey",k.trim());}catch(e){}}
+function forgetGroqKey(){try{localStorage.removeItem("archiGroqKey");}catch(e){}}
 
-// Resource index summary for the AI (name + url + desc, compact)
 const resourcesForAI = resources.map(r=>`• ${r.name} [${catLabels[r.cat]}] — ${r.desc.slice(0,120)}… — ${r.url}`).join("\n");
+const intlForAI = Object.entries(paysLabels).filter(([k])=>k!=="all").map(([k,v])=>`— ${v.replace(/^\S+\s/,"")} : ${intlSources.filter(s=>s.pays===k).map(s=>`${s.name} (${s.url})`).join(", ")}`).join("\n");
 
 const systemPrompts = {
   libre: `Tu es un assistant expert en architecture intégré dans ARCHI//INDEX, un index de ressources pour étudiants en architecture de niveau master (ULB, Bruxelles). Tu réponds toujours en français, de façon précise et structurée.
@@ -900,22 +1158,15 @@ RÈGLES ABSOLUES — à appliquer dans chaque réponse sans exception :
 5. STRUCTURE : utilise des sauts de ligne et du **gras** pour les points importants. Sois dense mais lisible — pas de remplissage, pas de généralités.
 
 Ressources disponibles dans l'index que tu peux recommander :
-Gallica BnF, Persée, OpenEdition Journals, In Situ, Internet Archive, Open Library, Europeana, Getty Research Portal, Wikimedia Commons, archINFORM, Smarthistory, ETH Zürich, RIBA Library, Avery Index, JSTOR, Google Scholar, Sci-Hub, ResearchGate, BASE, DART, Kanal Architecture, Inventaire Patrimoine Bruxelles, Archives ULB, BAIU UCLouvain, KBR, Cartesius, BruGIS, WalOnMap, Inventaris Erfgoed Vlaanderen, BICTEL.`,
+Gallica BnF, Persée, OpenEdition Journals, In Situ, Internet Archive, Open Library, Europeana, Getty Research Portal, Wikimedia Commons, archINFORM, Smarthistory, ETH Zürich, RIBA Library, Avery Index, JSTOR, Google Scholar, Sci-Hub, ResearchGate, BASE, Kanal Architecture, Inventaire Patrimoine Bruxelles, Archives ULB, BAIU UCLouvain, KBR, Cartesius, BruGIS, WalOnMap, Inventaris Erfgoed Vlaanderen.`,
 
   recherche: `Tu es un assistant de recherche documentaire expert en architecture, intégré dans ARCHI//INDEX. L'utilisatrice est étudiante en master d'architecture à l'ULB (Bruxelles). Tu réponds toujours en français.
 
 Voici les ressources disponibles dans l'index principal :
 ${resourcesForAI}
 
-L'index comprend également un onglet "Sources Internationales" avec des ressources par pays :
-— International : UNESCO WHC, ICOMOS, DOCOMOMO, Archnet, SAH Archipedia, Colossus
-— France : Cité de l'Architecture (portail documentaire), Médiathèque du Patrimoine (MPP), Base Mérimée, Base Mémoire, FRAC Centre
-— Italie : Fondazione Zeri, MAXXI, Treccani, Casabella, Archivio Comune di Venezia
-— Royaume-Uni : Historic England Archive, Canmore (Écosse), C20 Society, Archives Hub UK, AA Archive
-— Allemagne & Autriche : Bauhaus-Archiv, DAM Frankfurt, Wien Geschichte Wiki, Deutsche Digitale Bibliothek
-— Pays-Bas & Flandre : Het Nieuwe Instituut, Rijksdienst Cultureel Erfgoed, Onroerend Erfgoed Vlaanderen
-— Espagne & Portugal : Fundación Mies van der Rohe, IPCE, SIPA Portugal
-— USA : Getty Conservation Institute, SAH, MIT OpenCourseWare Architecture, NYPL, Case Study Houses
+L'index comprend également des sources internationales classées par pays :
+${intlForAI}
 
 RÈGLES ABSOLUES pour chaque réponse :
 
@@ -954,307 +1205,231 @@ const suggestionsParMode = {
   ]
 };
 
-function setAiMode(mode) {
-  aiMode = mode;
-  document.getElementById("modeLibre").classList.toggle("active", mode === "libre");
-  document.getElementById("modeRecherche").classList.toggle("active", mode === "recherche");
-  const input = document.getElementById("aiInput");
-  input.placeholder = mode === "libre"
-    ? "Écris ta question sur l'architecture…"
-    : "Décris ton sujet ou ce que tu cherches…";
-  renderSuggestions();
+function updateKeyStatus(){
+  const ok=!!getGroqKey();
+  $("keyDot").classList.toggle("ok",ok);
+  const lbl=ok?"Clé Groq configurée — la changer":"Clé Groq à configurer";
+  $("keyBtn").title=lbl;$("keyBtn").setAttribute("aria-label",lbl);
+}
+function setAiMode(mode){
+  if(aiBusy)stopAi();
+  aiMode=mode;
+  $("modeSeg").querySelectorAll("button").forEach(b=>{const on=b.dataset.mode===mode;b.classList.toggle("on",on);b.setAttribute("aria-pressed",on);});
+  $("modeDesc").textContent=MODE_DESC[mode];
+  $("aiInput").placeholder=PLACEHOLDER[mode];
   clearChat();
 }
+$("modeSeg").addEventListener("click",e=>{const b=e.target.closest("[data-mode]");if(b&&b.dataset.mode!==aiMode)setAiMode(b.dataset.mode);});
+$("newChat").addEventListener("click",()=>clearChat());
+$("keyBtn").addEventListener("click",()=>showKeyPrompt(true));
 
-function renderSuggestions() {
-  const chips = document.getElementById("aiSugChips");
-  chips.innerHTML = suggestionsParMode[aiMode]
-    .map(s => `<button class="ai-sug-chip" onclick="useSuggestion('${s.replace(/'/g, "\\'")}')">${s}</button>`)
-    .join("");
+function clearChat(){
+  if(aiBusy)stopAi();
+  aiMessages=[];
+  const body=$("aiMessages");
+  body.innerHTML=`<div class="welcome" id="aiWelcome">
+      <div class="mark lg">${MARK}</div>
+      <h2 class="welcome-t">Bonjour, que puis-je faire pour toi ?</h2>
+      <p class="welcome-s">${WELCOME_SUB[aiMode]}</p>
+      ${getGroqKey()?"":keyPanelHtml()}
+      <div class="sugs">${suggestionsParMode[aiMode].map(s=>`<button class="pill sug" type="button" data-s="${esc(s)}">${esc(s)}</button>`).join("")}</div>
+    </div>`;
+  wireKeyPanel();
+  body.scrollTop=0;updateToBottom();
 }
+$("aiMessages").addEventListener("click",e=>{
+  const b=e.target.closest("[data-s]");if(!b)return;
+  sendMessage(b.dataset.s);
+});
 
-function useSuggestion(text) {
-  document.getElementById("aiInput").value = text;
-  sendMessage();
-}
-
-function clearChat() {
-  aiMessages = [];
-  const msgs = document.getElementById("aiMessages");
-  msgs.innerHTML = `<div class="ai-welcome" id="aiWelcome">
-    <div class="ai-welcome-title">Bonjour, que puis-je faire pour toi ?</div>
-    <div class="ai-welcome-sub">${aiMode === "libre"
-      ? "Pose une question sur l'architecture, un style, un architecte ou un concept."
-      : "Décris ton sujet de recherche et je t'oriente vers les meilleures ressources de l'index."
-    }</div>
+function keyPanelHtml(){
+  const has=!!getGroqKey();
+  return `<div class="keybox" id="aiKeyPrompt">
+    <div class="keybox-h">${ic("key")}<span>${has?"Changer ta clé Groq":"Une clé Groq gratuite est nécessaire"}</span></div>
+    <p>Crée-la en une minute sur <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer">console.groq.com/keys</a> puis colle-la ici. Elle reste uniquement dans ce navigateur, jamais dans le code du site.</p>
+    <div class="keyrow"><input type="password" id="aiKeyInput" placeholder="gsk_…" autocomplete="off" spellcheck="false" aria-label="Clé API Groq"><button class="btn-primary sm" id="aiKeySave" type="button">Enregistrer</button></div>
+    ${has?`<button class="link-btn" id="aiKeyForget" type="button" style="align-self:flex-start">Oublier la clé enregistrée</button>`:""}
   </div>`;
 }
+function wireKeyPanel(){
+  const inp=$("aiKeyInput");if(!inp)return;
+  const save=()=>{
+    const v=inp.value.trim();
+    if(!/^gsk_\S{10,}$/.test(v)){inp.classList.add("bad");inp.focus();return;}
+    saveGroqKey(v);updateKeyStatus();
+    $("aiKeyPrompt")?.remove();
+    if(!aiMessages.length)clearChat();
+    $("aiInput").focus();
+  };
+  $("aiKeySave").addEventListener("click",save);
+  inp.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();save();}});
+  inp.addEventListener("input",()=>inp.classList.remove("bad"));
+  $("aiKeyForget")?.addEventListener("click",()=>{forgetGroqKey();updateKeyStatus();clearChat();});
+}
+function showKeyPrompt(toggle){
+  const ex=$("aiKeyPrompt");
+  if(ex){if(toggle&&aiMessages.length)ex.remove();else $("aiKeyInput")?.focus();return;}
+  const body=$("aiMessages");
+  const wrap=document.createElement("div");wrap.innerHTML=keyPanelHtml();
+  const panel=wrap.firstElementChild;
+  const w=$("aiWelcome");
+  if(w)w.querySelector(".sugs").before(panel);else body.prepend(panel);
+  wireKeyPanel();
+  panel.scrollIntoView({block:"nearest"});
+  $("aiKeyInput").focus();
+}
 
-function appendMessage(role, content, resourceLinks = []) {
-  const welcome = document.getElementById("aiWelcome");
-  if (welcome) welcome.remove();
-
-  const msgs = document.getElementById("aiMessages");
-  const div = document.createElement("div");
-  div.className = `ai-msg ${role}`;
-
-  // Format markdown-lite: bold, newlines
-  const formatted = content
-    .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\n/g, "<br>");
-
-  let html = `<div class="ai-bubble">${formatted}</div>`;
-  if (role === "assistant") html += `<div class="ai-bubble-src">ARCHI//INDEX · Llama 3.3 70B</div>`;
-
-  // Resource chips
-  if (resourceLinks.length) {
-    html += `<div class="ai-res-chips">`;
-    resourceLinks.forEach(({name, url}) => {
-      html += `<a class="ai-res-chip" href="${url}" target="_blank" rel="noopener">${name}</a>`;
-    });
-    html += `</div>`;
+/* Markdown sûr : tout est échappé d'abord, puis mis en forme */
+function mdInline(s){
+  return s
+    .replace(/&lt;br\s*\/?&gt;/gi,"<br>")
+    .replace(/`([^`]+)`/g,"<code>$1</code>")
+    .replace(/\*\*([^*]+?)\*\*/g,"<strong>$1</strong>")
+    .replace(/(^|[^*\w])\*([^*\s][^*]*?)\*(?!\*)/g,"$1<em>$2</em>")
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g,'<a href="$2" target="_blank" rel="noopener noreferrer">$1</a>')
+    .replace(/(^|[\s(])(https?:\/\/[^\s<)]+[^\s<).,;:!?])/g,'$1<a href="$2" target="_blank" rel="noopener noreferrer">$2</a>');
+}
+function mdToHtml(src){
+  const R=esc(src).replace(/\r/g,"").split("\n"),out=[];let i=0;
+  const isRow=l=>/^\s*\|.*\|\s*$/.test(l);
+  const BLOCK=/^\s*(#{1,6}\s|[-*•]\s|\d+[.)]\s|&gt;|\|)/;
+  while(i<R.length){
+    const l=R[i];let m;
+    if(!l.trim()){i++;continue;}
+    if((m=l.match(/^\s*#{1,6}\s+(.*)$/))){out.push(`<h4>${mdInline(m[1])}</h4>`);i++;continue;}
+    if(/^\s*(-{3,}|\*{3,}|_{3,})\s*$/.test(l)){out.push("<hr>");i++;continue;}
+    if(isRow(l)&&i+1<R.length&&/^\s*\|?\s*:?-{2,}/.test(R[i+1])){
+      const cells=r=>r.trim().replace(/^\|/,"").replace(/\|$/,"").split("|").map(c=>mdInline(c.trim()));
+      const head=cells(l);i+=2;const rows=[];
+      while(i<R.length&&isRow(R[i])){rows.push(cells(R[i]));i++;}
+      out.push(`<div class="tbl"><table><thead><tr>${head.map(c=>`<th>${c}</th>`).join("")}</tr></thead><tbody>${rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</tbody></table></div>`);
+      continue;
+    }
+    if(/^\s*[-*•]\s+/.test(l)){const it=[];while(i<R.length&&/^\s*[-*•]\s+/.test(R[i])){it.push(R[i].replace(/^\s*[-*•]\s+/,""));i++;}out.push(`<ul>${it.map(x=>`<li>${mdInline(x)}</li>`).join("")}</ul>`);continue;}
+    if((m=l.match(/^\s*(\d+)[.)]\s+/))){const start=+m[1],it=[];while(i<R.length&&/^\s*\d+[.)]\s+/.test(R[i])){it.push(R[i].replace(/^\s*\d+[.)]\s+/,""));i++;}out.push(`<ol${start>1?` start="${start}"`:""}>${it.map(x=>`<li>${mdInline(x)}</li>`).join("")}</ol>`);continue;}
+    if(/^\s*&gt;\s?/.test(l)){const it=[];while(i<R.length&&/^\s*&gt;\s?/.test(R[i])){it.push(R[i].replace(/^\s*&gt;\s?/,""));i++;}out.push(`<blockquote>${it.map(mdInline).join("<br>")}</blockquote>`);continue;}
+    const p=[l];i++;
+    while(i<R.length&&R[i].trim()&&!BLOCK.test(R[i]))p.push(R[i++]);
+    out.push(`<p>${p.map(mdInline).join("<br>")}</p>`);
   }
-
-  div.innerHTML = html;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
+  return out.join("");
 }
-
-function showTyping() {
-  const msgs = document.getElementById("aiMessages");
-  const div = document.createElement("div");
-  div.className = "ai-msg assistant";
-  div.id = "aiTyping";
-  div.innerHTML = `<div class="ai-bubble"><div class="ai-typing"><span></span><span></span><span></span></div></div>`;
-  msgs.appendChild(div);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function removeTyping() {
-  const t = document.getElementById("aiTyping");
-  if (t) t.remove();
-}
-
-function parseResourceLinks(text) {
-  const links = [];
-  const lines = text.split("\n");
-  lines.forEach(line => {
-    const match = line.match(/\[(.+?)\]\|\|\|(.+)/);
-    if (match) links.push({ name: match[1].trim(), url: match[2].trim() });
+function parseResourceLinks(text){
+  const links=[],seen=new Set();
+  text.split("\n").forEach(line=>{
+    const m=line.match(/\[(.+?)\]\|\|\|\s*\[?(https?:\/\/[^\s\]]+)\]?/);
+    if(m&&!seen.has(m[2])){seen.add(m[2]);links.push({name:m[1].trim(),url:m[2].trim()});}
   });
   return links;
 }
+function stripResourceLines(text){return text.replace(/^\s*\[[^\]\n]*\]\|.*$/gm,"").replace(/\n{3,}/g,"\n\n").trim();}
 
-function cleanResponse(text) {
-  // Remove the [NOM]|||[URL] lines from displayed text
-  return text.replace(/\[.+?\]\|\|\|.+\n?/g, "").trim();
+function nearBottom(){const b=$("aiMessages");return b.scrollHeight-b.scrollTop-b.clientHeight<80;}
+function scrollChat(force){const b=$("aiMessages");if(force||nearBottom())b.scrollTop=b.scrollHeight;updateToBottom();}
+function updateToBottom(){const b=$("aiMessages");$("toBottom").hidden=!$("aiMessages").querySelector(".msg-u")||b.scrollHeight-b.scrollTop-b.clientHeight<140;}
+$("aiMessages").addEventListener("scroll",updateToBottom,{passive:true});
+$("toBottom").addEventListener("click",()=>{const b=$("aiMessages");b.scrollTo({top:b.scrollHeight,behavior:"smooth"});});
+
+function addUserMsg(q){const d=document.createElement("div");d.className="msg-u";d.textContent=q;$("aiMessages").appendChild(d);}
+function addAssistantMsg(){
+  const d=document.createElement("div");d.className="msg-a";
+  d.innerHTML=`<div class="mark">${MARK}</div><div class="md"><span class="thinking">${SPIN}Réflexion en cours…</span></div>`;
+  $("aiMessages").appendChild(d);
+  return d.querySelector(".md");
 }
+function renderAssistant(md,raw,final){
+  const stick=nearBottom();
+  const text=aiMode==="recherche"?stripResourceLines(raw):raw;
+  md.innerHTML=mdToHtml(text);
+  if(final&&aiMode==="recherche"){
+    const links=parseResourceLinks(raw);
+    if(links.length)md.insertAdjacentHTML("beforeend",`<div class="rchips">${links.map(l=>`<a class="rchip" href="${esc(l.url)}" target="_blank" rel="noopener noreferrer">${esc(l.name)}${ic("arrowUpRight",13)}</a>`).join("")}</div>`);
+  }
+  if(stick)scrollChat(true);else updateToBottom();
+}
+function setSendMode(busy){
+  const b=$("aiSend");
+  b.classList.toggle("stop",busy);
+  b.innerHTML=busy?ic("stop",18):ic("arrowUp",18);
+  const lbl=busy?"Arrêter la réponse":"Envoyer";b.setAttribute("aria-label",lbl);b.title=lbl;
+  b.disabled=!busy&&!$("aiInput").value.trim();
+}
+function stopAi(){aiAbort?.abort();}
+$("aiSend").addEventListener("click",()=>{if(aiBusy)stopAi();else sendMessage();});
+const aiInput=$("aiInput");
+function autoGrow(){aiInput.style.height="36px";aiInput.style.height=Math.min(aiInput.scrollHeight,140)+"px";}
+aiInput.addEventListener("input",()=>{autoGrow();if(!aiBusy)$("aiSend").disabled=!aiInput.value.trim();});
+aiInput.addEventListener("keydown",e=>{if(e.key==="Enter"&&!e.shiftKey&&!e.isComposing){e.preventDefault();if(!aiBusy)sendMessage();}});
 
-async function sendMessage() {
-  const key = getGroqKey();
-  if (!key) { showKeyPrompt(); return; }
-
-  const input = document.getElementById("aiInput");
-  const q = input.value.trim();
-  if (!q) return;
-
-  input.value = "";
-  input.style.height = "42px";
-  document.getElementById("aiSend").disabled = true;
-
-  appendMessage("user", q);
-  aiMessages.push({ role: "user", content: q });
-
-  showTyping();
-
-  try {
-    const resp = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${key}`
-      },
-      body: JSON.stringify({
-        model: GROQ_MODEL,
-        messages: [
-          { role: "system", content: systemPrompts[aiMode] },
-          ...aiMessages
-        ],
-        max_tokens: 1200,
-        temperature: 0.5
-      })
-    });
-
-    if (resp.status === 401) {
-      removeTyping();
-      appendMessage("assistant", "❌ Clé API invalide ou révoquée. Clique sur **Changer la clé** pour en saisir une nouvelle.");
-      localStorage.removeItem("archiGroqKey");
-      document.getElementById("aiSend").disabled = false;
-      return;
+async function sendMessage(preset){
+  if(aiBusy)return;
+  const q=(preset??aiInput.value).trim();
+  if(!q)return;
+  const key=getGroqKey();
+  if(!key){showKeyPrompt();return;}
+  aiInput.value="";autoGrow();
+  $("aiWelcome")?.remove();$("aiKeyPrompt")?.remove();
+  addUserMsg(q);aiMessages.push({role:"user",content:q});
+  const md=addAssistantMsg();scrollChat(true);
+  aiBusy=true;setSendMode(true);
+  aiAbort=new AbortController();
+  const mode=aiMode;
+  let raw="",errMsg=null,stopped=false;
+  try{
+    const resp=await fetch(GROQ_URL,{method:"POST",signal:aiAbort.signal,
+      headers:{"Content-Type":"application/json","Authorization":`Bearer ${key}`},
+      body:JSON.stringify({model:GROQ_MODEL,messages:[{role:"system",content:systemPrompts[mode]},...aiMessages],
+        max_completion_tokens:2500,reasoning_effort:"low",include_reasoning:false,temperature:0.5,stream:true})});
+    if(!resp.ok){
+      const data=await resp.json().catch(()=>({}));
+      const why=data.error?.message||"";
+      if(resp.status===401){forgetGroqKey();updateKeyStatus();errMsg="Clé Groq invalide ou révoquée — enregistre une nouvelle clé avec le bouton « Clé Groq ».";}
+      else if(resp.status===429)errMsg="Trop de demandes d’affilée (ou quota Groq atteint) — patiente une minute puis réessaie.";
+      else if(resp.status===403||resp.status===404)errMsg=`Groq refuse le modèle ${GROQ_MODEL} (${resp.status}). Vérifie qu’il est autorisé dans les limites de ton projet Groq. ${why}`;
+      else errMsg=`Groq a répondu une erreur (${resp.status})${why?" : "+why:""}.`;
+    }else{
+      const reader=resp.body.getReader(),dec=new TextDecoder();let buf="";
+      for(;;){
+        const {done,value}=await reader.read();if(done)break;
+        buf+=dec.decode(value,{stream:true});
+        let nl;
+        while((nl=buf.indexOf("\n"))>=0){
+          const line=buf.slice(0,nl).trim();buf=buf.slice(nl+1);
+          if(!line.startsWith("data:"))continue;
+          const d=line.slice(5).trim();if(!d||d==="[DONE]")continue;
+          let j;try{j=JSON.parse(d);}catch(e){continue;}
+          if(j.error){errMsg=`Groq : ${j.error.message||"erreur pendant la réponse"}`;continue;}
+          const c=j.choices?.[0]?.delta?.content;
+          if(c){raw+=c;renderAssistant(md,raw,false);}
+        }
+      }
     }
-
-    const data = await resp.json();
-    const raw = data.choices?.[0]?.message?.content || "Désolée, je n'ai pas pu générer une réponse.";
-
-    const resourceLinks = aiMode === "recherche" ? parseResourceLinks(raw) : [];
-    const cleaned = aiMode === "recherche" ? cleanResponse(raw) : raw;
-
-    removeTyping();
-    appendMessage("assistant", cleaned, resourceLinks);
-    aiMessages.push({ role: "assistant", content: raw });
-
-  } catch(e) {
-    removeTyping();
-    appendMessage("assistant", "Une erreur est survenue. Vérifie ta connexion et réessaie.");
+  }catch(e){
+    if(e.name==="AbortError")stopped=true;
+    else errMsg="Connexion impossible — vérifie ta connexion internet et réessaie.";
   }
-
-  document.getElementById("aiSend").disabled = false;
-}
-
-// Auto-resize textarea
-document.getElementById("aiInput").addEventListener("input", function() {
-  this.style.height = "42px";
-  this.style.height = Math.min(this.scrollHeight, 120) + "px";
-});
-document.getElementById("aiInput").addEventListener("keydown", function(e) {
-  if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendMessage(); }
-});
-
-function showKeyPrompt() {
-  const msgs = document.getElementById("aiMessages");
-  // Remove existing prompt if any
-  const existing = document.getElementById("aiKeyPrompt");
-  if (existing) { existing.remove(); return; }
-
-  const div = document.createElement("div");
-  div.id = "aiKeyPrompt";
-  div.className = "ai-key-prompt";
-  div.innerHTML = `
-    <p>Pour utiliser l'assistant, saisis ta <strong>clé API Groq</strong> (gratuite sur <a href="https://console.groq.com" target="_blank" style="color:var(--gold)">console.groq.com</a>).<br>
-    Elle sera stockée <strong>uniquement dans ton navigateur</strong> — jamais dans le code.</p>
-    <div class="ai-key-row">
-      <input type="password" class="ai-key-input" id="aiKeyInput" placeholder="gsk_…" autocomplete="off">
-      <button class="ai-key-save" onclick="saveKey()">Sauvegarder</button>
-    </div>
-    <div class="ai-key-note">Raccourci : Entrée pour valider. La clé reste en localStorage entre sessions.</div>`;
-
-  msgs.insertBefore(div, msgs.firstChild);
-  document.getElementById("aiKeyInput").focus();
-  document.getElementById("aiKeyInput").addEventListener("keydown", e => {
-    if (e.key === "Enter") saveKey();
-  });
-}
-
-function saveKey() {
-  const val = document.getElementById("aiKeyInput")?.value?.trim();
-  if (!val || !val.startsWith("gsk_")) {
-    document.getElementById("aiKeyInput").style.borderColor = "rgba(200,80,80,.5)";
-    return;
+  if(raw){
+    aiMessages.push({role:"assistant",content:raw});
+    renderAssistant(md,raw,true);
+    if(stopped)md.insertAdjacentHTML("beforeend",`<p class="msg-note">Réponse interrompue.</p>`);
+    if(errMsg)md.insertAdjacentHTML("beforeend",`<p class="msg-err">${esc(errMsg)}</p>`);
+  }else{
+    aiMessages.pop();
+    md.innerHTML=stopped?`<p class="msg-note">Réponse interrompue.</p>`:`<p class="msg-err">${esc(errMsg||"Aucune réponse reçue — réessaie.")}</p>`;
   }
-  saveGroqKey(val);
-  document.getElementById("aiKeyPrompt")?.remove();
-  updateKeyStatus();
-  clearChat();
-  appendMessage("assistant", "✅ Clé API configurée ! Tu peux maintenant poser tes questions. Essaie un des sujets suggérés ou écris directement ta question.");
+  aiBusy=false;aiAbort=null;setSendMode(false);scrollChat();
 }
 
-function updateKeyStatus() {
-  const el = document.getElementById("keyStatus");
-  if (!el) return;
-  el.textContent = getGroqKey() ? "✓ Configurée" : "Non configurée";
-}
-
-// ── INIT AI ──
-renderSuggestions();
-setTimeout(() => {
-  updateKeyStatus();
-  if (!getGroqKey()) {
-    const welcome = document.getElementById("aiWelcome");
-    if (welcome) welcome.innerHTML = `
-      <div class="ai-welcome-title">Assistant <em>Architecture</em></div>
-      <div class="ai-welcome-sub">Configure ta clé API Groq pour démarrer — clique sur <strong>🔑 Clé API Groq</strong> dans la sidebar, ou sur le bouton ci-dessous.</div>
-      <br><button class="ai-sug-chip" style="margin:0 auto;display:inline-block;" onclick="showKeyPrompt()">🔑 Configurer ma clé Groq</button>`;
-  }
-}, 100);
-
-/* ── SOURCES INTERNATIONALES (fusionnées dans l'Index) ── */
-const intlSources = [
-  // INTERNATIONAL
-  {pays:"international",flag:"🌐",name:"UNESCO World Heritage — Architecture",url:"https://whc.unesco.org/en/list/",desc:"Liste des 1200+ sites du patrimoine mondial avec fiches, plans, photos et dossiers de nomination. Référence incontournable pour l'architecture à valeur universelle.",access:"free",tip:"Chercher par catégorie « Cultural » et filtrer par période ou pays. Les dossiers de nomination PDF sont téléchargeables et constituent des sources académiques de premier rang."},
-  {pays:"international",flag:"🌐",name:"ICOMOS — Chartes & Archives",url:"https://www.icomos.org/charters-and-doctrinal-texts/",desc:"Toutes les chartes doctrinales de l'ICOMOS (Venise, Florence, Burra, Cracovie…) en accès libre. Fondements théoriques incontournables de la conservation du patrimoine architectural mondial.",access:"free",tip:"Les chartes sont en plusieurs langues dont le français. Indispensables pour tout mémoire sur la restauration ou la conservation du patrimoine — à citer directement dans les bibliographies."},
-  {pays:"international",flag:"🌐",name:"DOCOMOMO International",url:"https://www.docomomo.com",desc:"Organisation internationale pour la documentation et conservation du mouvement moderne. Registres de bâtiments modernes à protéger, publications et ressources sur l'architecture du XXe siècle dans le monde entier.",access:"free",tip:"La base de données des registres DOCOMOMO par pays est une référence pour tout travail sur le patrimoine moderniste. Les dossiers ISU (International Selection Unique) sont téléchargeables."},
-  {pays:"international",flag:"🌐",name:"Archnet — Architecture islamique MIT",url:"https://archnet.org",desc:"Ressource open access dédiée à l'architecture et l'urbanisme des cultures musulmanes, développée par le MIT et l'Aga Khan Trust. Projets, bibliothèque, images et publications en accès libre.",access:"free",tip:"Riche en plans, photos d'archives et études de cas sur l'architecture du Moyen-Orient, d'Afrique du Nord et d'Asie centrale. Excellent pour les typologies de mosquées, medersas et espaces publics."},
-  {pays:"international",flag:"🌐",name:"SAH Archipedia",url:"https://sah-archipedia.org",desc:"Encyclopédie en ligne de l'architecture mondiale publiée par la Society of Architectural Historians. Histories, photos et cartes de milliers de bâtiments avec bibliographies de référence.",access:"free",tip:"Chaque notice inclut des références bibliographiques vérifiées — très utile pour constituer une bibliographie sur un bâtiment ou un architecte spécifique."},
-  {pays:"international",flag:"🌐",name:"Colossus — Architecture Magazine Archive",url:"https://www.usmodernist.org",desc:"Plus de 5 millions de pages de revues d'architecture modernistes américaines téléchargeables gratuitement. Arts & Architecture, Architectural Forum, Progressive Architecture, Architectural Record...",access:"free",tip:"Rechercher directement par revue puis parcourir par décennie. Arts & Architecture (1929-1967) est particulièrement précieuse pour les Case Study Houses et le modernisme californien."},
-  {pays:"international",flag:"🌐",name:"Archis / Volume Magazine",url:"https://archis.org",desc:"Revue néerlandaise d'architecture critique et d'urbanisme, plateforme de débat international. Articles en anglais sur l'architecture contemporaine et ses enjeux sociaux et politiques.",access:"partial",tip:"Les archives en ligne sont partiellement gratuites. Fortes sur les thèmes urbains critiques, le logement et les questions territoriales — utile pour les mémoires à dimension théorique."},
-
-  // FRANCE
-  {pays:"france",flag:"🇫🇷",name:"Cité de l'Architecture — Portail Documentaire",url:"https://portaildocumentaire.citedelarchitecture.fr",desc:"Portail de la Cité de l'architecture et du patrimoine — revues patrimoniales numérisées, livres anciens libres de droits, archives d'architectes contemporains français depuis la fin du XIXe siècle.",access:"free",tip:"Les revues numérisées incluent L'Architecture, La Construction Moderne, L'Architecte — des sources primaires précieuses pour l'architecture française du XXe siècle."},
-  {pays:"france",flag:"🇫🇷",name:"POP — Plateforme Ouverte du Patrimoine",url:"https://pop.culture.gouv.fr",desc:"Portail du Ministère de la Culture regroupant 8 bases dont Mérimée (275k bâtiments protégés) et Mémoire (600k photographies du patrimoine français). Nouvellement refondu en décembre 2025.",access:"free",tip:"Utiliser le filtre par base pour accéder à Mérimée (architecture) ou Mémoire (photos). La recherche par commune + époque est très efficace pour cibler des bâtiments spécifiques."},
-  {pays:"france",flag:"🇫🇷",name:"Médiathèque du Patrimoine (MPP)",url:"https://www.mediatheque-patrimoine.culture.gouv.fr",desc:"Service national conservant toutes les archives des travaux sur monuments historiques, fonds photographiques, dossiers des architectes en chef. Des millions de documents sur le patrimoine bâti français.",access:"partial",tip:"Le catalogue en ligne permet d'identifier les fonds. Les dossiers de monument historique sont consultables en salle de lecture à Charenton-le-Pont — réserver à l'avance par courriel."},
-  {pays:"france",flag:"🇫🇷",name:"FRAC Centre-Val de Loire",url:"https://www.frac-centre.fr",desc:"Troisième collection d'art et d'architecture au monde après le Centre Pompidou et le MoMA. Architecture expérimentale et radicale des années 1950 à nos jours — 1200+ maquettes, 17000+ dessins d'architectes.",access:"partial",tip:"Le catalogue de collection est consultable en ligne. Les expositions ArchiLab sont de référence pour l'architecture d'avant-garde. Collection idéale pour étudier les utopies architecturales."},
-
-  // ITALIE
-  {pays:"italie",flag:"🇮🇹",name:"Fondazione Zeri — Photothèque",url:"https://fondazionezeri.unibo.it/en",desc:"Archive photographique de Federico Zeri — 290.000+ images d'architecture et d'art italien de toutes les périodes, librement consultables et téléchargeables en haute résolution pour la recherche.",access:"free",tip:"Rechercher par architecte, lieu ou période. Forte sur l'architecture de la Renaissance et du baroque italien. Images téléchargeables en haute résolution pour usage académique."},
-  {pays:"italie",flag:"🇮🇹",name:"MAXXI — Collections Architecture",url:"https://www.maxxi.art/en/collections/architecture/",desc:"Collections d'architecture du Musée national des arts du XXIe siècle (Rome) — dessins originaux, maquettes et archives d'architectes italiens et internationaux contemporains dont Zaha Hadid.",access:"partial",tip:"Le catalogue en ligne donne accès aux fonds. Pour la consultation physique des archives, prendre contact avec le Centre de documentation du MAXXI à Rome."},
-  {pays:"italie",flag:"🇮🇹",name:"Treccani — Architecture",url:"https://www.treccani.it/enciclopedia/architettura",desc:"Encyclopédie italienne de référence avec entrées approfondies sur l'architecture, les architectes, les styles et les monuments. Textes académiques rédigés par des spécialistes.",access:"free",tip:"En italien, mais les entrées sur les grands architectes et styles européens sont des synthèses de référence. Utile pour vérifier des dates, noms et informations factuelles."},
-  {pays:"italie",flag:"🇮🇹",name:"Domus Archive",url:"https://www.domusweb.it/en/archivio.html",desc:"Archive de la revue Domus, fondée en 1928 — l'une des publications d'architecture les plus influentes au monde. Articles et projets sur l'architecture italienne et internationale contemporaine.",access:"partial",tip:"Les archives complètes sont accessibles sur abonnement, mais de nombreux articles récents sont en accès libre. Indispensable pour suivre la pensée critique architecturale italienne."},
-
-  // ROYAUME-UNI
-  {pays:"uk",flag:"🇬🇧",name:"Historic England Archive",url:"https://historicengland.org.uk/images-books/archive/",desc:"Plus d'un million de photographies, plans et dessins du patrimoine bâti anglais depuis 1850. Inclut la collection Aerofilms (photos aériennes 1919-1953) téléchargeables en haute résolution.",access:"free",tip:"La recherche par lieu, type de bâtiment ou période est très précise. Les photos aériennes historiques permettent de reconstituer l'évolution urbaine de n'importe quelle ville anglaise."},
-  {pays:"uk",flag:"🇬🇧",name:"Canmore — Patrimoine Écossais",url:"https://canmore.org.uk",desc:"Base nationale des monuments et bâtiments historiques d'Écosse — 300.000+ notices avec photos, plans et documents historiques. Géré par Historic Environment Scotland.",access:"free",tip:"Couvre l'architecture vernaculaire écossaise avec une exhaustivité remarquable. Les séries de photos d'archives permettent de voir l'évolution d'un bâtiment ou d'un quartier dans le temps."},
-  {pays:"uk",flag:"🇬🇧",name:"C20 Society — Patrimoine XXe siècle",url:"https://c20society.org.uk",desc:"Société de préservation de l'architecture britannique du XXe siècle (depuis 1914). Publications, listes de bâtiments en danger, ressources sur le modernisme et le brutalisme anglais.",access:"free",tip:"La « Buildings at Risk » list est une ressource unique pour identifier les bâtiments modernistes britanniques menacés. Le C20 Journal PDF est téléchargeable gratuitement pour les membres."},
-  {pays:"uk",flag:"🇬🇧",name:"Archives Hub UK",url:"https://archiveshub.jisc.ac.uk",desc:"Portail d'accès unifié aux archives de plus de 300 universités et institutions culturelles britanniques. Idéal pour localiser les fonds d'archives d'architectes et designers britanniques.",access:"free",tip:"Rechercher par nom d'architecte ou par institution pour identifier les fonds archivistiques disponibles. Les notices pointent vers les collections physiques et éventuellement numériques."},
-  {pays:"uk",flag:"🇬🇧",name:"Architectural Association — Archive",url:"https://www.aaschool.ac.uk/AALIFE/LIBRARY/aaarchive.php",desc:"Archives de l'Architectural Association de Londres — l'une des écoles d'architecture les plus influentes au monde. Projets étudiants historiques, conférences et publications depuis 1847.",access:"partial",tip:"Le catalogue d'archives est consultable en ligne. L'AA dispose d'un fonds exceptionnel sur les avant-gardes architecturales des années 1960-1980 (Archigram, etc.)."},
-
-  // ALLEMAGNE & AUTRICHE
-  {pays:"allemagne",flag:"🇩🇪",name:"Bauhaus-Archiv Berlin",url:"https://www.bauhaus.de/en/",desc:"Archive officielle du Bauhaus — documents originaux, dessins, photographies et publications de l'école fondée par Gropius en 1919. Catalogue en ligne avec objets numérisés accessibles.",access:"partial",tip:"L'outil de recherche en ligne donne accès à des milliers d'objets numérisés. Contacter le Bauhaus-Archiv directement pour les recherches approfondies sur un enseignant ou une période."},
-  {pays:"allemagne",flag:"🇩🇪",name:"Deutsches Architekturmuseum — DAM",url:"https://dam-online.de",desc:"Musée allemand de l'architecture (Francfort) — une des plus grandes collections de dessins et maquettes d'architecture au monde. Catalogue en ligne, publications et archives numérisées.",access:"partial",tip:"Le DAM publie des monographies de référence et organise les expositions phares sur l'architecture allemande contemporaine. Le catalogue en ligne est consultable librement."},
-  {pays:"allemagne",flag:"🇩🇪",name:"Wien Geschichte Wiki",url:"https://www.geschichtewiki.wien.gv.at",desc:"Encyclopédie historique de la Ville de Vienne — architecture, urbanisme, biographies d'architectes (Wagner, Loos, Hoffmann…), plans historiques et photos. Référence pour la Sécession viennoise.",access:"free",tip:"Rechercher directement en allemand par nom d'architecte ou de bâtiment. Couvre exceptionnellement bien l'architecture de la Ringstrasse et du Jugendstil viennois."},
-  {pays:"allemagne",flag:"🇩🇪",name:"Deutsche Digitale Bibliothek",url:"https://www.deutsche-digitale-bibliothek.de",desc:"Bibliothèque numérique nationale allemande — millions d'objets culturels numérisés issus de milliers d'institutions, dont archives et collections d'architecture.",access:"free",tip:"Filtrer par « Architektur » dans la recherche par sujet. Donne accès aux fonds numérisés de nombreux musées et archives régionaux allemands."},
-
-  // PAYS-BAS & FLANDRE
-  {pays:"paysbas",flag:"🇳🇱",name:"Het Nieuwe Instituut — Collectie",url:"https://zoeken.nieuweinstituut.nl/en",desc:"Portail de recherche des collections du Nieuwe Instituut — 1,4 million de dessins, 300.000 photos et 3000 maquettes d'architectes néerlandais. Archive nationale hollandaise d'architecture et d'urbanisme.",access:"free",tip:"Rechercher directement par nom d'architecte (OMA, MVRDV, Van Eyck, Bakema, Hertzberger…). Plus de 140.000 images numérisées accessibles en ligne, reste consultable sur place à Rotterdam."},
-  {pays:"paysbas",flag:"🇳🇱",name:"Rijksdienst Cultureel Erfgoed",url:"https://www.cultureelerfgoed.nl",desc:"Service national néerlandais du patrimoine culturel — base de données complète des monuments protégés des Pays-Bas, photographies historiques, cartes et documentation architecturale.",access:"free",tip:"La base de données des monuments (monumentenregister.cultureelerfgoed.nl) est très complète et inclut des photos d'archives et des dates de protection. Interface en néerlandais."},
-  {pays:"paysbas",flag:"🇳🇱",name:"Onroerend Erfgoed Vlaanderen",url:"https://www.onroerenderfgoed.be",desc:"Agence du patrimoine immobilier flamand — base de données, publications de recherche et ressources sur l'architecture flamande. Pendant de la Rijksdienst pour la Flandre.",access:"free",tip:"Complémentaire aux inventaires belges francophones. Riche en architecture industrielle flamande, en Art Nouveau gantois et anversois, et en architecture vernaculaire rurale."},
-
-  // ESPAGNE & PORTUGAL
-  {pays:"espagne",flag:"🇪🇸",name:"Fundación Mies van der Rohe Barcelone",url:"https://miesbcn.com",desc:"Fondation dédiée à Mies van der Rohe et à l'architecture européenne contemporaine. Archive du Pavillon de Barcelone, ressources sur le modernisme et le Prix Mies van der Rohe UE.",access:"free",tip:"La section Archives du Pavillon de Barcelone (1929) comprend des plans originaux, photos et documentation historique. La base de données du Prix Mies référence l'architecture européenne contemporaine."},
-  {pays:"espagne",flag:"🇪🇸",name:"IPCE — Institut du Patrimoine Culturel Espagne",url:"https://ipce.culturaydeporte.gob.es",desc:"Institut du Patrimoine Culturel d'Espagne — dossiers de monuments nationaux, publications de restauration et conservation du patrimoine architectural espagnol.",access:"free",tip:"Forte en documentation technique de restauration. Les plans et relevés des grands monuments espagnols sont consultables dans les publications de l'IPCE, téléchargeables en PDF."},
-  {pays:"espagne",flag:"🇪🇸",name:"SIPA — Patrimoine Architectural Portugal",url:"https://www.patrimoniocultural.gov.pt",desc:"Portail du patrimoine culturel portugais — inventaire du patrimoine architectural, dossiers de monuments nationaux, publications sur le patrimoine bâti ibérique.",access:"free",tip:"La base SIPA (Sistema de Informação para o Património Arquitectónico) contient des milliers de fiches avec plans et photos. Interface multilingue partiellement disponible."},
-
-  // USA
-  {pays:"usa",flag:"🇺🇸",name:"Getty Conservation Institute",url:"https://www.getty.edu/conservation",desc:"Institut américain de référence pour la conservation du patrimoine architectural mondial. Publications gratuites téléchargeables (PDF), recherches sur le modernisme, matériaux et techniques.",access:"free",tip:"Les publications GCI sont téléchargeables gratuitement — en particulier 'Conserving Modern Architecture' et les Preserving Modern Architecture PDFs. Références incontournables en conservation."},
-  {pays:"usa",flag:"🇺🇸",name:"SAH — Society of Architectural Historians",url:"https://www.sah.org",desc:"Principale société académique d'histoire de l'architecture aux USA. JSAH (Journal), Archipedia et listes de dissertations. Référence pour la recherche historique en architecture.",access:"partial",tip:"Le Journal of the Society of Architectural Historians (JSAH) est accessible via JSTOR. SAH Archipedia est en accès libre. Les listes de dissertations permettent de cartographier la recherche en cours."},
-  {pays:"usa",flag:"🇺🇸",name:"MIT OpenCourseWare — Architecture",url:"https://ocw.mit.edu/search/?d=Architecture",desc:"Cours complets du MIT en architecture et urbanisme en accès libre — syllabus, lectures, notes de cours, bibliographies. Ressource pédagogique exceptionnelle pour un master.",access:"free",tip:"Les cours de Kenneth Frampton, Reinhold Martin et des autres professeurs du MIT incluent des bibliographies très complètes — idéales pour construire une bibliographie de mémoire."},
-  {pays:"usa",flag:"🇺🇸",name:"NYPL — Collections Architecture & Cartes",url:"https://digitalcollections.nypl.org/search/index?utf8=%E2%9C%93&keywords=architecture",desc:"Collections numériques de la New York Public Library — cartes historiques, plans d'architecture, photographies et documents d'époque, librement téléchargeables.",access:"free",tip:"Filtrer par type 'Still Image' et 'Maps' pour les documents architecturaux. Les plans de NYC anciens sont particulièrement détaillés. Téléchargement en haute résolution gratuit."},
-  {pays:"usa",flag:"🇺🇸",name:"Case Study Houses — Archive.org",url:"https://archive.org/details/arts-and-architecture",desc:"Archive complète de la revue Arts & Architecture (1943-1967) — le programme Case Study Houses, qui a redéfini l'architecture domestique moderne californienne. John Entenza, Eames, Neutra, Koenig...",access:"free",tip:"Télécharger directement les numéros PDF par année. Les numéros de 1945 à 1966 contiennent les Case Study Houses avec plans originaux et photos de Julius Shulman."},
-];
-
-/* ── INIT PAYS FILTERS ── */
-function initPaysFilters(){
-  const pf=document.getElementById("paysFilters");
-  pf.innerHTML=`<span class="filter-label">Région —</span>`+
-    Object.entries(paysLabels).map(([k,v])=>
-      `<button class="filter-btn${k==="all"?" active":""}" data-pays="${k}" onclick="setPays(this,'${k}')">${v} <span style="opacity:.45;font-size:.85em">(${k==="all"?intlSources.length:intlSources.filter(s=>s.pays===k).length})</span></button>`
-    ).join("");
-}
-function setPays(btn,pays){
-  activePays=pays;
-  document.querySelectorAll("#paysFilters .filter-btn").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-  if(pays!=="all"){
-    activeCat="all";
-    document.querySelectorAll("#catFilters .filter-btn").forEach(b=>b.classList.toggle("active",b.dataset.cat==="all"));
-  }
-  renderIdx();
-}
-
-/* ── INIT FINAL — après intlSources ── */
-document.getElementById("totalCount").textContent=getAllRes().length;
-initPaysFilters();
-renderIdx();
-renderFavs();
+/* ══════════ DÉMARRAGE ══════════ */
+applyTheme(document.documentElement.classList.contains("dark")?"dark":"light");
+syncFontSeg();
+$("totalCount").textContent=ALL.length;
+renderFeat();renderFilters();renderIdx();
+updateFavCount();renderHist();updateSearchBtn();
+computeVisible();renderCarteFilters();renderInstList();
+$("modeDesc").textContent=MODE_DESC[aiMode];
+updateKeyStatus();clearChat();setSendMode(false);
+if(location.hash.length>1)switchTab(location.hash.slice(1),{instant:true});
 </script>
 </body>
 </html>
